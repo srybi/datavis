@@ -10,8 +10,9 @@ Datavis ist ein Projekt im Rahmen der **Software Engineering Praxis (WIF)** Vera
     ├── Application                  # tbd
     │   ├── src                 
     │   ├── test         
-    │   └── gui                     
+    │   └── gui                 
     ├── Documents                    # Documentation files 
+    │   └── Images                   
     ├── Data                         # Data provide by Ericsson
     └── README.md
     
