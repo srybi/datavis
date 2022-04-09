@@ -16,5 +16,17 @@ Datavis ist ein Projekt im Rahmen der **Software Engineering Praxis (WIF)** Vera
     ├── Data                         # Data provide by Ericsson
     └── README.md
     
+### Git Workflow
+- Primär Branches: **prod**, **dev**
+- Push auf Primär Branches ist nicht möglich
+- Hierarchie: **prod**, **dev**, **feature/bug/fix branches**
+  - ALLE neuen branches müssen auf **dev** basieren und durch Merge Request in **dev** gemerged werden.
+  - In **prod** wird nur von **dev** gemerged
+- Merge Requests
+  - Merge in **dev**: 2 Augen Prinzip (nicht Autor selbst)
+  - Merge in **prod**: 4 Augen Prinzip (nicht Autor selbst)
+  - Fast forward Merge
+  
+
 ### Installation
 tbd
