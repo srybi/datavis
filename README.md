@@ -7,12 +7,16 @@ Datavis ist ein Projekt im Rahmen der **Software Engineering Praxis (WIF)** Vera
 ## Getting Started
 ### Verzeichnisstruktur
     .
-    ├── Application                  # tbd
+    ├── app                          # Andorid Studio Application
     │   ├── src
-    │   ├── test
-    │   └── gui
+    │   |   ├── main
+    |   |   ├── test
+    │   |   └── andoridTest
+    |   └── miscellaneous scripts
     ├── Data                         # Data provide by Ericsson
-    └── README.md
+    ├── miscellaneous scripts
+    ├── .gitignore
+    └── README.md                    # You are here
 
 ### Git Workflow
 - Primär Branches: **prod**, **dev**
@@ -27,4 +31,34 @@ Datavis ist ein Projekt im Rahmen der **Software Engineering Praxis (WIF)** Vera
 
 
 ### Installation
-tbd
+
+Vorbedinung: 
+- Android Studio Vesion 3.1 oder höher mit Android SDK Platform Version 7.0 (API-Level 24) oder höher.
+- Smartohone/Tablet mit Anddroid 7 (API-Level 24) oder höher.  
+- AR Core fähiges Smartohone/Tablet. Link zur Liste der AR unterstützenden Geräte  https://developers.google.com/ar/devices
+
+Erste Installation: 
+- Android Studio Installieren. 
+- datavis Projekt Clonen: Neu -> Neues Projekt von VCS -> von Version control: Git 
+- Clone Link ist auffindbar unter https://inf-git.th-rosenheim.de/sep-wif-22/datavis 
+- datavis Projekt in Android Studio öffnen. 
+- Datei -> Synchronisiere Gradle Datein im Projekt (Eng: File -> Sync Project with Gradle Files)
+
+
+Installation auf einem Android Gerät
+- Android Gerät per USB mit dem Rechner verbinden. 
+- In der Meüleiste sollte nun das Gerät im DropDown "Verfügbare Geräte" angezeigt werden. 
+- Klick auf den "Play" Button in der Menüleiste. 
+- datavis App wird auf dem verbundenem Gerät Installiert. 
+
+Info: 
+Die datavis Applikation wird nicht über den Google PlayStore verteilt. 
+Daher kann es vorkommen, dass die Installieren von Applikationen aus Unbekannten Quellen erlaubt werden muss.
+
+Dies kann sich je nach Android Version Unterscheiden. 
+Über die folgende Google Beispiel Suche kann herausgefunden werden wie 
+die Installieren von Applikationen aus Unbekannten Quellen erlaubt werden kann.
+
+Link: Beispiel Google Suche: android 7 installation von apps aus unbekannten quellen zulassen
+https://www.google.com/search?q=android+7+installation+von+apps+aus+unbekannten+quellen+zulassen
+
