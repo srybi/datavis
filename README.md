@@ -11,7 +11,7 @@ Datavis ist ein Projekt im Rahmen der **Software Engineering Praxis (WIF)** Vera
     │   ├── src
     │   |   ├── main
     |   |   ├── test
-    │   |   └── andoridTest
+    │   |   └── androidTest
     |   └── miscellaneous scripts
     ├── Data                         # Data provide by Ericsson
     ├── miscellaneous scripts
