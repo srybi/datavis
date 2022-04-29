@@ -1,9 +1,7 @@
 package de.th.ro.datavis;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.MotionEvent;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +29,6 @@ import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +39,6 @@ public class MainActivity extends AppCompatActivity implements
         ArFragment.OnViewCreatedListener {
 
     private ArFragment arFragment;
-    private Renderable model;
-    private Renderable sphereBlue;
     private ViewRenderable viewRenderable;
 
     private List<Renderable> renderableList = new ArrayList<>();
@@ -63,8 +58,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
-        //loadModels();
-        //loadSpheres();
         loadSphereList();
     }
 
@@ -93,87 +86,26 @@ public class MainActivity extends AppCompatActivity implements
         arSceneView.setFrameRateFactor(SceneView.FrameRate.FULL);
     }
 
-    public void loadModels() {
-        WeakReference<MainActivity> weakActivity = new WeakReference<>(this);
-
-        // Uri.parse("models/dragon.glb")
-
-
-        ModelRenderable.builder()
-                //.setSource(this, Uri.parse("https://storage.googleapis.com/ar-answers-in-search-models/static/Tiger/model.glb"))
-                .setSource(this, Uri.parse("models/hex.gltf"))
-                .setIsFilamentGltf(true)
-                .setAsyncLoadEnabled(true)
-                .build()
-                .thenAccept(model -> {
-                    MainActivity activity = weakActivity.get();
-                    if (activity != null) {
-                        activity.model = model;
-                    }
-                })
-                .exceptionally(throwable -> {
-                    Toast.makeText(
-                            this, "Unable to load model", Toast.LENGTH_LONG).show();
-                    return null;
-                });
-
-
-        ViewRenderable.builder()
-                .setView(this, R.layout.view_model_title)
-                .build()
-                .thenAccept(viewRenderable -> {
-                    MainActivity activity = weakActivity.get();
-                    if (activity != null) {
-                        activity.viewRenderable = viewRenderable;
-                    }
-                })
-                .exceptionally(throwable -> {
-                    Toast.makeText(this, "Unable to load model", Toast.LENGTH_LONG).show();
-                    return null;
-                });
-    }
-
-
-    private void loadSpheres(){
-
-        WeakReference<MainActivity> weakActivity = new WeakReference<>(this);
-
-
-        MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
-                .thenAccept(
-                        material -> {
-                            ModelRenderable redSphereRenderable = ShapeFactory.makeSphere(0.1f, new Vector3(0.0f, 0.15f, 0.0f), material);
-                            MainActivity activity = weakActivity.get();
-                            if (activity != null) {
-                                activity.model = redSphereRenderable;
-                            }
-
-                        });
-
-        MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.BLUE))
-                .thenAccept(
-                        material -> {
-                            ModelRenderable redSphereRenderable = ShapeFactory.makeSphere(0.2f, new Vector3(0.0f, 0.55f, 0.0f), material);
-
-                            MainActivity activity = weakActivity.get();
-                            if (activity != null) {
-                                activity.sphereBlue = redSphereRenderable;
-                            }
-
-                        });
-
-
-
-
-    }
-
-
     private void loadSphereList(){
 
-        WeakReference<MainActivity> weakActivity = new WeakReference<>(this);
+        float zOffsetAddition = 0.04f; // 1f = Meter
+        int repititionCount = 50; // *3
 
-        float zOffsetAddition = 0.02f; // 1f = Meter
-        int repititionCount = 200; // *3
+        float sphereRadius = 0.01f;
+        float cubeSize = 0.15f;
+
+        MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.MAGENTA))
+                .thenAccept(
+                        material -> {
+
+                            Vector3 size = new Vector3(cubeSize/2, cubeSize*3, cubeSize/2);
+                            Vector3 position = new Vector3(0f,0f + cubeSize/2,0f);
+
+                            ModelRenderable cube = ShapeFactory.makeCube(size, position, material);
+                            renderableList.add(cube);
+
+                        });
+
 
         MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
                 .thenAccept(
@@ -181,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements
                             float zOffset = 0;
                             for (int i = 0 ; i < repititionCount ; i++){
                                 zOffset += zOffsetAddition;
-                                ModelRenderable sphere = ShapeFactory.makeSphere(0.01f, new Vector3(0.0f, 0.0f + zOffset, 0.0f), material);
+                                ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, new Vector3(0.1f, 0.0f + zOffset, 0.0f), material);
                                 renderableList.add(sphere);
                             }
                         });
@@ -192,17 +124,7 @@ public class MainActivity extends AppCompatActivity implements
                             float zOffset = 0;
                             for (int i = 0 ; i < repititionCount ; i++){
                                 zOffset += zOffsetAddition;
-                                ModelRenderable sphere = ShapeFactory.makeSphere(0.01f, new Vector3(0.1f, 0.0f + zOffset, 0.0f), material);
-                                renderableList.add(sphere);
-                            }
-                        });
-        MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.GREEN))
-                .thenAccept(
-                        material -> {
-                            float zOffset = 0;
-                            for (int i = 0 ; i < repititionCount ; i++){
-                                zOffset += zOffsetAddition;
-                                ModelRenderable sphere = ShapeFactory.makeSphere(0.01f, new Vector3(-0.1f, 0.0f + zOffset, 0.0f), material);
+                                ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, new Vector3(-0.1f, 0.0f + zOffset, 0.0f), material);
                                 renderableList.add(sphere);
                             }
                         });
@@ -225,13 +147,6 @@ public class MainActivity extends AppCompatActivity implements
         AnchorNode anchorNode = new AnchorNode(anchor);
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-        // Create the transformable model and add it to the anchor.
-//        TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
-//        model.setParent(anchorNode);
-//        model.setRenderable(this.model)
-//                .animate(true).start();
-//        model.select();
-
 
         for (Renderable renderable : renderableList){
 
@@ -243,12 +158,5 @@ public class MainActivity extends AppCompatActivity implements
 
         }
 
-//        Model Title - not used
-//        Node titleNode = new Node();
-//        titleNode.setParent(model);
-//        titleNode.setEnabled(false);
-//        titleNode.setLocalPosition(new Vector3(0.0f, 1.0f, 0.0f));
-//        titleNode.setRenderable(viewRenderable);
-//        titleNode.setEnabled(true);
     }
 }
