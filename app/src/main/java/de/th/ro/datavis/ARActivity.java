@@ -28,10 +28,16 @@ import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.th.ro.datavis.interfaces.IInterpreter;
+import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.util.activity.BaseActivity;
+import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 public class ARActivity extends BaseActivity implements
         FragmentOnAttachListener,
@@ -44,6 +50,8 @@ public class ARActivity extends BaseActivity implements
     private ViewRenderable viewRenderable;
 
     private List<Renderable> renderableList = new ArrayList<>();
+
+    private IInterpreter ffsInterpreter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +67,8 @@ public class ARActivity extends BaseActivity implements
                         .commit();
             }
         }
+
+        ffsInterpreter = new FFSInterpreter();
 
         loadSphereList();
     }
@@ -89,6 +99,14 @@ public class ARActivity extends BaseActivity implements
     }
 
     private void loadSphereList(){
+        File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
+        List<Vector3> coordinates = null;
+        try {
+            coordinates = ffsInterpreter.interpretData(file);
+        } catch (FFSInterpretException e) {
+            e.printStackTrace();
+        }
+
 
         float zOffsetAddition = 0.04f; // 1f = Meter
         int repititionCount = 50; // *3
@@ -108,30 +126,20 @@ public class ARActivity extends BaseActivity implements
 
                         });
 
+if(coordinates != null) {
+    List<Vector3> finalCoordinates = coordinates;
+    MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
+            .thenAccept(
+                    material -> {
+                        float zOffset = 0;
+                        for (Vector3 vector3 : finalCoordinates) {
+                            zOffset += zOffsetAddition;
+                            ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vector3, material);
+                            renderableList.add(sphere);
+                        }
+                    });
 
-        MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
-                .thenAccept(
-                        material -> {
-                            float zOffset = 0;
-                            for (int i = 0 ; i < repititionCount ; i++){
-                                zOffset += zOffsetAddition;
-                                ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, new Vector3(0.1f, 0.0f + zOffset, 0.0f), material);
-                                renderableList.add(sphere);
-                            }
-                        });
-
-        MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.BLUE))
-                .thenAccept(
-                        material -> {
-                            float zOffset = 0;
-                            for (int i = 0 ; i < repititionCount ; i++){
-                                zOffset += zOffsetAddition;
-                                ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, new Vector3(-0.1f, 0.0f + zOffset, 0.0f), material);
-                                renderableList.add(sphere);
-                            }
-                        });
-
-
+}
 
     }
 

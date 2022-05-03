@@ -32,6 +32,14 @@
             android:textColor="@color/white"
             />
 
+        <Button
+            android:id="@+id/btn_ffs_interpret"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_ar_main"
+            android:text="@string/trigger_ffs"
+            android:textColor="@color/white" />
+
     </RelativeLayout>
 
 

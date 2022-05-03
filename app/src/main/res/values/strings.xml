@@ -16,5 +16,6 @@
     <!-- Main -->
     <string name="hello">Hello world</string>
     <string name="open_ar">Open AR</string>
+    <string name="trigger_ffs">Trigger Interpretation</string>
 
 </resources>

@@ -2,20 +2,16 @@ package de.th.ro.datavis.interfaces;
 
 import java.math.BigDecimal;
 
-interface ICalc {
+public interface ICalc {
 
+    BigDecimal x_polarToCartesian(BigDecimal xPolar);
 
-    BigDecimal x_polarToKartesien(BigDecimal xPolar);
+    BigDecimal y_polarToCartesian(BigDecimal yPolar);
 
-    BigDecimal y_polarToKartesien(BigDecimal yPolar);
-
-    BigDecimal z_polarToKartesien(BigDecimal zPolar);
+    BigDecimal z_polarToCartesian(BigDecimal zPolar);
 
 
     // Todo Custom Model
-    BigDecimal intensity(BigDecimal realPhi, BigDecimal imaginaryPhi,  BigDecimal realTheta, BigDecimal imaginaryTheta);
-
-
-
+    BigDecimal calcIntensity(BigDecimal realPhi, BigDecimal imaginaryPhi, BigDecimal realTheta, BigDecimal imaginaryTheta);
 
 }
