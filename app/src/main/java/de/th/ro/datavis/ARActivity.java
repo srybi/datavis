@@ -120,6 +120,18 @@ public class ARActivity extends BaseActivity implements
                             }
                         });
 
+        MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.BLUE))
+                .thenAccept(
+                        material -> {
+                            float zOffset = 0;
+                            for (int i = 0 ; i < repititionCount ; i++){
+                                zOffset += zOffsetAddition;
+                                ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, new Vector3(-0.1f, 0.0f + zOffset, 0.0f), material);
+                                renderableList.add(sphere);
+                            }
+                        });
+
+
 
     }
 
