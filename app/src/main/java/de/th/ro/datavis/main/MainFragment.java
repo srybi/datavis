@@ -1,5 +1,6 @@
 package de.th.ro.datavis.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -35,7 +36,15 @@ public class MainFragment extends BaseFragment {
 
     private void findButton(){
         Button button = getActivity().findViewById(R.id.btn_ar_main);
-        button.setOnClickListener(view -> changeActivity(ARActivity.class));
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
+                getActivity().startActivity(intent);
+
+            }
+        });
 
     }
 
