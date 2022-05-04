@@ -44,6 +44,7 @@ import de.th.ro.datavis.util.fragment.BaseFragment;
 public class MainFragment extends BaseFragment {
 
     private IInterpreter ffsInterpreter;
+    private final String fixFilePath = "/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs";
 
     public MainFragment(int fragmentContainer) {
         super(fragmentContainer);
@@ -117,14 +118,10 @@ public class MainFragment extends BaseFragment {
                         Intent data = result.getData();
                         Uri uri = data.getData();
 
-                        File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
+
+                        File file = new File(uri.getPath());
                         try {
-                            FileReader reader = new FileReader(file);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            List<Vector3> coordinates = ffsInterpreter.interpretData(file);
+                            List<Vector3> coordinates = ffsInterpreter.interpretData(file, 0.1);
                         } catch (FFSInterpretException e) {
                             e.printStackTrace();
                         }

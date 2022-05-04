@@ -14,5 +14,5 @@ public interface IInterpreter {
      * @param file
      * @return a List of Vector3's
      */
-    List<Vector3> interpretData(File file) throws FFSInterpretException;
+    List<Vector3> interpretData(File file, double scalingFactor) throws FFSInterpretException;
 }

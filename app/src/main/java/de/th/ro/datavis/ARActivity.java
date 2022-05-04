@@ -1,5 +1,6 @@
 package de.th.ro.datavis;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MotionEvent;
 
@@ -8,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
 
+import com.google.android.filament.Material;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Config;
 import com.google.ar.core.HitResult;
@@ -102,7 +104,7 @@ public class ARActivity extends BaseActivity implements
         File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
         List<Vector3> coordinates = null;
         try {
-            coordinates = ffsInterpreter.interpretData(file);
+            coordinates = ffsInterpreter.interpretData(file, 0.2);
         } catch (FFSInterpretException e) {
             e.printStackTrace();
         }
@@ -128,7 +130,7 @@ public class ARActivity extends BaseActivity implements
 
 if(coordinates != null) {
     List<Vector3> finalCoordinates = coordinates;
-    MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.RED))
+    MaterialFactory.makeTransparentWithColor(this, new Color(0.0f,0.0f,1.0f,0.75f))
             .thenAccept(
                     material -> {
                         float zOffset = 0;
@@ -138,7 +140,6 @@ if(coordinates != null) {
                             renderableList.add(sphere);
                         }
                     });
-
 }
 
     }

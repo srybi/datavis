@@ -24,7 +24,7 @@ public class FFSInterpreter implements IInterpreter {
     public FFSInterpreter() {}
 
     @Override
-    public List<Vector3> interpretData(File file) throws FFSInterpretException {
+    public List<Vector3> interpretData(File file, double scalingFactor) throws FFSInterpretException {
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -43,7 +43,7 @@ public class FFSInterpreter implements IInterpreter {
                 double y = Calc.y_polarToCartesian(line);
                 double z = Calc.z_polarToCartesian(line);
 
-                return new Vector3((float) x, (float) y, (float) z);
+                return new Vector3((float) (x * scalingFactor), (float) (y*scalingFactor) , (float) (z*scalingFactor));
             }).collect(Collectors.toList());
 
             return coordinates;
