@@ -7,16 +7,20 @@
     tools:context=".main.MainFragment">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/datavis_logo"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
         android:src="@drawable/datavis_logo" />
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/lin_layout_ar"
-        android:layout_centerInParent="true"
+        android:layout_below="@id/datavis_logo"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
+        android:layout_marginTop="20dp"
         android:orientation="vertical">
     <TextView
         android:id="@+id/datavis_intro"
@@ -58,14 +62,18 @@
             android:id="@+id/btn_ffs_interpret"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/btn_ar_main"
             android:text="@string/trigger_ffs"
             android:textColor="@color/white"
             android:layout_marginTop="5dp"/>
 
+        <ListView
+            android:id="@+id/list_antenna_fields"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </ListView>
+
     </LinearLayout>
-
-
 
 
 </RelativeLayout>

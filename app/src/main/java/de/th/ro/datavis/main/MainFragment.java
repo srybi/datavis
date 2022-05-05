@@ -4,19 +4,18 @@ import static android.os.Build.VERSION.SDK_INT;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CancellationSignal;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -25,29 +24,36 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 import com.google.ar.sceneform.math.Vector3;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import de.th.ro.datavis.ARActivity;
 import de.th.ro.datavis.R;
+import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
+import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 import de.th.ro.datavis.util.fragment.BaseFragment;
 
 public class MainFragment extends BaseFragment {
 
     private IInterpreter ffsInterpreter;
-    private final String fixFilePath = "/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs";
+    private AppDatabase appDb;
+
+    private ListView listView;
+
+    private LiveData<List<AntennaField>> antennaFields = new MutableLiveData<>(new ArrayList<>());
 
     public MainFragment(int fragmentContainer) {
         super(fragmentContainer);
@@ -76,13 +82,26 @@ public class MainFragment extends BaseFragment {
             }
         }
 
+        appDb = AppDatabase.getInstance(getActivity().getApplicationContext());
+        antennaFields = appDb.antennaFieldDao().getAll();
+
         Intent i = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
         startActivity(i);
 
         ffsInterpreter = new FFSInterpreter();
 
+        findListView();
         findButton();
         findTriggerButton();
+
+        antennaFields.observe(getActivity(), list -> {
+            AntennaFieldAdapter adapter = new AntennaFieldAdapter(getActivity().getApplicationContext(), list);
+            listView.setAdapter(adapter);
+        });
+    }
+
+    private void findListView() {
+        listView = getActivity().findViewById(R.id.list_antenna_fields);
     }
 
 
@@ -91,10 +110,8 @@ public class MainFragment extends BaseFragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
                 getActivity().startActivity(intent);
-
             }
         });
 
@@ -119,6 +136,19 @@ public class MainFragment extends BaseFragment {
                     if(result.getResultCode() == Activity.RESULT_OK){
                         Intent data = result.getData();
 
+                        Executors.newSingleThreadExecutor().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.e("Database", "entering background thread");
+                                try {
+                                    appDb.antennaFieldDao().insert(new AntennaField(data.getData()));
+                                }catch(Exception e){
+                                    e.printStackTrace();
+                                }
+                                Log.e("Database", "exiting background thread");
+
+                            }
+                        });
 
                         try {
                             InputStream stream = getActivity().getContentResolver().openInputStream(data.getData());
