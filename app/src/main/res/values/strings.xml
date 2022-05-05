@@ -14,7 +14,7 @@
 
 
     <!-- Main -->
-    <string name="introduction">Click Open Ar to start your AR Experience.</string>
+    <string name="introduction">Upload a file using the Upload File Button. Long Pressing the item in the list will start your AR Experience.</string>
     <string name="howto">Tap on a plane to place the antenna. This might take a few seconds. Be patient</string>
     <string name="open_ar">Open AR</string>
     <string name="upload_field">Upload File</string>
