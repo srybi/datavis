@@ -28,8 +28,10 @@ public class AntennaFieldAdapter extends ArrayAdapter<AntennaField> {
          if(convertView == null){
              convertView = LayoutInflater.from(getContext()).inflate(R.layout.antenna_field_list_item, parent, false);
          }
-        TextView tvName = (TextView) convertView.findViewById(R.id.field_name);
-         tvName.setText(field.uri);
+         TextView tvName = (TextView) convertView.findViewById(R.id.field_name);
+         tvName.setText(field.filename);
+         TextView tvUri = (TextView) convertView.findViewById(R.id.field_uri);
+         tvUri.setText(field.uri);
 
          return convertView;
     }

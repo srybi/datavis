@@ -62,14 +62,16 @@
             android:id="@+id/btn_ffs_interpret"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/trigger_ffs"
+            android:text="@string/upload_field"
             android:textColor="@color/white"
             android:layout_marginTop="5dp"/>
 
         <ListView
             android:id="@+id/list_antenna_fields"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp">
 
         </ListView>
 

@@ -6,6 +6,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -44,6 +46,7 @@ import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
+import de.th.ro.datavis.util.filehandling.FileHandler;
 import de.th.ro.datavis.util.fragment.BaseFragment;
 
 public class MainFragment extends BaseFragment {
@@ -102,6 +105,17 @@ public class MainFragment extends BaseFragment {
 
     private void findListView() {
         listView = getActivity().findViewById(R.id.list_antenna_fields);
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
+                AntennaField item = antennaFields.getValue().get(i);
+                intent.putExtra("fileUri", item.uri);
+                getActivity().startActivity(intent);
+
+                return true;
+            }
+        });
     }
 
 
@@ -136,27 +150,22 @@ public class MainFragment extends BaseFragment {
                     if(result.getResultCode() == Activity.RESULT_OK){
                         Intent data = result.getData();
 
+
                         Executors.newSingleThreadExecutor().execute(new Runnable() {
                             @Override
                             public void run() {
-                                Log.e("Database", "entering background thread");
                                 try {
-                                    appDb.antennaFieldDao().insert(new AntennaField(data.getData()));
+                                    Uri uri = data.getData();
+                                    String name = FileHandler.queryName(
+                                            getActivity()
+                                                    .getContentResolver(), uri);
+                                    appDb.antennaFieldDao().insert(new AntennaField(uri, name));
                                 }catch(Exception e){
+                                    //TODO: Improve exception handling
                                     e.printStackTrace();
                                 }
-                                Log.e("Database", "exiting background thread");
-
                             }
                         });
-
-                        try {
-                            InputStream stream = getActivity().getContentResolver().openInputStream(data.getData());
-                            List<Vector3> coordinates = ffsInterpreter.interpretData(stream, 0.1);
-
-                        } catch (FFSInterpretException | FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
 
                     }
                 }
@@ -166,6 +175,9 @@ public class MainFragment extends BaseFragment {
     public void openFileDialog(View view){
         Intent data = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         data.setType("*/*");
+        data.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         data = Intent.createChooser(data, "Choose one .ffs file");
         activityResultLauncher.launch(data);
     }

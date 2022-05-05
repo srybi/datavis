@@ -11,15 +11,18 @@ public class AntennaField {
     @PrimaryKey(autoGenerate = true)
     public int id;
     public String uri;
+    public String filename;
 
 
-    public AntennaField(int id, String uri) {
+    public AntennaField(int id, String uri, String filename) {
         this.id = id;
         this.uri = uri;
+        this.filename = filename;
     }
 
     @Ignore
-    public AntennaField(Uri uri) {
+    public AntennaField(Uri uri, String filename) {
         this.uri = uri.toString();
+        this.filename = filename;
     }
 }

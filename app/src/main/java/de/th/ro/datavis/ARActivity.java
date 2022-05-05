@@ -1,8 +1,11 @@
 package de.th.ro.datavis;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -33,6 +36,8 @@ import com.google.ar.sceneform.ux.TransformableNode;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +60,8 @@ public class ARActivity extends BaseActivity implements
 
     private IInterpreter ffsInterpreter;
 
+    private Uri fileUri;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +76,10 @@ public class ARActivity extends BaseActivity implements
                         .commit();
             }
         }
+
+        Bundle b = getIntent().getExtras();
+        String uriString = b.getString("fileUri");
+        fileUri = Uri.parse(uriString);
 
         ffsInterpreter = new FFSInterpreter();
 
@@ -101,12 +112,24 @@ public class ARActivity extends BaseActivity implements
     }
 
     private void loadSphereList(){
-        File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
         List<Vector3> coordinates = null;
+
         try {
-            coordinates = ffsInterpreter.interpretData(file, 0.2);
-        } catch (FFSInterpretException e) {
+            if(fileUri == null){
+                File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
+                coordinates = ffsInterpreter.interpretData(file, 0.2);
+            }else{
+                getContentResolver().takePersistableUriPermission(fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                InputStream inputStream = getContentResolver().openInputStream(fileUri);
+                coordinates = ffsInterpreter.interpretData(inputStream, 0.2);
+            }
+
+        } catch (FFSInterpretException | FileNotFoundException e) {
             e.printStackTrace();
+            return;
+        }catch (SecurityException se){
+            Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
+            return;
         }
 
 
