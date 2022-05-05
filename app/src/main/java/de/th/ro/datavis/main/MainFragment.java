@@ -32,6 +32,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import de.th.ro.datavis.ARActivity;
@@ -103,7 +106,6 @@ public class MainFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 openFileDialog(view);
-
             }
         });
 
@@ -116,13 +118,13 @@ public class MainFragment extends BaseFragment {
                 public void onActivityResult(ActivityResult result) {
                     if(result.getResultCode() == Activity.RESULT_OK){
                         Intent data = result.getData();
-                        Uri uri = data.getData();
 
 
-                        File file = new File(uri.getPath());
                         try {
-                            List<Vector3> coordinates = ffsInterpreter.interpretData(file, 0.1);
-                        } catch (FFSInterpretException e) {
+                            InputStream stream = getActivity().getContentResolver().openInputStream(data.getData());
+                            List<Vector3> coordinates = ffsInterpreter.interpretData(stream, 0.1);
+
+                        } catch (FFSInterpretException | FileNotFoundException e) {
                             e.printStackTrace();
                         }
 
