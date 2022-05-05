@@ -14,7 +14,8 @@
 
 
     <!-- Main -->
-    <string name="hello">Hello world</string>
+    <string name="introduction">Click Open Ar to start your AR Experience.</string>
+    <string name="howto">Tap on a plane to place the antenna. This might take a few seconds. Be patient</string>
     <string name="open_ar">Open AR</string>
     <string name="trigger_ffs">Trigger Interpretation</string>
 

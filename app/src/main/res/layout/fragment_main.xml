@@ -1,33 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".main.MainFragment"
-    android:orientation="vertical">
+    tools:context=".main.MainFragment">
 
-
-    <TextView
-        android:layout_width="fill_parent"
+    <ImageView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:src="@drawable/datavis_logo" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/lin_layout_ar"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:orientation="vertical">
+    <TextView
+        android:id="@+id/datavis_intro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:paddingTop="5dp"
         android:textSize="18sp"
-        android:text="@string/hello"
-        />
+        android:textStyle="bold"
+        android:text="@string/introduction" />
+    <TextView
+        android:id="@+id/datavis_howto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:textSize="18sp"
+        android:text="@string/howto" />
 
+    </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        >
+        android:id="@+id/rel_layout_ar"
+        android:orientation="vertical"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="80dp"
+        android:layout_below="@id/lin_layout_ar">
 
         <Button
             android:id="@+id/btn_ar_main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
             android:text="@string/open_ar"
             android:textColor="@color/white"
             />
@@ -42,9 +64,9 @@
             android:enabled="false"
             android:layout_marginTop="5dp"/>
 
-    </RelativeLayout>
+    </LinearLayout>
 
 
 
 
-</LinearLayout>
+</RelativeLayout>
