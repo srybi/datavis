@@ -1,5 +1,7 @@
 package de.th.ro.datavis.interpreter.ffs;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -28,6 +30,7 @@ import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 public class FFSInterpreter implements IInterpreter {
 
     private static final int startingLine = 32;
+    private static final String LOG_TAG = "Interpretation";
 
     public FFSInterpreter() {}
 
@@ -57,9 +60,10 @@ public class FFSInterpreter implements IInterpreter {
     }
 
     private List<Vector3> interpretData(BufferedReader reader, double scalingFactor) throws FFSInterpretException {
+        Log.d(LOG_TAG, "Start Interpretation...");
             List<FFSLine> ffsLines = reader.lines()
                     .skip(startingLine - 1)
-                    .limit(2600)
+                    .limit(2701)
                     .map(x -> {
                         String [] vals = x.trim().split("\\s+");
                         double [] dVals = Arrays.stream(vals).mapToDouble(Double::parseDouble).toArray();
@@ -74,7 +78,7 @@ public class FFSInterpreter implements IInterpreter {
 
                 return new Vector3((float) (x * scalingFactor), (float) (y*scalingFactor) , (float) (z*scalingFactor));
             }).collect(Collectors.toList());
-
+        Log.d(LOG_TAG, "Interpretation finished");
             return coordinates;
     }
 }

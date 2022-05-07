@@ -28,7 +28,7 @@ public class Calc {
 
     // Todo Custom Model
     public static double calcIntensity(double realPhi, double imaginaryPhi, double realTheta, double imaginaryTheta) {
-        double squaredResult = Math.pow(realPhi, 2) + Math.pow(imaginaryPhi, 2) + Math.pow(realTheta, 2) + Math.pow(imaginaryPhi, 2);
+        double squaredResult = Math.pow(realPhi, 2) + Math.pow(imaginaryPhi, 2) + Math.pow(realTheta, 2) + Math.pow(imaginaryTheta, 2);
         return Math.sqrt(squaredResult);
     }
 
