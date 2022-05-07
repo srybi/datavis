@@ -30,13 +30,23 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:text="@string/introduction" />
+
+        <TextView
+            android:id="@+id/datavis_howtoTap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:textSize="18sp"
+            android:text="@string/howtoChooseFile" />
+
     <TextView
         android:id="@+id/datavis_howto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="5dp"
         android:textSize="18sp"
-        android:text="@string/howto" />
+        android:text="@string/howtoAr" />
+
 
     </LinearLayout>
 
