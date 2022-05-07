@@ -44,6 +44,7 @@ import java.util.List;
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.util.activity.BaseActivity;
+import de.th.ro.datavis.util.enums.InterpretationMode;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 public class ARActivity extends BaseActivity implements
@@ -79,11 +80,18 @@ public class ARActivity extends BaseActivity implements
 
         Bundle b = getIntent().getExtras();
         String uriString = b.getString("fileUri");
+        InterpretationMode mode = InterpretationMode.Linear;
+        try {
+            mode = InterpretationMode.valueOf(b.getString("interpretationMode"));
+
+        }catch (IllegalArgumentException ignored){
+
+        }
         fileUri = Uri.parse(uriString);
 
         ffsInterpreter = new FFSInterpreter();
 
-        loadSphereList();
+        loadSphereList(mode);
     }
 
     @Override
@@ -111,17 +119,17 @@ public class ARActivity extends BaseActivity implements
         arSceneView.setFrameRateFactor(SceneView.FrameRate.FULL);
     }
 
-    private void loadSphereList(){
+    private void loadSphereList(InterpretationMode mode){
         List<Vector3> coordinates = null;
 
         try {
             if(fileUri == null){
                 File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
-                coordinates = ffsInterpreter.interpretData(file, 0.2);
+                coordinates = ffsInterpreter.interpretData(file, 0.2, mode);
             }else{
                 getContentResolver().takePersistableUriPermission(fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 InputStream inputStream = getContentResolver().openInputStream(fileUri);
-                coordinates = ffsInterpreter.interpretData(inputStream, 0.2);
+                coordinates = ffsInterpreter.interpretData(inputStream, 0.2, mode);
             }
 
         } catch (FFSInterpretException | FileNotFoundException e) {
@@ -136,7 +144,7 @@ public class ARActivity extends BaseActivity implements
         float zOffsetAddition = 0.04f; // 1f = Meter
         int repititionCount = 50; // *3
 
-        float sphereRadius = 0.01f;
+        float sphereRadius = 0.0065f;
         float cubeSize = 0.15f;
 
         MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.MAGENTA))
@@ -153,7 +161,7 @@ public class ARActivity extends BaseActivity implements
 
 if(coordinates != null) {
     List<Vector3> finalCoordinates = coordinates;
-    MaterialFactory.makeTransparentWithColor(this, new Color(0.0f,0.0f,1.0f,0.75f))
+    MaterialFactory.makeTransparentWithColor(this, new Color(0.0f,0.0f,1.0f,0.6f))
             .thenAccept(
                     material -> {
                         float zOffset = 0;

@@ -111,9 +111,21 @@ public class MainFragment extends BaseFragment {
                 Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
                 AntennaField item = antennaFields.getValue().get(i);
                 intent.putExtra("fileUri", item.uri);
+                intent.putExtra("interpretationMode", "Linear");
                 getActivity().startActivity(intent);
 
                 return true;
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
+                AntennaField item = antennaFields.getValue().get(i);
+                intent.putExtra("fileUri", item.uri);
+                intent.putExtra("interpretationMode", "Logarithmic");
+                getActivity().startActivity(intent);
             }
         });
     }

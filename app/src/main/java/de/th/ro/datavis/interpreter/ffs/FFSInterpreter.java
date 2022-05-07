@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.calc.Calc;
 import de.th.ro.datavis.models.FFSLine;
+import de.th.ro.datavis.util.enums.InterpretationMode;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 public class FFSInterpreter implements IInterpreter {
@@ -35,50 +36,54 @@ public class FFSInterpreter implements IInterpreter {
     public FFSInterpreter() {}
 
     @Override
-    public List<Vector3> interpretData(InputStream stream, double scalingFactor) throws FFSInterpretException {
+    public List<Vector3> interpretData(InputStream stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
             InputStreamReader reader = new InputStreamReader(stream);
             BufferedReader bufferedReader = new BufferedReader(reader);
 
-            return interpretData(bufferedReader, scalingFactor);
+            return interpretData(bufferedReader, scalingFactor, mode);
 
     }
 
     @Override
-    public List<Vector3> interpretData(File file, double scalingFactor) throws FFSInterpretException {
+    public List<Vector3> interpretData(File file, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
 
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-            return interpretData(bufferedReader, scalingFactor);
+            return interpretData(bufferedReader, scalingFactor, mode);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return new ArrayList<Vector3>();
         }
-
-
     }
 
-    private List<Vector3> interpretData(BufferedReader reader, double scalingFactor) throws FFSInterpretException {
+    private List<Vector3> interpretData(BufferedReader reader, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
         Log.d(LOG_TAG, "Start Interpretation...");
+        List<Vector3> coordinates;
+        try {
             List<FFSLine> ffsLines = reader.lines()
                     .skip(startingLine - 1)
                     .limit(2701)
                     .map(x -> {
-                        String [] vals = x.trim().split("\\s+");
-                        double [] dVals = Arrays.stream(vals).mapToDouble(Double::parseDouble).toArray();
+                        String[] vals = x.trim().split("\\s+");
+                        double[] dVals = Arrays.stream(vals).mapToDouble(Double::parseDouble).toArray();
 
                         return new FFSLine(dVals[0], dVals[1], dVals[2], dVals[3], dVals[4], dVals[5]);
                     }).collect(Collectors.toList());
 
-            List<Vector3> coordinates = ffsLines.stream().map(line -> {
-                double x = Calc.x_polarToCartesian(line);
-                double y = Calc.y_polarToCartesian(line);
-                double z = Calc.z_polarToCartesian(line);
+            coordinates = ffsLines.stream().map(line -> {
+                double x = Calc.x_polarToCartesian(line, mode);
+                double y = Calc.y_polarToCartesian(line, mode);
+                double z = Calc.z_polarToCartesian(line, mode);
 
-                return new Vector3((float) (x * scalingFactor), (float) (y*scalingFactor) , (float) (z*scalingFactor));
+                return new Vector3((float) (x * scalingFactor), (float) (y * scalingFactor), (float) (z * scalingFactor));
             }).collect(Collectors.toList());
+        } catch (Exception e) {
+            //TODO: Specify exceptions, which can be thrown during the interpretation
+            throw new FFSInterpretException(e.getMessage());
+        }
         Log.d(LOG_TAG, "Interpretation finished");
-            return coordinates;
+        return coordinates;
     }
 }
