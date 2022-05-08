@@ -7,16 +7,40 @@ Datavis ist ein Projekt im Rahmen der **Software Engineering Praxis (WIF)** Vera
 ## Getting Started
 ### Verzeichnisstruktur
     .
-    ├── app                          # Andorid Studio Application
+    ├── app                                     # Andorid Studio Application
     │   ├── src
     │   |   ├── main
+    │   |   |   ├── java
+    │   |   |   |   └── de.th.re.datavis
+    │   |   |   |   |   |── db                  # Database
+    │   |   |   |   |   |   |── daos
+    │   |   |   |   |   |   └── database
+    │   |   |   |   |   |── interpreter         # Data Interpretation
+    │   |   |   |   |   |   |── cals
+    │   |   |   |   |   |   |── ffs
+    │   |   |   |   |   |   └── step
+    │   |   |   |   |   |── util                # Utility
+    │   |   |   |   |   |   |── activity
+    │   |   |   |   |   |   |── fragment
+    │   |   |   |   |   |   |── enum
+    │   |   |   |   |   |   |── exeptions
+    │   |   |   |   |   |   |── filehandling
+    │   |   |   |   |   |   └── renderable
+    │   |   |   |   |   |── main
+    │   |   |   |   |   |── interfaces    
+    │   |   |   |   |   |── models
+    │   |   |   |   |   └── ui                  # User Interface
+    │   |   |   ├── assets           
+    │   |   |   |   └── models                  # Demo 3D-Model files           
+    │   |   |   ├── res                         # Resource and Layout Files
+    │   |   |   └── Android Manifest 
     |   |   ├── test
     │   |   └── androidTest
     |   └── miscellaneous scripts
-    ├── Data                         # Data provide by Ericsson
+    ├── Data                                    # Data provide by Ericsson
     ├── miscellaneous scripts
     ├── .gitignore
-    └── README.md                    # You are here
+    └── README.md                               # You are here
 
 ### Git Workflow
 - Primär Branches: **prod**, **dev**
