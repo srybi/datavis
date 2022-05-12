@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import de.th.ro.datavis.R;
+
 public abstract class BaseFragment extends Fragment {
 
 
@@ -20,6 +22,12 @@ public abstract class BaseFragment extends Fragment {
     private final int layoutRes;
     private final int fragmentContainer;
 
+
+    public BaseFragment() {
+
+        layoutRes = registerLayoutResource();
+        fragmentContainer = R.id.mainFragment;
+    }
 
     /**
      * @param fragmentContainer id of FragmentContainer

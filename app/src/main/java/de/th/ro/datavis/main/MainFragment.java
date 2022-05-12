@@ -1,21 +1,16 @@
 package de.th.ro.datavis.main;
 
-import static android.os.Build.VERSION.SDK_INT;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -27,15 +22,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
 
-import com.google.ar.sceneform.math.Vector3;
-
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -46,9 +36,10 @@ import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.models.AntennaField;
-import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 import de.th.ro.datavis.util.fragment.BaseFragment;
+
+import static android.os.Build.VERSION.SDK_INT;
 
 public class MainFragment extends BaseFragment {
 
@@ -58,6 +49,13 @@ public class MainFragment extends BaseFragment {
     private ListView listView;
 
     private LiveData<List<AntennaField>> antennaFields = new MutableLiveData<>(new ArrayList<>());
+
+    private FragmentActivity context;
+
+    private int genericDocRequest = 666;
+
+    public MainFragment() {
+    }
 
     public MainFragment(int fragmentContainer) {
         super(fragmentContainer);
@@ -74,6 +72,8 @@ public class MainFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
+        Log.d("datavis", "Used SDK " + SDK_INT);
         if (SDK_INT >= Build.VERSION_CODES.R) {
             Log.d("myz", ""+SDK_INT);
             if (!Environment.isExternalStorageManager()) {
@@ -87,11 +87,14 @@ public class MainFragment extends BaseFragment {
             }
         }
 
+        context = getActivity();
         appDb = AppDatabase.getInstance(getActivity().getApplicationContext());
         antennaFields = appDb.antennaFieldDao().getAll();
 
-        Intent i = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-        startActivity(i);
+
+        // todo nicht bei android 9 ausführen
+        //Intent i = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+        //startActivity(i);
 
         ffsInterpreter = new FFSInterpreter();
 
@@ -100,7 +103,7 @@ public class MainFragment extends BaseFragment {
         findTriggerButton();
 
         antennaFields.observe(getActivity(), list -> {
-            AntennaFieldAdapter adapter = new AntennaFieldAdapter(getActivity().getApplicationContext(), list);
+            AntennaFieldAdapter adapter = new AntennaFieldAdapter(context.getApplicationContext(), list);
             listView.setAdapter(adapter);
         });
     }
@@ -156,6 +159,7 @@ public class MainFragment extends BaseFragment {
 
     }
 
+    // use Android größer 9
     ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
@@ -187,14 +191,25 @@ public class MainFragment extends BaseFragment {
     );
 
     public void openFileDialog(View view){
-        Intent data = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        data.setType("*/*");
-        data.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
-                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-        data = Intent.createChooser(data, "Choose one .ffs file");
-        activityResultLauncher.launch(data);
+
+        // todo nutzen bei Android größer 9
+//        Intent data = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+//        data.setType("*/*");
+//        data.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+//                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+//                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+//        data = Intent.createChooser(data, "Choose one .ffs file");
+//        activityResultLauncher.launch(data);
+
+
+        // todo nutzen bei Android 9 & 8
+        Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+        chooseFile.setType("*/*");
+        chooseFile = Intent.createChooser(chooseFile, "Choose a file");
+        getActivity().startActivityForResult(chooseFile, genericDocRequest);
+
     }
+
 
 
 }
