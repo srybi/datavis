@@ -1,9 +1,9 @@
 package de.th.ro.datavis;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
 
-import com.google.android.filament.Material;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Config;
 import com.google.ar.core.HitResult;
@@ -35,9 +34,7 @@ import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.InputStream;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,14 +56,18 @@ public class ARActivity extends BaseActivity implements
 
     private List<Renderable> renderableList = new ArrayList<>();
 
+
     private IInterpreter ffsInterpreter;
 
     private Uri fileUri;
+
+    private String TAG = "myTag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.d(TAG, "StartUp ARActivity");
         setContentView(R.layout.activity_main);
         getSupportFragmentManager().addFragmentOnAttachListener(this);
 
@@ -122,6 +123,8 @@ public class ARActivity extends BaseActivity implements
     private void loadSphereList(InterpretationMode mode){
         List<Vector3> coordinates = null;
 
+        Log.d(TAG, "Start coordinate Loading...");
+
         try {
             if(fileUri == null){
                 File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
@@ -139,6 +142,10 @@ public class ARActivity extends BaseActivity implements
             Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
             return;
         }
+
+
+        Log.d(TAG, "Coordinate Loading done");
+        Log.d(TAG, "Coordinate List Size: " + coordinates.size());
 
 
         float zOffsetAddition = 0.04f; // 1f = Meter
@@ -161,18 +168,39 @@ public class ARActivity extends BaseActivity implements
 
 if(coordinates != null) {
     List<Vector3> finalCoordinates = coordinates;
+
+
+
+
     MaterialFactory.makeTransparentWithColor(this, new Color(0.0f,0.0f,1.0f,0.6f))
             .thenAccept(
                     material -> {
                         float zOffset = 0;
+                        int i = 0;
+
                         for (Vector3 vector3 : finalCoordinates) {
+
+                            if (i == 2000){
+                                // do something
+                                // DK: Ab 2550 Crasht mein Gerät
+                                continue;
+                            }
+
                             zOffset += zOffsetAddition;
                             ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vector3, material);
                             renderableList.add(sphere);
+                            Log.d(TAG, "Model Done " + i);
+                            i++;
                         }
+
                     });
 }
 
+    }
+
+
+    private List<Renderable> getRenderList(){
+        return new ArrayList<Renderable>();
     }
 
 
@@ -184,22 +212,34 @@ if(coordinates != null) {
 //            return;
 //        }
 
+        Log.d(TAG, "Plane Tab");
+
         // Create the Anchor.
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
+        processRenderList(anchorNode, renderableList);
 
-        for (Renderable renderable : renderableList){
 
-            TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
-            model.setParent(anchorNode);
-            model.setRenderable(renderable)
-                    .animate(true).start();
-            model.select();
+    }
 
+
+    private void processRenderList(AnchorNode anchorNode, List<Renderable> list){
+        Log.d(TAG, "Start processing RenderList");
+        for (Renderable renderable : list){
+            attachReferableToAnchorNode(anchorNode, renderable);
         }
+        Log.d(TAG, "Processing RenderList Done");
+    }
 
+
+    private void attachReferableToAnchorNode(AnchorNode anchorNode, Renderable renderable){
+        TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
+        model.setParent(anchorNode);
+        model.setRenderable(renderable)
+                .animate(true).start();
+        model.select();
     }
 
 }

@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -52,8 +53,6 @@ public class MainFragment extends BaseFragment {
 
     private FragmentActivity context;
 
-    private int genericDocRequest = 666;
-
     public MainFragment() {
     }
 
@@ -81,6 +80,12 @@ public class MainFragment extends BaseFragment {
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.MANAGE_EXTERNAL_STORAGE}, 1);//permission request code is just an int
             }
+
+
+
+            Intent i = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+            startActivity(i);
+
         }else {
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
@@ -88,24 +93,12 @@ public class MainFragment extends BaseFragment {
         }
 
         context = getActivity();
-        appDb = AppDatabase.getInstance(getActivity().getApplicationContext());
-        antennaFields = appDb.antennaFieldDao().getAll();
-
-
-        // todo nicht bei android 9 ausführen
-        //Intent i = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-        //startActivity(i);
-
         ffsInterpreter = new FFSInterpreter();
 
-        findListView();
+        initAntennaList();
         findButton();
         findTriggerButton();
 
-        antennaFields.observe(getActivity(), list -> {
-            AntennaFieldAdapter adapter = new AntennaFieldAdapter(context.getApplicationContext(), list);
-            listView.setAdapter(adapter);
-        });
     }
 
     private void findListView() {
@@ -135,6 +128,19 @@ public class MainFragment extends BaseFragment {
         });
     }
 
+    public void initAntennaList(){
+        appDb = AppDatabase.getInstance(getActivity().getApplicationContext());
+        antennaFields = appDb.antennaFieldDao().getAll();
+
+        findListView();
+
+        antennaFields.observe(getActivity(), list -> {
+            AntennaFieldAdapter adapter = new AntennaFieldAdapter(context.getApplicationContext(), list);
+            listView.setAdapter(adapter);
+        });
+
+    }
+
 
     private void findButton(){
         Button button = getActivity().findViewById(R.id.btn_ar_main);
@@ -159,7 +165,37 @@ public class MainFragment extends BaseFragment {
 
     }
 
-    // use Android größer 9
+
+
+    public void openFileDialog(View view){
+
+        if (SDK_INT >= Build.VERSION_CODES.R) {
+            openFileDialog_Android11(view);
+        } else {
+            openFileDialog_Android9(view);
+        }
+
+    }
+
+    private void openFileDialog_Android9(View view){
+
+        Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+        chooseFile.setType("*/*");
+        chooseFile = Intent.createChooser(chooseFile, "Choose a file");
+        getActivity().startActivityForResult(chooseFile, 666);
+    }
+
+    private void openFileDialog_Android11(View view){
+        Intent data = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        data.setType("*/*");
+        data.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        data = Intent.createChooser(data, "Choose one .ffs file");
+        activityResultLauncher.launch(data);
+    }
+
+    // use ab Android 10
     ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
@@ -189,27 +225,6 @@ public class MainFragment extends BaseFragment {
                 }
             }
     );
-
-    public void openFileDialog(View view){
-
-        // todo nutzen bei Android größer 9
-//        Intent data = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-//        data.setType("*/*");
-//        data.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
-//                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-//                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-//        data = Intent.createChooser(data, "Choose one .ffs file");
-//        activityResultLauncher.launch(data);
-
-
-        // todo nutzen bei Android 9 & 8
-        Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
-        chooseFile.setType("*/*");
-        chooseFile = Intent.createChooser(chooseFile, "Choose a file");
-        getActivity().startActivityForResult(chooseFile, genericDocRequest);
-
-    }
-
 
 
 }

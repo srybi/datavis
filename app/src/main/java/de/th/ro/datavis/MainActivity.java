@@ -18,6 +18,8 @@ import de.th.ro.datavis.util.filehandling.FileHandler;
 public class MainActivity extends BaseActivity{
 
 
+    MainFragment mainFragment;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,7 +28,10 @@ public class MainActivity extends BaseActivity{
         setContentView(R.layout.activity_main);
         setFragmentContainerView(R.id.mainFragment);
 
-        navigateTo(new MainFragment(getFragmentContainerView()));
+
+        mainFragment = new MainFragment(getFragmentContainerView());
+
+        navigateTo( mainFragment);
 
     }
 
@@ -48,6 +53,10 @@ public class MainActivity extends BaseActivity{
                         AntennaField field = new AntennaField(uri, name);
 
                         appDb.antennaFieldDao().insert(field);
+
+
+                        mainFragment.initAntennaList();
+
                     }catch(Exception e){
                         //TODO: Improve exception handling
                         e.printStackTrace();
