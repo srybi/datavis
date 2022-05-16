@@ -169,7 +169,7 @@ public class MainFragment extends BaseFragment {
 
     public void openFileDialog(View view){
 
-        if (SDK_INT >= Build.VERSION_CODES.R) {
+        if (SDK_INT >= Build.VERSION_CODES.Q) {
             openFileDialog_Android11(view);
         } else {
             openFileDialog_Android9(view);
