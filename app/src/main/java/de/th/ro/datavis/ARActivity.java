@@ -154,47 +154,42 @@ public class ARActivity extends BaseActivity implements
         float sphereRadius = 0.0065f;
         float cubeSize = 0.15f;
 
-        MaterialFactory.makeOpaqueWithColor(this, new Color(android.graphics.Color.MAGENTA))
+        ModelRenderable.builder()
+                .setSource(this, Uri.parse("models/datavis_antenna_asm.glb"))
+                .setIsFilamentGltf(true)
+                .setAsyncLoadEnabled(true)
+                .build()
+                .thenAccept(model -> renderableList.add(model))
+                .exceptionally(throwable -> {
+                    Toast.makeText(
+                            this, "Unable to load model", Toast.LENGTH_LONG).show();
+                    return null;
+                });
+
+    if(coordinates != null) {
+        List<Vector3> finalCoordinates = coordinates;
+        MaterialFactory.makeTransparentWithColor(this, new Color(0.0f,0.0f,1.0f,0.6f))
                 .thenAccept(
                         material -> {
+                            float zOffset = 0;
+                            int i = 0;
 
-                            Vector3 size = new Vector3(cubeSize/2, cubeSize*3, cubeSize/2);
-                            Vector3 position = new Vector3(0f,0f + cubeSize/2,0f);
+                            for (Vector3 vector3 : finalCoordinates) {
 
-                            ModelRenderable cube = ShapeFactory.makeCube(size, position, material);
-                            renderableList.add(cube);
+                                if (i == 2000){
+                                    // do something
+                                    // DK: Ab 2550 Crasht mein Gerät
+                                    continue;
+                                }
 
-                        });
-
-if(coordinates != null) {
-    List<Vector3> finalCoordinates = coordinates;
-
-
-
-
-    MaterialFactory.makeTransparentWithColor(this, new Color(0.0f,0.0f,1.0f,0.6f))
-            .thenAccept(
-                    material -> {
-                        float zOffset = 0;
-                        int i = 0;
-
-                        for (Vector3 vector3 : finalCoordinates) {
-
-                            if (i == 2000){
-                                // do something
-                                // DK: Ab 2550 Crasht mein Gerät
-                                continue;
+                                zOffset += zOffsetAddition;
+                                ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vector3, material);
+                                renderableList.add(sphere);
+                                Log.d(TAG, "Model Done " + i);
+                                i++;
                             }
-
-                            zOffset += zOffsetAddition;
-                            ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vector3, material);
-                            renderableList.add(sphere);
-                            Log.d(TAG, "Model Done " + i);
-                            i++;
-                        }
-
-                    });
-}
+                        });
+    }
 
     }
 
