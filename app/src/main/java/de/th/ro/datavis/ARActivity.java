@@ -28,6 +28,7 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.rendering.ViewRenderable;
+import com.google.ar.sceneform.utilities.ChangeId;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
@@ -55,6 +56,7 @@ public class ARActivity extends BaseActivity implements
     private ViewRenderable viewRenderable;
 
     private List<Renderable> renderableList = new ArrayList<>();
+    private ChangeId modelChangeID;
 
 
     private IInterpreter ffsInterpreter;
@@ -159,7 +161,11 @@ public class ARActivity extends BaseActivity implements
                 .setIsFilamentGltf(true)
                 .setAsyncLoadEnabled(true)
                 .build()
-                .thenAccept(model -> renderableList.add(model))
+                .thenAccept(model -> {
+                    renderableList.add(model);
+                    modelChangeID = model.getId();
+                    Log.d(TAG, "Antenna model done");
+                })
                 .exceptionally(throwable -> {
                     Toast.makeText(
                             this, "Unable to load model", Toast.LENGTH_LONG).show();
@@ -231,6 +237,10 @@ public class ARActivity extends BaseActivity implements
 
     private void attachReferableToAnchorNode(AnchorNode anchorNode, Renderable renderable){
         TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
+        if(renderable.getId() == modelChangeID){
+            model.getScaleController().setMaxScale(0.20f);
+            model.getScaleController().setMinScale(0.15f);
+        }
         model.setParent(anchorNode);
         model.setRenderable(renderable)
                 .animate(true).start();
