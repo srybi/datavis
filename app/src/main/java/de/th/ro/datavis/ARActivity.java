@@ -57,12 +57,8 @@ public class ARActivity extends BaseActivity implements
 
     private List<Renderable> renderableList = new ArrayList<>();
     private ChangeId modelChangeID;
-
-
     private IInterpreter ffsInterpreter;
-
     private Uri fileUri;
-
     private String TAG = "myTag";
 
     @Override
@@ -94,7 +90,10 @@ public class ARActivity extends BaseActivity implements
 
         ffsInterpreter = new FFSInterpreter();
 
-        loadSphereList(mode);
+        List<Vector3> coordinates = loadCoordinates(mode);
+        buildAntennaModel();
+        buildSphereList(coordinates);
+
     }
 
     @Override
@@ -122,40 +121,7 @@ public class ARActivity extends BaseActivity implements
         arSceneView.setFrameRateFactor(SceneView.FrameRate.FULL);
     }
 
-    private void loadSphereList(InterpretationMode mode){
-        List<Vector3> coordinates = null;
-
-        Log.d(TAG, "Start coordinate Loading...");
-
-        try {
-            if(fileUri == null){
-                File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
-                coordinates = ffsInterpreter.interpretData(file, 0.2, mode);
-            }else{
-                getContentResolver().takePersistableUriPermission(fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                InputStream inputStream = getContentResolver().openInputStream(fileUri);
-                coordinates = ffsInterpreter.interpretData(inputStream, 0.2, mode);
-            }
-
-        } catch (FFSInterpretException | FileNotFoundException e) {
-            e.printStackTrace();
-            return;
-        }catch (SecurityException se){
-            Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-
-        Log.d(TAG, "Coordinate Loading done");
-        Log.d(TAG, "Coordinate List Size: " + coordinates.size());
-
-
-        float zOffsetAddition = 0.04f; // 1f = Meter
-        int repititionCount = 50; // *3
-
-        float sphereRadius = 0.0065f;
-        float cubeSize = 0.15f;
-
+    private void buildAntennaModel(){
         ModelRenderable.builder()
                 .setSource(this, Uri.parse("models/datavis_antenna_asm.glb"))
                 .setIsFilamentGltf(true)
@@ -171,32 +137,61 @@ public class ARActivity extends BaseActivity implements
                             this, "Unable to load model", Toast.LENGTH_LONG).show();
                     return null;
                 });
-
-    if(coordinates != null) {
-        List<Vector3> finalCoordinates = coordinates;
-        MaterialFactory.makeTransparentWithColor(this, new Color(0.0f,0.0f,1.0f,0.6f))
-                .thenAccept(
-                        material -> {
-                            float zOffset = 0;
-                            int i = 0;
-
-                            for (Vector3 vector3 : finalCoordinates) {
-
-                                if (i == 2000){
-                                    // do something
-                                    // DK: Ab 2550 Crasht mein Gerät
-                                    continue;
-                                }
-
-                                zOffset += zOffsetAddition;
-                                ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vector3, material);
-                                renderableList.add(sphere);
-                                Log.d(TAG, "Model Done " + i);
-                                i++;
-                            }
-                        });
     }
 
+    private void buildSphereList(List<Vector3> coordinates){
+        float zOffsetAddition = 0.04f; // 1f = Meter
+        float sphereRadius = 0.0065f;
+
+        if(coordinates != null) {
+            MaterialFactory.makeTransparentWithColor(this, new Color(0.0f,0.0f,1.0f,0.6f))
+                    .thenAccept(
+                            material -> {
+                                float zOffset = 0;
+                                int i = 0;
+                                for (Vector3 vector3 : coordinates) {
+                                    if (i == 2000){
+                                        // do something
+                                        // DK: Ab 2550 Crasht mein Gerät
+                                        continue;
+                                    }
+
+                                    zOffset += zOffsetAddition;
+                                    ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vector3, material);
+                                    renderableList.add(sphere);
+                                    Log.d(TAG, "Model Done " + i);
+                                    i++;
+                                }
+                            });
+    }
+
+    }
+
+    private List<Vector3> loadCoordinates(InterpretationMode mode){
+        List<Vector3> coordinates = null;
+        Log.d(TAG, "Start coordinate Loading...");
+
+        try {
+            if(fileUri == null){
+                File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
+                coordinates = ffsInterpreter.interpretData(file, 0.2, mode);
+            }else{
+                getContentResolver().takePersistableUriPermission(fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                InputStream inputStream = getContentResolver().openInputStream(fileUri);
+                coordinates = ffsInterpreter.interpretData(inputStream, 0.2, mode);
+            }
+
+        } catch (FFSInterpretException | FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }catch (SecurityException se){
+            Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        Log.d(TAG, "Coordinate Loading done");
+        Log.d(TAG, "Coordinate List Size: " + coordinates.size());
+        return coordinates;
     }
 
 
