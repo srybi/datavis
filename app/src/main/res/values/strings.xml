@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">datavis</string>
-    <string name="action_settings">Settings</string>
+
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
@@ -19,5 +19,9 @@
     <string name="howtoAr">Tap on a plane to place the antenna. This might take a few seconds. Be patient</string>
     <string name="open_ar">Open AR</string>
     <string name="upload_field">Upload File</string>
+
+    <!-- MainMenu -->
+    <string name="action_settings">Settings</string>
+    <string name="action_import">Import</string>
 
 </resources>

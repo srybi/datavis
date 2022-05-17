@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 
 import java.util.concurrent.Executors;
 
@@ -28,12 +30,23 @@ public class MainActivity extends BaseActivity{
         setContentView(R.layout.activity_main);
         setFragmentContainerView(R.id.mainFragment);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         mainFragment = new MainFragment(getFragmentContainerView());
 
         navigateTo( mainFragment);
 
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
