@@ -10,7 +10,7 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_settings2"
+        android:id="@+id/action_settings"
         android:orderInCategory="200"
         android:title="@string/action_settings"
         android:iconTint="@color/black"

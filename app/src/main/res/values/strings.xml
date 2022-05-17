@@ -10,8 +10,10 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
-
-
+    <!-- Misc -->
+    <string name="antenna">Antenna</string>
+    <string name="metaData">Metadata</string>
+    <string name="farFieldSource">Farfield Source</string>
 
     <!-- Main -->
     <string name="introduction">Upload a file using the Upload File Button.</string>
@@ -23,5 +25,11 @@
     <!-- MainMenu -->
     <string name="action_settings">Settings</string>
     <string name="action_import">Import</string>
+
+    <!-- Import -->
+    <string name="btn_choose_existing">Choose Existing</string>
+    <string name="btn_add_new_antenna">Add new antenna</string>
+    <string name="btn_add_metaData">Add Metadata</string>
+    <string name="btn_add_ffs">Add FFS</string>
 
 </resources>

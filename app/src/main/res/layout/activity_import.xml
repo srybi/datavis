@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".MainActivity"
+    tools:context=".imp.ImportActivity"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -12,7 +12,7 @@
         android:theme="@style/Theme.Datavis.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/main_toolbar"
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -22,7 +22,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/mainFragment"
+        android:id="@+id/importFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
