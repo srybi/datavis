@@ -41,6 +41,7 @@ import java.util.List;
 
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
+import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
@@ -90,7 +91,7 @@ public class ARActivity extends BaseActivity implements
 
         ffsInterpreter = new FFSInterpreter();
 
-        List<Vector3> coordinates = loadCoordinates(mode);
+        List<Sphere> coordinates = loadCoordinates(mode);
         buildAntennaModel();
         buildSphereList(coordinates);
 
@@ -139,7 +140,7 @@ public class ARActivity extends BaseActivity implements
                 });
     }
 
-    private void buildSphereList(List<Vector3> coordinates){
+    private void buildSphereList(List<Sphere> coordinates){
         float zOffsetAddition = 0.04f; // 1f = Meter
         float sphereRadius = 0.0065f;
 
@@ -150,7 +151,7 @@ public class ARActivity extends BaseActivity implements
                             material -> {
                                 float zOffset = 0;
                                 int i = 0;
-                                for (Vector3 vector3 : coordinates) {
+                                for (Sphere s  : coordinates) {
                                     if (i == 2000){
                                         // do something
                                         // DK: Ab 2550 Crasht mein Gerät
@@ -159,7 +160,8 @@ public class ARActivity extends BaseActivity implements
 
                                     zOffset += zOffsetAddition;
                                     //here a vector 3 should be created
-                                    ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vector3, material);
+                                    Vector3 vec = new Vector3((float) s.getX(),(float) s.getY(), (float) s.getZ());
+                                    ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vec, material);
                                     renderableList.add(sphere);
                                     Log.d(TAG, "Model Done " + i);
                                     i++;
@@ -169,9 +171,8 @@ public class ARActivity extends BaseActivity implements
 
     }
 
-    //work with and return a List of Sphere
-    private List<Vector3> loadCoordinates(InterpretationMode mode){
-        List<Vector3> coordinates = null;
+    private List<Sphere> loadCoordinates(InterpretationMode mode){
+        List<Sphere> coordinates = null;
         Log.d(TAG, "Start coordinate Loading...");
 
         try {

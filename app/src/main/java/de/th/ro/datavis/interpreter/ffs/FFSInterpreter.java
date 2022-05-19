@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.calc.Calc;
 import de.th.ro.datavis.models.FFSLine;
+import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
@@ -35,9 +36,9 @@ public class FFSInterpreter implements IInterpreter {
 
     public FFSInterpreter() {}
 
-    //all the interpretData should return List<Sphere>
+
     @Override
-    public List<Vector3> interpretData(InputStream stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+    public List<Sphere> interpretData(InputStream stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
             InputStreamReader reader = new InputStreamReader(stream);
             BufferedReader bufferedReader = new BufferedReader(reader);
 
@@ -46,7 +47,7 @@ public class FFSInterpreter implements IInterpreter {
     }
 
     @Override
-    public List<Vector3> interpretData(File file, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+    public List<Sphere> interpretData(File file, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
 
         try {
             FileReader fileReader = new FileReader(file);
@@ -55,13 +56,13 @@ public class FFSInterpreter implements IInterpreter {
             return interpretData(bufferedReader, scalingFactor, mode);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return new ArrayList<Vector3>();
+            return new ArrayList<Sphere>();
         }
     }
 
-    private List<Vector3> interpretData(BufferedReader reader, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+    private List<Sphere> interpretData(BufferedReader reader, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
         Log.d(LOG_TAG, "Start Interpretation...");
-        List<Vector3> coordinates;
+        List<Sphere> coordinates;
         try {
             List<FFSLine> ffsLines = reader.lines()
                     .skip(startingLine - 1)
@@ -77,9 +78,9 @@ public class FFSInterpreter implements IInterpreter {
                 double x = Calc.x_polarToCartesian(line, mode);
                 double y = Calc.y_polarToCartesian(line, mode);
                 double z = Calc.z_polarToCartesian(line, mode);
+                double intensity = Calc.calcIntensity(line, mode);
 
-                //instead of returning a Vector3, return a Sphere
-                return new Vector3((float) (x * scalingFactor), (float) (y * scalingFactor), (float) (z * scalingFactor));
+                return new Sphere(x*scalingFactor, y*scalingFactor, z*scalingFactor, intensity);
             }).collect(Collectors.toList());
         } catch (Exception e) {
             //TODO: Specify exceptions, which can be thrown during the interpretation

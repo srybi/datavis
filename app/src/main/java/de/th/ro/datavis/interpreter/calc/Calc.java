@@ -25,6 +25,9 @@ public class Calc {
                 * Math.cos(line.getTheta());
     }
 
+    public static double calcIntensity(FFSLine line, InterpretationMode mode) {
+        return calcIntensity(line.getRePhi(), line.getImPhi(), line.getReTheta(), line.getImTheta(), mode);
+    }
 
     // Todo Custom Model
     public static double calcIntensity(double realPhi, double imaginaryPhi, double realTheta, double imaginaryTheta, InterpretationMode mode) {
@@ -36,5 +39,4 @@ public class Calc {
             return Math.log10(Math.sqrt(squaredResult));
         }
     }
-
 }
