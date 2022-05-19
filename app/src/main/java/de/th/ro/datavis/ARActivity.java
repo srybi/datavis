@@ -117,6 +117,7 @@ public class ARActivity extends BaseActivity implements
     @Override
     public void onViewCreated(ArSceneView arSceneView) {
         arFragment.setOnViewCreatedListener(null);
+        arSceneView.getPlaneRenderer().setShadowReceiver(false);
 
         // Fine adjust the maximum frame rate
         arSceneView.setFrameRateFactor(SceneView.FrameRate.FULL);
@@ -240,6 +241,7 @@ public class ARActivity extends BaseActivity implements
         model.setRenderable(renderable)
                 .animate(true).start();
         model.select();
+
     }
 
 }

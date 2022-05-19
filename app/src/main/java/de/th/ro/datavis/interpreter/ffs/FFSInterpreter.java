@@ -99,6 +99,7 @@ public class FFSInterpreter implements IInterpreter {
 
     @Override
     public Color getIntensityColor(double intensity) {
+        //TODO Farben wie in CST
         double delta = Math.abs(averageIntensity - intensity);
 
         if(delta > 2){
@@ -117,7 +118,6 @@ public class FFSInterpreter implements IInterpreter {
             //#abd9e9 baby blue
             return new Color(0.67f, 0.85f, 0.91f);
         }
-
         //#2c7bb6 blue
         return new Color(0.17f, 0.48f, 0.71f);
     }
