@@ -5,7 +5,9 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".main.MainFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+
+    >
 
 
     <TextView
@@ -24,6 +26,7 @@
         >
 
         <Button
+            android:id="@+id/btn_import_choose_antenna"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/btn_choose_existing"
@@ -39,6 +42,7 @@
             />
 
         <Button
+            android:id="@+id/btn_import_add_antenna"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/btn_add_new_antenna"
@@ -49,12 +53,14 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/tv_metadataHeadLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/metaData"
         style="@style/HeadLine"/>
 
     <Button
+        android:id="@+id/btn_import_add_metadata"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -69,6 +75,7 @@
         style="@style/HeadLine"/>
 
     <Button
+        android:id="@+id/btn_import_add_ffs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
