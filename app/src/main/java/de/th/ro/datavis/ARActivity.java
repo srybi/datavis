@@ -146,29 +146,25 @@ public class ARActivity extends BaseActivity implements
 
         if(coordinates != null) {
             //here new Color should be set depending on the intensity of the coordinates
-            MaterialFactory.makeTransparentWithColor(this, new Color(0.0f,0.0f,1.0f,0.6f))
-                    .thenAccept(
-                            material -> {
-                                float zOffset = 0;
-                                int i = 0;
-                                for (Sphere s  : coordinates) {
-                                    if (i == 2000){
-                                        // do something
-                                        // DK: Ab 2550 Crasht mein Gerät
-                                        continue;
-                                    }
-
+            int i = 0;
+            for(Sphere s : coordinates) {
+                MaterialFactory.makeTransparentWithColor(this, ffsInterpreter.getIntensityColor(s.getIntensity()))
+                        .thenAccept(
+                                material -> {
+                                    float zOffset = 0;
                                     zOffset += zOffsetAddition;
                                     //here a vector 3 should be created
                                     Vector3 vec = new Vector3((float) s.getX(),(float) s.getY(), (float) s.getZ());
                                     ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vec, material);
                                     renderableList.add(sphere);
-                                    Log.d(TAG, "Model Done " + i);
-                                    i++;
-                                }
-                            });
-    }
+                                });
+                if(i == 2000){
+                    break;
+                }
+                i++;
+            }
 
+         }
     }
 
     private List<Sphere> loadCoordinates(InterpretationMode mode){
