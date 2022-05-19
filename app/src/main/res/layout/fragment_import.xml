@@ -5,7 +5,9 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".main.MainFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+
+    >
 
 
     <TextView

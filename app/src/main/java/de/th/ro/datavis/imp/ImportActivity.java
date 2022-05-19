@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 
 import java.util.concurrent.Executors;
 
@@ -25,6 +26,9 @@ public class ImportActivity extends BaseActivity {
 
         setContentView(R.layout.activity_import);
         setFragmentContainerView(R.id.importFragment);
+
+        Toolbar toolbar = findViewById(R.id.import_toolbar);
+        setSupportActionBar(toolbar);
 
 
         navigateTo(new ImportFragment());
