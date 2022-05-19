@@ -39,36 +39,10 @@ public class MainActivity extends BaseActivity{
 
         navigateTo( mainFragment);
 
-        initMenuItems();
-
-
-
     }
 
 
-    private void initMenuItems(){
-//        MenuItem itemImport = findViewById(R.id.action_import);
-//        MenuItem itemSettings = findViewById(R.id.action_settings);
 
-//        itemImport.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem menuItem) {
-//                // switch to import
-//
-//                return false;
-//            }
-//        });
-//
-//        itemSettings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem menuItem) {
-//                // switch to settings
-//
-//                return false;
-//            }
-//        });
-
-    }
 
 
     @Override
