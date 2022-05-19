@@ -144,6 +144,7 @@ public class ARActivity extends BaseActivity implements
         float sphereRadius = 0.0065f;
 
         if(coordinates != null) {
+            //here new Color should be set depending on the intensity of the coordinates
             MaterialFactory.makeTransparentWithColor(this, new Color(0.0f,0.0f,1.0f,0.6f))
                     .thenAccept(
                             material -> {
@@ -157,6 +158,7 @@ public class ARActivity extends BaseActivity implements
                                     }
 
                                     zOffset += zOffsetAddition;
+                                    //here a vector 3 should be created
                                     ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vector3, material);
                                     renderableList.add(sphere);
                                     Log.d(TAG, "Model Done " + i);
@@ -167,6 +169,7 @@ public class ARActivity extends BaseActivity implements
 
     }
 
+    //work with and return a List of Sphere
     private List<Vector3> loadCoordinates(InterpretationMode mode){
         List<Vector3> coordinates = null;
         Log.d(TAG, "Start coordinate Loading...");

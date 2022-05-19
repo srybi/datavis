@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 import de.th.ro.datavis.interfaces.ICalc;
 import de.th.ro.datavis.models.FFSLine;
-import de.th.ro.datavis.models.PolarCoordinates;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 public class Calc {
@@ -36,7 +35,6 @@ public class Calc {
         }else{
             return Math.log10(Math.sqrt(squaredResult));
         }
-
     }
 
 }

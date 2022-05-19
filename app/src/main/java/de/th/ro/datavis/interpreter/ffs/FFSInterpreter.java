@@ -35,6 +35,7 @@ public class FFSInterpreter implements IInterpreter {
 
     public FFSInterpreter() {}
 
+    //all the interpretData should return List<Sphere>
     @Override
     public List<Vector3> interpretData(InputStream stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
             InputStreamReader reader = new InputStreamReader(stream);
@@ -77,6 +78,7 @@ public class FFSInterpreter implements IInterpreter {
                 double y = Calc.y_polarToCartesian(line, mode);
                 double z = Calc.z_polarToCartesian(line, mode);
 
+                //instead of returning a Vector3, return a Sphere
                 return new Vector3((float) (x * scalingFactor), (float) (y * scalingFactor), (float) (z * scalingFactor));
             }).collect(Collectors.toList());
         } catch (Exception e) {
