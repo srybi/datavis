@@ -1,7 +1,5 @@
 package de.th.ro.datavis.util.activity;
 
-import android.content.Intent;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -32,13 +30,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * Switch from a Activity to another
-     * @param intent Intent with the target Activity
-     */
-    public void switchActivity(Intent intent){
-        startActivity(intent);
-    }
 
     public int getFragmentContainerView() {
         return fragmentContainerView;
