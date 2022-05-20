@@ -68,7 +68,7 @@ public class ImportFragment extends BaseFragment  implements IImportOptions{
         antennaList.observe(getActivity(), list -> {
 
             if (list != null && list.size() > 0)
-            Toast.makeText(getContext(), list.get(0).toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), list.get(0).toString(), Toast.LENGTH_LONG).show();
 
         });
 

@@ -33,9 +33,10 @@ import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 public class FFSInterpreter implements IInterpreter {
 
-    private static final int startingLine = 32;
     private static final String LOG_TAG = "Interpretation";
     private double averageIntensity = 0;
+
+    private static final int MAX_HAMMING_DISTANCE = 10;
 
     public FFSInterpreter() {}
 
@@ -67,10 +68,34 @@ public class FFSInterpreter implements IInterpreter {
     private List<Sphere> interpretData(BufferedReader reader, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
         Log.d(LOG_TAG, "Start Interpretation...");
         List<Sphere> coordinates;
+        int frequencies = -1;
+        int samples = -1;
+        boolean startFound = false;
+
         try {
+            String line;
+            while((line = reader.readLine()) != null && (frequencies == -1 || samples == -1 || !startFound)){
+                if(Calc.calcHammingDistance(line.trim(),(FFSConstants.FREQUENCIES_HEADER.trim())) < MAX_HAMMING_DISTANCE){
+                    //go to next line to get the value
+                    line = reader.readLine();
+                    frequencies = Integer.parseInt(line.trim());
+                }
+                if(Calc.calcHammingDistance(line.trim(),(FFSConstants.SAMPLES_HEADER.trim())) < MAX_HAMMING_DISTANCE){
+                    //go to next line to get the value
+                    line = reader.readLine();
+                    // first value: phi samples; second value: theta samples
+                    int[] vals = Arrays.stream(line.trim().split("\\s+")).mapToInt(Integer::parseInt).toArray();
+                    samples = vals[0]*vals[1];
+                }
+                if(Calc.calcHammingDistance(line.trim(),(FFSConstants.VALUES_HEADER.trim())) < MAX_HAMMING_DISTANCE){
+                    startFound = true;
+                    break;
+                }
+            }
+
+            //TODO: Currently the first frequency is chosen. This should be specified in the parameter list
             List<FFSLine> ffsLines = reader.lines()
-                    .skip(startingLine - 1)
-                    .limit(2701)
+                    .limit(samples)
                     .map(x -> {
                         String[] vals = x.trim().split("\\s+");
                         double[] dVals = Arrays.stream(vals).mapToDouble(Double::parseDouble).toArray();
@@ -78,12 +103,12 @@ public class FFSInterpreter implements IInterpreter {
                         return new FFSLine(dVals[0], dVals[1], dVals[2], dVals[3], dVals[4], dVals[5]);
                     }).collect(Collectors.toList());
 
-            coordinates = ffsLines.stream().map(line -> {
+            coordinates = ffsLines.stream().map(l -> {
 
-                double x = Calc.x_polarToCartesian(line, mode);
-                double y = Calc.y_polarToCartesian(line, mode);
-                double z = Calc.z_polarToCartesian(line, mode);
-                double intensity = Calc.calcIntensity(line, mode);
+                double x = Calc.x_polarToCartesian(l, mode);
+                double y = Calc.y_polarToCartesian(l, mode);
+                double z = Calc.z_polarToCartesian(l, mode);
+                double intensity = Calc.calcIntensity(l, mode);
                 averageIntensity += intensity;
                 return new Sphere(x*scalingFactor, y*scalingFactor, z*scalingFactor, intensity);
             }).collect(Collectors.toList());

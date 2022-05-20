@@ -1,9 +1,13 @@
 package de.th.ro.datavis;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -24,6 +28,7 @@ public class MainActivity extends BaseActivity{
 
     MainFragment mainFragment;
 
+    public final String LOG_TAG = "MainActivity";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,34 +85,35 @@ public class MainActivity extends BaseActivity{
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (SDK_INT < Build.VERSION_CODES.Q) {
+            if (resultCode == Activity.RESULT_OK) {
 
-        if(resultCode == Activity.RESULT_OK){
+                Executors.newSingleThreadExecutor().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Log.d(LOG_TAG, "entering onActivityResult < android 11");
+                            Uri uri = data.getData();
+                            String name = FileHandler.queryName(getContentResolver(), uri);
 
-            Executors.newSingleThreadExecutor().execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Uri uri = data.getData();
-                        String name = FileHandler.queryName( getContentResolver(), uri);
+                            AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
 
-                        AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
+                            AntennaField field = new AntennaField(uri, name);
 
-                        AntennaField field = new AntennaField(uri, name);
-
-                        appDb.antennaFieldDao().insert(field);
+                            appDb.antennaFieldDao().insert(field);
 
 
-                        mainFragment.initAntennaList();
+                            mainFragment.initAntennaList();
 
-                    }catch(Exception e){
-                        //TODO: Improve exception handling
-                        e.printStackTrace();
+                        } catch (Exception e) {
+                            //TODO: Improve exception handling
+                            e.printStackTrace();
+                        }
                     }
-                }
-            });
+                });
 
+            }
         }
-
     }
 
 
