@@ -103,22 +103,22 @@ public class FFSInterpreter implements IInterpreter {
         double delta = Math.abs(averageIntensity - intensity);
 
         if(delta > 2){
-            //#d7191c red
-            return new Color(0.84f, 0.1f, 0.11f);
+            //#FE0000 red
+            return new Color(1f, 0f, 0f);
         }
         if(delta > 0.5){
-            //#fdae61 orange
-            return new Color(0.99f, 0.68f, 0.38f);
+            //#FF1178 pink
+            return new Color(1f, 0.07f, 0.47f);
         }
         if(delta > 0.25){
-            //#ffffbf yellow
-            return new Color(1f, 1f, 0.75f);
+            //#FFF205 yellow
+            return new Color(1f, 0.95f, 0.02f);
         }
         if(delta > 0.1){
-            //#abd9e9 baby blue
-            return new Color(0.67f, 0.85f, 0.91f);
+            //#01FFF4  blue
+            return new Color(0f, 1f, 0.96f);
         }
-        //#2c7bb6 blue
-        return new Color(0.17f, 0.48f, 0.71f);
+        //#7CFF01 green
+        return new Color(0.49f, 1f, 0f);
     }
 }
