@@ -1,11 +1,7 @@
 package de.th.ro.datavis.interpreter.calc;
 
-import androidx.annotation.NonNull;
-
-import java.math.BigDecimal;
 import java.util.Arrays;
 
-import de.th.ro.datavis.interfaces.ICalc;
 import de.th.ro.datavis.models.FFSLine;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
@@ -43,7 +39,7 @@ public class Calc {
         }
     }
 
-    public static int calcHammingDistance(String x, String y){
+    public static int calcLevenstheinDistance(String x, String y){
 
         int[][] dp = new int[x.length() + 1][y.length() + 1];
 

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Stream;
 
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.util.enums.InterpretationMode;
@@ -19,6 +20,7 @@ public interface IInterpreter {
      */
     List<Sphere> interpretData(InputStream stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException;
     List<Sphere> interpretData(File file, double scalingFactor, InterpretationMode mode) throws FFSInterpretException;
+    List<Sphere> interpretDataAsStream(Stream<String> stream, double scalingFactor, int samples, InterpretationMode mode) throws FFSInterpretException;
     Color getIntensityColor(double intensity);
 
 }
