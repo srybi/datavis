@@ -179,7 +179,7 @@ public class ARActivity extends BaseActivity implements
             }else{
                 getContentResolver().takePersistableUriPermission(fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 InputStream inputStream = getContentResolver().openInputStream(fileUri);
-                coordinates = ffsInterpreter.interpretData(inputStream, 0.2, mode);
+                coordinates = ffsInterpreter.interpretData(inputStream, 0.4, mode);
             }
 
         } catch (FFSInterpretException | FileNotFoundException e) {

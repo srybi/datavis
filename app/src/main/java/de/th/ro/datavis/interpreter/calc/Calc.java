@@ -9,19 +9,19 @@ public class Calc {
 
     public static double x_polarToCartesian(FFSLine line, InterpretationMode mode) {
         return calcIntensity(line.getRePhi(), line.getImPhi(), line.getReTheta(), line.getImTheta(), mode)
-                * Math.sin(line.getTheta())
-                * Math.cos(line.getPhi());
+                * Math.sin(line.getThetaRadians())
+                * Math.cos(line.getPhiRadians());
     }
 
     public static double y_polarToCartesian(FFSLine line, InterpretationMode mode) {
         return calcIntensity(line.getRePhi(), line.getImPhi(), line.getReTheta(), line.getImTheta(), mode)
-                * Math.sin(line.getTheta())
-                * Math.sin(line.getPhi());
+                * Math.sin(line.getThetaRadians())
+                * Math.sin(line.getPhiRadians());
     }
 
     public static double z_polarToCartesian(FFSLine line, InterpretationMode mode) {
         return calcIntensity(line.getRePhi(), line.getImPhi(), line.getReTheta(), line.getImTheta(), mode)
-                * Math.cos(line.getTheta());
+                * Math.cos(line.getThetaRadians());
     }
 
     public static double calcIntensity(FFSLine line, InterpretationMode mode) {
@@ -35,8 +35,12 @@ public class Calc {
         if(mode == InterpretationMode.Linear){
             return Math.sqrt(squaredResult);
         }else{
-            return Math.log10(Math.sqrt(squaredResult));
+            return customLog(40, Math.sqrt(squaredResult));
         }
+    }
+
+    private static double customLog(double base, double logNumber) {
+        return Math.log(logNumber) / Math.log(base);
     }
 
     public static int calcLevenstheinDistance(String x, String y){

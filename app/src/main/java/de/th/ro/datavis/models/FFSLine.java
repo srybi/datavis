@@ -1,7 +1,5 @@
 package de.th.ro.datavis.models;
 
-import java.math.BigDecimal;
-
 public class FFSLine {
      private double phi;
      private double theta;
@@ -19,16 +17,16 @@ public class FFSLine {
         this.imTheta = imTheta;
     }
 
-    public double getPhi() {
-        return phi;
+    public double getPhiRadians() {
+        return Math.toRadians(phi);
     }
 
     public void setPhi(double phi) {
         this.phi = phi;
     }
 
-    public double getTheta() {
-        return theta;
+    public double getThetaRadians() {
+        return Math.toRadians(theta);
     }
 
     public void setTheta(double theta) {

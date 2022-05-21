@@ -90,6 +90,33 @@ public class FFSInterpreter implements IInterpreter {
             //TODO: Specify exceptions, which can be thrown during the interpretation
             throw new FFSInterpretException(e.getMessage());
         }
+        try {
+            String line;
+            while((line = reader.readLine()) != null && (frequencies == -1 || samples == -1 || !startFound)){
+                if(Calc.calcLevenstheinDistance(line.trim(),(FFSConstants.FREQUENCIES_HEADER.trim())) < MAX_HAMMING_DISTANCE){
+                    //go to next line to get the value
+                    line = reader.readLine();
+                    frequencies = Integer.parseInt(line.trim());
+                }
+                if(Calc.calcLevenstheinDistance(line.trim(),(FFSConstants.SAMPLES_HEADER.trim())) < MAX_HAMMING_DISTANCE){
+                    //go to next line to get the value
+                    line = reader.readLine();
+                    // first value: phi samples; second value: theta samples
+                    int[] vals = Arrays.stream(line.trim().split("\\s+")).mapToInt(Integer::parseInt).toArray();
+                    samples = vals[0]*vals[1];
+                }
+                if(Calc.calcLevenstheinDistance(line.trim(),(FFSConstants.VALUES_HEADER.trim())) < MAX_HAMMING_DISTANCE){
+                    startFound = true;
+                    break;
+                }
+            }
+
+            coordinates = interpretDataAsStream(reader.lines(), scalingFactor, samples, mode);
+        } catch (Exception e) {
+            //TODO: Specify exceptions, which can be thrown during the interpretation
+            throw new FFSInterpretException(e.getMessage());
+        }
+
         averageIntensity /= coordinates.size();
 
         Log.d(LOG_TAG, "Interpretation finished");
