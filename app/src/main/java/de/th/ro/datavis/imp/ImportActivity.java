@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -14,11 +13,15 @@ import java.util.concurrent.Executors;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.models.Antenna;
+import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.util.activity.BaseActivity;
+import de.th.ro.datavis.util.constants.FileRequests;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 
 public class ImportActivity extends BaseActivity {
 
+
+    private ImportFragment importFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,7 +34,8 @@ public class ImportActivity extends BaseActivity {
         setSupportActionBar(toolbar);
 
 
-        navigateTo(new ImportFragment());
+        importFragment = new ImportFragment();
+        navigateTo(importFragment);
 
     }
 
@@ -53,10 +57,11 @@ public class ImportActivity extends BaseActivity {
 
                         AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
 
-                        Antenna antenna = new Antenna(uri, name);
-                        appDb.antennaDao().insert(antenna);
-
-                        Toast.makeText(getApplicationContext(), "Antenna " + antenna.toString(), Toast.LENGTH_LONG).show();
+                        if (requestCode == FileRequests.REQUEST_CODE_ANTENNA){
+                            persistAntenna(appDb, uri, name);
+                        } else {
+                            persistFFS(appDb, uri, name);
+                        }
 
                     }catch(Exception e){
                         //TODO: Improve exception handling
@@ -69,6 +74,19 @@ public class ImportActivity extends BaseActivity {
 
     }
 
+
+    public void persistAntenna(AppDatabase appDb, Uri uri, String name){
+        Antenna antenna = new Antenna(uri, name);
+        appDb.antennaDao().insert(antenna);
+
+        importFragment.setCurrentAntenna(antenna);
+    }
+
+    public void persistFFS(AppDatabase appDb, Uri uri, String name){
+        AntennaField antennaField = new AntennaField(uri, name);
+        appDb.antennaFieldDao().insert(antennaField);
+
+    }
 
 
 }
