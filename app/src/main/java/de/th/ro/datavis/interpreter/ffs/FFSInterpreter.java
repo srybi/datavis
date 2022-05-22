@@ -26,7 +26,7 @@ import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 public class FFSInterpreter implements IInterpreter {
 
     private static final String LOG_TAG = "Interpretation";
-    private double averageIntensity = 0;
+    private double maxItensity = -1;
 
     private static final int MAX_HAMMING_DISTANCE = 10;
 
@@ -91,8 +91,6 @@ public class FFSInterpreter implements IInterpreter {
             throw new FFSInterpretException(e.getMessage());
         }
 
-        averageIntensity /= coordinates.size();
-
         Log.d(LOG_TAG, "Interpretation finished");
         return coordinates;
     }
@@ -117,11 +115,11 @@ public class FFSInterpreter implements IInterpreter {
             double y = Calc.y_polarToCartesian(l, mode);
             double z = Calc.z_polarToCartesian(l, mode);
             double intensity = Calc.calcIntensity(l, mode);
-            averageIntensity += intensity;
+            if(intensity > maxItensity){
+                maxItensity = intensity;
+            }
             return new Sphere(x*scalingFactor, y*scalingFactor, z*scalingFactor, intensity);
         }).collect(Collectors.toList());
-
-        averageIntensity /= coordinates.size();
 
         return coordinates;
     }
@@ -129,26 +127,36 @@ public class FFSInterpreter implements IInterpreter {
 
     @Override
     public Color getIntensityColor(double intensity) {
-        //TODO Farben wie in CST
-        double delta = Math.abs(averageIntensity - intensity);
+        //wie in CST
+        double minIntensity = maxItensity - 1;
+        double stepSize = (maxItensity - Math.abs(minIntensity))/6;
 
-        if(delta > 2){
+        if(intensity > maxItensity - (stepSize * 1)){
             //#FE0000 red
             return new Color(1f, 0f, 0f);
         }
-        if(delta > 0.5){
-            //#FF1178 pink
-            return new Color(1f, 0.07f, 0.47f);
+        if(intensity > maxItensity - stepSize * 2){
+            //#e6793a orange
+            return new Color(getRGBPercentage(230), getRGBPercentage(121), getRGBPercentage(58));
         }
-        if(delta > 0.25){
+        if(intensity > maxItensity - stepSize * 3){
             //#FFF205 yellow
             return new Color(1f, 0.95f, 0.02f);
         }
-        if(delta > 0.1){
-            //#01FFF4  blue
-            return new Color(0f, 1f, 0.96f);
+        if(intensity > maxItensity - stepSize * 4){
+            //#7CFF01 green
+            return new Color(0.49f, 1f, 0f);
         }
-        //#7CFF01 green
-        return new Color(0.49f, 1f, 0f);
+        if(intensity > maxItensity - stepSize * 5){
+            //#3befe5 baby blue
+            return new Color(getRGBPercentage(59), getRGBPercentage(239), getRGBPercentage(229));
+        }
+        //#01FFF4  blue
+        return new Color(0f, 1f, 0.96f);
+
+    }
+
+    private float getRGBPercentage(int value){
+        return (float)(value/225);
     }
 }
