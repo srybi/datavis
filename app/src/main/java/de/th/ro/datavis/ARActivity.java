@@ -147,20 +147,27 @@ public class ARActivity extends BaseActivity implements
         if(coordinates != null) {
             //here new Color should be set depending on the intensity of the coordinates
             int i = 0;
+            int count = 0;
             for(Sphere s : coordinates) {
-                MaterialFactory.makeOpaqueWithColor(this, ffsInterpreter.getIntensityColor(s.getIntensity()))
-                        .thenAccept(
-                                material -> {
-                                    float yOffset = 0.1f;
-                                    //here a vector 3 should be created
-                                    Vector3 vec = new Vector3((float) s.getX(),(float) s.getY() + yOffset, (float) s.getZ());
-                                    ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vec, material);
-                                    renderableList.add(sphere);
-                                });
-                if(i == 2000){
-                    break;
+                if(count % (int)(coordinates.size()/2000) == 0) {
+                    MaterialFactory.makeTransparentWithColor(this, ffsInterpreter.getIntensityColor(s.getIntensity()))
+                            .thenAccept(
+                                    material -> {
+                                        float yOffset = 0.1f;
+                                        //here a vector 3 should be created
+                                        Vector3 vec = new Vector3((float) s.getX(), (float) s.getY() + yOffset, (float) s.getZ());
+
+                                        ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vec, material);
+
+                                        renderableList.add(sphere);
+
+                                    });
+                    if (i == 2000) {
+                        break;
+                    }
+                    i++;
                 }
-                i++;
+                count++;
             }
 
          }
