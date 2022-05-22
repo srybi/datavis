@@ -13,7 +13,6 @@ import java.util.concurrent.Executors;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.models.Antenna;
-import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.FileRequests;
 import de.th.ro.datavis.util.filehandling.FileHandler;
@@ -60,7 +59,7 @@ public class ImportActivity extends BaseActivity {
                         if (requestCode == FileRequests.REQUEST_CODE_ANTENNA){
                             persistAntenna(appDb, uri, name);
                         } else {
-                            persistFFS(appDb, uri, name);
+                            importFragment.persistFFS(appDb, uri, name);
                         }
 
                     }catch(Exception e){
@@ -81,12 +80,5 @@ public class ImportActivity extends BaseActivity {
 
         importFragment.setCurrentAntenna(antenna);
     }
-
-    public void persistFFS(AppDatabase appDb, Uri uri, String name){
-        AntennaField antennaField = new AntennaField(uri, name);
-        appDb.antennaFieldDao().insert(antennaField);
-
-    }
-
 
 }

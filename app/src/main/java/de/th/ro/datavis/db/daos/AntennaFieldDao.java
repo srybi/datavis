@@ -16,6 +16,12 @@ public interface AntennaFieldDao {
     @Query("SELECT * FROM antennafield")
     LiveData<List<AntennaField>> getAll();
 
+    @Query("SELECT * FROM antennafield where antennaId = :antennaID")
+    List<AntennaField> findByAntennaId_BackGround(int antennaID);
+
+    @Query("SELECT * FROM antennafield where antennaId = :antennaID")
+    LiveData<List<AntennaField>> findByAntennaId_Main(int antennaID);
+
     @Insert
     void insert(AntennaField antennaField);
 

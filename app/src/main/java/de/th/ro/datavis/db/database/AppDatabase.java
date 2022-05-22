@@ -11,7 +11,7 @@ import de.th.ro.datavis.db.daos.AntennaFieldDao;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 
-@Database(entities = {AntennaField.class, Antenna.class}, version = 2)
+@Database(entities = {AntennaField.class, Antenna.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract AntennaFieldDao antennaFieldDao();

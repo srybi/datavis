@@ -1,7 +1,10 @@
 package de.th.ro.datavis.imp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -31,6 +34,7 @@ public class ImportFragment extends BaseFragment  implements IImportOptions{
 
 
     private Antenna currentAntenna;
+    private ListView listViewAntennaFields;
 
 
     @Override
@@ -48,7 +52,27 @@ public class ImportFragment extends BaseFragment  implements IImportOptions{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        listViewAntennaFields = getActivity().findViewById(R.id.lv_import_antenna_fields);
         initButtons();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        int antennaId = preferences.getInt("ID", 0);
+
+
+        if (antennaId != 0){
+            // Load last used Antenna
+            AppDatabase appDb = AppDatabase.getInstance(getActivity().getApplicationContext());
+            LiveData<List<Antenna>> antennaList = new MutableLiveData<>(new ArrayList<>());
+
+            antennaList = appDb.antennaDao().getAll();
+            antennaList.observe(getActivity(), list -> {
+                setCurrentAntenna(list.get(0));
+                displayAntennafields();
+            });
+
+        }
+
+
     }
 
     private void initButtons(){
@@ -81,7 +105,7 @@ public class ImportFragment extends BaseFragment  implements IImportOptions{
 
     @Override
     public void addNewAntenna() {
-        openFileDialog_Android9(FileRequests.REQUEST_CODE_ANTENNA);
+        openFileDialog_Android9(FileRequests.REQUEST_CODE_ANTENNA, 0);
     }
 
     @Override
@@ -97,32 +121,35 @@ public class ImportFragment extends BaseFragment  implements IImportOptions{
             return;
         }
 
-        openFileDialog_Android9(FileRequests.REQUEST_CODE_FFS);
+        openFileDialog_Android9(FileRequests.REQUEST_CODE_FFS, currentAntenna.id);
 
     }
 
 
-    private void openFileDialog_Android9(int requestCode){
+    private void openFileDialog_Android9(int requestCode, int antennaId){
+
+        // Workaround since Inten Extras dont work with chooseFile
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        preferences.edit().putInt("ID", antennaId).apply();
 
         Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
         chooseFile.setType("*/*");
         chooseFile = Intent.createChooser(chooseFile, "Choose a file");
+
         getActivity().startActivityForResult(chooseFile, requestCode);
     }
 
     public void setCurrentAntenna(Antenna currentAntenna) {
         this.currentAntenna = currentAntenna;
-
         updateViewCurrentAntenna(currentAntenna);
     }
+
 
     private void updateViewCurrentAntenna(Antenna antenna){
         TextView tv = getActivity().findViewById(R.id.tv_import_headLine_antenna);
 
         String s = getString(R.string.antenna) + " " + antenna.filename;
         tv.setText( s );
-
-        displayAntennafields();
     }
 
     private void displayChooseAntennaDialog( List<Antenna> antennaList){
@@ -132,6 +159,7 @@ public class ImportFragment extends BaseFragment  implements IImportOptions{
             public void handelAntennaItemClick(Antenna antenna) {
                 Toast.makeText(getContext(), "Antenna " + antenna.filename, Toast.LENGTH_LONG).show();
                 setCurrentAntenna(antenna);
+                displayAntennafields();
 
                 this.getDialog().dismiss();
             }
@@ -146,17 +174,33 @@ public class ImportFragment extends BaseFragment  implements IImportOptions{
         AppDatabase appDb = AppDatabase.getInstance(getActivity().getApplicationContext());
 
         LiveData<List<AntennaField>> antennaFields = new MutableLiveData<>(new ArrayList<>());
-        antennaFields = appDb.antennaFieldDao().getAll();
-
-        ListView listView = getActivity().findViewById(R.id.lv_import_antenna_fields);
-
+        antennaFields = appDb.antennaFieldDao().findByAntennaId_Main(currentAntenna.id);
 
         antennaFields.observe(getActivity(), list -> {
             AntennaFieldAdapter adapter = new AntennaFieldAdapter(getActivity().getApplicationContext(), list);
-            listView.setAdapter(adapter);
+            listViewAntennaFields.setAdapter(adapter);
         });
 
-
     }
+
+
+
+    public void persistFFS(AppDatabase appDb, Uri uri, String name){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        int antennaId = preferences.getInt("ID", 1);
+
+        AntennaField antennaField = new AntennaField(uri, name, antennaId);
+        appDb.antennaFieldDao().insert(antennaField);
+
+        List<Antenna> antenna = appDb.antennaDao().find_Background(antennaId);
+        setCurrentAntenna(antenna.get(0));
+
+        List<AntennaField> fields = appDb.antennaFieldDao().findByAntennaId_BackGround(antennaId);
+
+        AntennaFieldAdapter adapter = new AntennaFieldAdapter(getActivity().getApplicationContext(), fields);
+        listViewAntennaFields.setAdapter(adapter);
+        listViewAntennaFields.deferNotifyDataSetChanged();
+    }
+
 
 }
