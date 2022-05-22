@@ -142,20 +142,18 @@ public class ARActivity extends BaseActivity implements
     }
 
     private void buildSphereList(List<Sphere> coordinates){
-        float zOffsetAddition = 0.04f; // 1f = Meter
         float sphereRadius = 0.0065f;
 
         if(coordinates != null) {
             //here new Color should be set depending on the intensity of the coordinates
             int i = 0;
             for(Sphere s : coordinates) {
-                MaterialFactory.makeTransparentWithColor(this, ffsInterpreter.getIntensityColor(s.getIntensity()))
+                MaterialFactory.makeOpaqueWithColor(this, ffsInterpreter.getIntensityColor(s.getIntensity()))
                         .thenAccept(
                                 material -> {
-                                    float zOffset = 0;
-                                    zOffset += zOffsetAddition;
+                                    float yOffset = 0.1f;
                                     //here a vector 3 should be created
-                                    Vector3 vec = new Vector3((float) s.getX(),(float) s.getY(), (float) s.getZ());
+                                    Vector3 vec = new Vector3((float) s.getX(),(float) s.getY() + yOffset, (float) s.getZ());
                                     ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vec, material);
                                     renderableList.add(sphere);
                                 });
