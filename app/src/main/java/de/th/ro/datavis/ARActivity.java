@@ -8,7 +8,6 @@ import android.view.MotionEvent;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
@@ -24,15 +23,11 @@ import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.Sceneform;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.Color;
-import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
-import com.google.ar.sceneform.rendering.RenderableDefinition;
 import com.google.ar.sceneform.rendering.ShapeFactory;
-import com.google.ar.sceneform.rendering.Vertex;
 import com.google.ar.sceneform.rendering.ViewRenderable;
-import com.google.ar.sceneform.utilities.AndroidPreconditions;
 import com.google.ar.sceneform.utilities.ChangeId;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
@@ -42,10 +37,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.Map;
 
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
@@ -62,9 +56,8 @@ public class ARActivity extends BaseActivity implements
 
 
     private ArFragment arFragment;
-    private ViewRenderable viewRenderable;
     private InterpretationMode mode = InterpretationMode.Linear;
-    private List<Renderable> renderableList = new ArrayList<>();
+    private Map<String, Renderable> renderableList = new HashMap<>();
     private ChangeId modelChangeID;
     private IInterpreter ffsInterpreter;
     private Uri fileUri;
@@ -100,7 +93,7 @@ public class ARActivity extends BaseActivity implements
 
 
         buildAntennaModel();
-        buildSphere();
+        buildSpheres();
     }
 
     @Override
@@ -136,7 +129,7 @@ public class ARActivity extends BaseActivity implements
                 .setAsyncLoadEnabled(true)
                 .build()
                 .thenAccept(model -> {
-                    renderableList.add(model);
+                    renderableList.put("antenne", model);
                     modelChangeID = model.getId();
                     Log.d(TAG, "Antenna model done");
                 })
@@ -147,13 +140,49 @@ public class ARActivity extends BaseActivity implements
                 });
     }
 
-    private void buildSphere(){
-        MaterialFactory.makeTransparentWithColor(this, new Color(0.5f, 0.5f, 0.5f))
+    private void buildSpheres(){
+        //red
+        MaterialFactory.makeTransparentWithColor(this, new Color(1f, 0f, 0f))
                 .thenAccept(
                         material -> {
                             ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
-                            renderableList.add(sphere);
+                            renderableList.put("redSphere", sphere);
                                     });
+        //orange
+        MaterialFactory.makeTransparentWithColor(this, new Color(0.9f, 0.47f, 0.23f))
+                .thenAccept(
+                        material -> {
+                            ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
+                            renderableList.put("orangeSphere", sphere);
+                        });
+        //yellow
+        MaterialFactory.makeTransparentWithColor(this, new Color(1f, 0.95f, 0.02f))
+                .thenAccept(
+                        material -> {
+                            ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
+                            renderableList.put("yellowSphere", sphere);
+                        });
+        //green
+        MaterialFactory.makeTransparentWithColor(this, new Color(0.49f, 1f, 0f))
+                .thenAccept(
+                        material -> {
+                            ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
+                            renderableList.put("greenSphere", sphere);
+                        });
+        //babyBlue
+        MaterialFactory.makeTransparentWithColor(this, new Color(0.23f, 0.93f, 0.9f))
+                .thenAccept(
+                        material -> {
+                            ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
+                            renderableList.put("babyBlueSphere", sphere);
+                        });
+        //blue
+        MaterialFactory.makeTransparentWithColor(this, new Color(0f, 1f, 0.96f))
+                .thenAccept(
+                        material -> {
+                            ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
+                            renderableList.put("blueSphere", sphere);
+                        });
     }
 
     private List<Sphere> loadCoordinates(InterpretationMode mode){
@@ -203,14 +232,34 @@ public class ARActivity extends BaseActivity implements
     }
 
 
-    private void processRenderList(AnchorNode anchorNode, List<Renderable> list, List<Sphere> coords){
+    private void processRenderList(AnchorNode anchorNode, Map<String, Renderable> list, List<Sphere> coords){
         Log.d(TAG, "Start processing RenderList");
-        for (Renderable renderable : list){
-            if(renderable.getId() == modelChangeID){
-                attachAntennaToAnchorNode(anchorNode, renderable);
-            }else{
-                attachSpheresToAnchorNode(anchorNode, renderable, coords);
+        attachAntennaToAnchorNode(anchorNode, list.get("antenne"));
+        int i = 0;
+        for(Sphere s : coords){
+            int color = ffsInterpreter.mapToColor(s.getIntensity());
+            switch (color){
+                case 1:
+                    attachSphereToAnchorNode(anchorNode, list.get("redSphere"), s);
+                    break;
+                case 2:
+                    attachSphereToAnchorNode(anchorNode, list.get("orangeSphere"), s);
+                    break;
+                case 3:
+                    attachSphereToAnchorNode(anchorNode, list.get("yellowSphere"), s);
+                    break;
+                case 4:
+                    attachSphereToAnchorNode(anchorNode, list.get("greenSphere"), s);
+                    break;
+                case 5:
+                    attachSphereToAnchorNode(anchorNode, list.get("babyBlueSphere"), s);
+                    break;
+                case 6:
+                    attachSphereToAnchorNode(anchorNode, list.get("blueSphere"), s);
+                    break;
             }
+            i++;
+            Log.d(TAG, "processRenderList: proccessing #" + i);
         }
         Log.d(TAG, "Processing RenderList Done");
     }
@@ -226,23 +275,14 @@ public class ARActivity extends BaseActivity implements
     }
 
 
-    private void attachSpheresToAnchorNode(AnchorNode anchorNode, Renderable renderable, List<Sphere> coords){
+    private void attachSphereToAnchorNode(AnchorNode anchorNode, Renderable renderable, Sphere sphere){
         float yOffset = 0.1f;
-        int i=0;
-        for(Sphere s : coords) {
-            TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
-            //position
-            model.setLocalPosition(new Vector3((float) s.getX(), (float) s.getY() + yOffset, (float) s.getZ()));
-            i++;
-            Log.d(TAG, "attachSpheresToAnchorNode: rendering... " + i);
-            model.setParent(anchorNode);
-            model.setRenderable(renderable)
-                    .animate(true).start();
-            model.select();
-            if(i == 15000){
-                break;
-            }
-        }
+        TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
+        model.setLocalPosition(new Vector3((float) sphere.getX(), (float) sphere.getY() + yOffset, (float) sphere.getZ()));
+        model.setParent(anchorNode);
+        model.setRenderable(renderable)
+                .animate(true).start();
+        model.select();
     }
 
 }

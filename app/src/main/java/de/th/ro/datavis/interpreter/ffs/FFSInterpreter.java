@@ -126,33 +126,33 @@ public class FFSInterpreter implements IInterpreter {
 
 
     @Override
-    public Color getIntensityColor(double intensity) {
+    public int mapToColor(double intensity) {
         //wie in CST
         double minIntensity = maxItensity - 1;
         double stepSize = (maxItensity - Math.abs(minIntensity))/6;
 
         if(intensity > maxItensity - (stepSize * 1)){
             //#FE0000 red
-            return new Color(1f, 0f, 0f);
+            return 1;
         }
         if(intensity > maxItensity - stepSize * 2){
             //#e6793a orange
-            return new Color(getRGBPercentage(230), getRGBPercentage(121), getRGBPercentage(58));
+            return 2;
         }
         if(intensity > maxItensity - stepSize * 3){
             //#FFF205 yellow
-            return new Color(1f, 0.95f, 0.02f);
+            return 3;
         }
         if(intensity > maxItensity - stepSize * 4){
             //#7CFF01 green
-            return new Color(0.49f, 1f, 0f);
+            return 4;
         }
         if(intensity > maxItensity - stepSize * 5){
             //#3befe5 baby blue
-            return new Color(getRGBPercentage(59), getRGBPercentage(239), getRGBPercentage(229));
+            return 5;
         }
         //#01FFF4  blue
-        return new Color(0f, 1f, 0.96f);
+        return 6;
 
     }
 
