@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
@@ -23,11 +24,15 @@ import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.Sceneform;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.Color;
+import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
+import com.google.ar.sceneform.rendering.RenderableDefinition;
 import com.google.ar.sceneform.rendering.ShapeFactory;
+import com.google.ar.sceneform.rendering.Vertex;
 import com.google.ar.sceneform.rendering.ViewRenderable;
+import com.google.ar.sceneform.utilities.AndroidPreconditions;
 import com.google.ar.sceneform.utilities.ChangeId;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
@@ -37,7 +42,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
@@ -55,7 +63,7 @@ public class ARActivity extends BaseActivity implements
 
     private ArFragment arFragment;
     private ViewRenderable viewRenderable;
-
+    private InterpretationMode mode = InterpretationMode.Linear;
     private List<Renderable> renderableList = new ArrayList<>();
     private ChangeId modelChangeID;
     private IInterpreter ffsInterpreter;
@@ -80,7 +88,6 @@ public class ARActivity extends BaseActivity implements
 
         Bundle b = getIntent().getExtras();
         String uriString = b.getString("fileUri");
-        InterpretationMode mode = InterpretationMode.Linear;
         try {
             mode = InterpretationMode.valueOf(b.getString("interpretationMode"));
 
@@ -91,10 +98,9 @@ public class ARActivity extends BaseActivity implements
 
         ffsInterpreter = new FFSInterpreter();
 
-        List<Sphere> coordinates = loadCoordinates(mode);
-        buildAntennaModel();
-        buildSphereList(coordinates);
 
+        buildAntennaModel();
+        buildSphere();
     }
 
     @Override
@@ -141,36 +147,13 @@ public class ARActivity extends BaseActivity implements
                 });
     }
 
-    private void buildSphereList(List<Sphere> coordinates){
-        float sphereRadius = 0.0065f;
-
-        if(coordinates != null) {
-            //here new Color should be set depending on the intensity of the coordinates
-            int i = 0;
-            int count = 0;
-            for(Sphere s : coordinates) {
-                if(count % (int)(coordinates.size()/2000) == 0) {
-                    MaterialFactory.makeTransparentWithColor(this, ffsInterpreter.getIntensityColor(s.getIntensity()))
-                            .thenAccept(
-                                    material -> {
-                                        float yOffset = 0.1f;
-                                        //here a vector 3 should be created
-                                        Vector3 vec = new Vector3((float) s.getX(), (float) s.getY() + yOffset, (float) s.getZ());
-
-                                        ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vec, material);
-
-                                        renderableList.add(sphere);
-
+    private void buildSphere(){
+        MaterialFactory.makeTransparentWithColor(this, new Color(0.5f, 0.5f, 0.5f))
+                .thenAccept(
+                        material -> {
+                            ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
+                            renderableList.add(sphere);
                                     });
-                    if (i == 2000) {
-                        break;
-                    }
-                    i++;
-                }
-                count++;
-            }
-
-         }
     }
 
     private List<Sphere> loadCoordinates(InterpretationMode mode){
@@ -209,11 +192,6 @@ public class ARActivity extends BaseActivity implements
 
     @Override
     public void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
-//        if (model == null ) {
-//            Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-
         Log.d(TAG, "Plane Tab");
 
         // Create the Anchor.
@@ -221,32 +199,50 @@ public class ARActivity extends BaseActivity implements
         AnchorNode anchorNode = new AnchorNode(anchor);
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-        processRenderList(anchorNode, renderableList);
-
-
+        processRenderList(anchorNode, renderableList, loadCoordinates(mode));
     }
 
 
-    private void processRenderList(AnchorNode anchorNode, List<Renderable> list){
+    private void processRenderList(AnchorNode anchorNode, List<Renderable> list, List<Sphere> coords){
         Log.d(TAG, "Start processing RenderList");
         for (Renderable renderable : list){
-            attachReferableToAnchorNode(anchorNode, renderable);
+            if(renderable.getId() == modelChangeID){
+                attachAntennaToAnchorNode(anchorNode, renderable);
+            }else{
+                attachSpheresToAnchorNode(anchorNode, renderable, coords);
+            }
         }
         Log.d(TAG, "Processing RenderList Done");
     }
 
-
-    private void attachReferableToAnchorNode(AnchorNode anchorNode, Renderable renderable){
+    private void attachAntennaToAnchorNode(AnchorNode anchorNode, Renderable renderable) {
         TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
-        if(renderable.getId() == modelChangeID){
-            model.getScaleController().setMaxScale(0.20f);
-            model.getScaleController().setMinScale(0.15f);
-        }
+        model.getScaleController().setMaxScale(0.20f);
+        model.getScaleController().setMinScale(0.15f);
         model.setParent(anchorNode);
         model.setRenderable(renderable)
                 .animate(true).start();
         model.select();
+    }
 
+
+    private void attachSpheresToAnchorNode(AnchorNode anchorNode, Renderable renderable, List<Sphere> coords){
+        float yOffset = 0.1f;
+        int i=0;
+        for(Sphere s : coords) {
+            TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
+            //position
+            model.setLocalPosition(new Vector3((float) s.getX(), (float) s.getY() + yOffset, (float) s.getZ()));
+            i++;
+            Log.d(TAG, "attachSpheresToAnchorNode: rendering... " + i);
+            model.setParent(anchorNode);
+            model.setRenderable(renderable)
+                    .animate(true).start();
+            model.select();
+            if(i == 15000){
+                break;
+            }
+        }
     }
 
 }
