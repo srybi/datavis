@@ -22,12 +22,10 @@ import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.Sceneform;
 import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.rendering.ShapeFactory;
-import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.utilities.ChangeId;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
@@ -42,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.th.ro.datavis.interfaces.IInterpreter;
+import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.util.activity.BaseActivity;
@@ -58,7 +57,6 @@ public class ARActivity extends BaseActivity implements
     private ArFragment arFragment;
     private InterpretationMode mode = InterpretationMode.Linear;
     private Map<String, Renderable> renderableList = new HashMap<>();
-    private ChangeId modelChangeID;
     private IInterpreter ffsInterpreter;
     private Uri fileUri;
     private String TAG = "myTag";
@@ -130,7 +128,6 @@ public class ARActivity extends BaseActivity implements
                 .build()
                 .thenAccept(model -> {
                     renderableList.put("antenne", model);
-                    modelChangeID = model.getId();
                     Log.d(TAG, "Antenna model done");
                 })
                 .exceptionally(throwable -> {
@@ -141,48 +138,14 @@ public class ARActivity extends BaseActivity implements
     }
 
     private void buildSpheres(){
-        //red
-        MaterialFactory.makeTransparentWithColor(this, new Color(1f, 0f, 0f))
-                .thenAccept(
-                        material -> {
-                            ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
-                            renderableList.put("redSphere", sphere);
-                                    });
-        //orange
-        MaterialFactory.makeTransparentWithColor(this, new Color(0.9f, 0.47f, 0.23f))
-                .thenAccept(
-                        material -> {
-                            ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
-                            renderableList.put("orangeSphere", sphere);
-                        });
-        //yellow
-        MaterialFactory.makeTransparentWithColor(this, new Color(1f, 0.95f, 0.02f))
-                .thenAccept(
-                        material -> {
-                            ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
-                            renderableList.put("yellowSphere", sphere);
-                        });
-        //green
-        MaterialFactory.makeTransparentWithColor(this, new Color(0.49f, 1f, 0f))
-                .thenAccept(
-                        material -> {
-                            ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
-                            renderableList.put("greenSphere", sphere);
-                        });
-        //babyBlue
-        MaterialFactory.makeTransparentWithColor(this, new Color(0.23f, 0.93f, 0.9f))
-                .thenAccept(
-                        material -> {
-                            ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
-                            renderableList.put("babyBlueSphere", sphere);
-                        });
-        //blue
-        MaterialFactory.makeTransparentWithColor(this, new Color(0f, 1f, 0.96f))
-                .thenAccept(
-                        material -> {
-                            ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
-                            renderableList.put("blueSphere", sphere);
-                        });
+        for(FFSIntensityColor intensityColor : FFSIntensityColor.values()){
+            MaterialFactory.makeTransparentWithColor(this, intensityColor.getColor())
+                    .thenAccept(
+                            material -> {
+                                ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
+                                renderableList.put(intensityColor.getName() + "Sphere", sphere);
+                            });
+        }
     }
 
     private List<Sphere> loadCoordinates(InterpretationMode mode){
@@ -237,27 +200,8 @@ public class ARActivity extends BaseActivity implements
         attachAntennaToAnchorNode(anchorNode, list.get("antenne"));
         int i = 0;
         for(Sphere s : coords){
-            int color = ffsInterpreter.mapToColor(s.getIntensity());
-            switch (color){
-                case 1:
-                    attachSphereToAnchorNode(anchorNode, list.get("redSphere"), s);
-                    break;
-                case 2:
-                    attachSphereToAnchorNode(anchorNode, list.get("orangeSphere"), s);
-                    break;
-                case 3:
-                    attachSphereToAnchorNode(anchorNode, list.get("yellowSphere"), s);
-                    break;
-                case 4:
-                    attachSphereToAnchorNode(anchorNode, list.get("greenSphere"), s);
-                    break;
-                case 5:
-                    attachSphereToAnchorNode(anchorNode, list.get("babyBlueSphere"), s);
-                    break;
-                case 6:
-                    attachSphereToAnchorNode(anchorNode, list.get("blueSphere"), s);
-                    break;
-            }
+            FFSIntensityColor intensityColor = ffsInterpreter.mapToColor(s.getIntensity());
+            attachSphereToAnchorNode(anchorNode, list.get(intensityColor.getName()+"Sphere"), s);
             i++;
             Log.d(TAG, "processRenderList: proccessing #" + i);
         }

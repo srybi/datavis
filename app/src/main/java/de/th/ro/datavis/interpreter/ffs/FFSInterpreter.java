@@ -2,8 +2,6 @@ package de.th.ro.datavis.interpreter.ffs;
 
 import android.util.Log;
 
-import com.google.ar.sceneform.rendering.Color;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -126,37 +124,32 @@ public class FFSInterpreter implements IInterpreter {
 
 
     @Override
-    public int mapToColor(double intensity) {
+    public FFSIntensityColor mapToColor(double intensity) {
         //wie in CST
         double minIntensity = maxItensity - 1;
         double stepSize = (maxItensity - Math.abs(minIntensity))/6;
 
         if(intensity > maxItensity - (stepSize * 1)){
             //#FE0000 red
-            return 1;
+            return FFSIntensityColor.RED;
         }
         if(intensity > maxItensity - stepSize * 2){
             //#e6793a orange
-            return 2;
+            return FFSIntensityColor.ORANGE;
         }
         if(intensity > maxItensity - stepSize * 3){
             //#FFF205 yellow
-            return 3;
+            return FFSIntensityColor.YELLOW;
         }
         if(intensity > maxItensity - stepSize * 4){
             //#7CFF01 green
-            return 4;
+            return FFSIntensityColor.GREEN;
         }
         if(intensity > maxItensity - stepSize * 5){
             //#3befe5 baby blue
-            return 5;
+            return FFSIntensityColor.BABYBLUE;
         }
         //#01FFF4  blue
-        return 6;
-
-    }
-
-    private float getRGBPercentage(int value){
-        return (float)(value/225);
+        return FFSIntensityColor.BLUE;
     }
 }

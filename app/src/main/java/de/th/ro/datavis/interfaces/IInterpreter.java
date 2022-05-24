@@ -1,14 +1,11 @@
 package de.th.ro.datavis.interfaces;
 
-import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.Color;
-
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Stream;
 
+import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
@@ -21,6 +18,6 @@ public interface IInterpreter {
     List<Sphere> interpretData(InputStream stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException;
     List<Sphere> interpretData(File file, double scalingFactor, InterpretationMode mode) throws FFSInterpretException;
     List<Sphere> interpretDataAsStream(Stream<String> stream, double scalingFactor, int samples, InterpretationMode mode) throws FFSInterpretException;
-    int mapToColor(double intensity);
+    FFSIntensityColor mapToColor(double intensity);
 
 }
