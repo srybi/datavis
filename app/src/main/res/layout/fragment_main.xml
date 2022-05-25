@@ -10,8 +10,8 @@
         android:id="@+id/datavis_logo"
         android:layout_width="300dp"
         android:layout_height="50dp"
-        android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
         android:src="@drawable/datavis_logo" />
     <LinearLayout
         android:layout_width="wrap_content"

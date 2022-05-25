@@ -18,6 +18,8 @@ import java.util.concurrent.Executors;
 
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.imp.ImportActivity;
+import de.th.ro.datavis.instructions.AppInstructionsActivity;
+import de.th.ro.datavis.instructions.ImportInstructionsActivity;
 import de.th.ro.datavis.main.MainFragment;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.util.activity.BaseActivity;
@@ -54,8 +56,34 @@ public class MainActivity extends BaseActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
+        MenuItem itemImportInstructions = menu.findItem(R.id.import_instructions);
+        MenuItem itemAppInstructions = menu.findItem(R.id.app_instructions);
         MenuItem itemImport = menu.findItem(R.id.action_import);
         MenuItem itemSettings = menu.findItem(R.id.action_settings);
+
+        itemImportInstructions.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                // switch to import instructions
+
+                Intent intent = new Intent(getApplicationContext(), ImportInstructionsActivity.class);
+                startActivity(intent);
+
+                return false;
+            }
+        });
+
+        itemAppInstructions.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                // switch to app instructions
+
+                Intent intent = new Intent(getApplicationContext(), AppInstructionsActivity.class);
+                startActivity(intent);
+
+                return false;
+            }
+        });
 
         itemImport.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
