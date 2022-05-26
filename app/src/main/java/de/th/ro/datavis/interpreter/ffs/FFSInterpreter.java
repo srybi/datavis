@@ -42,7 +42,6 @@ public class FFSInterpreter implements IInterpreter {
 
     @Override
     public List<Sphere> interpretData(File file, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
-
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -56,6 +55,7 @@ public class FFSInterpreter implements IInterpreter {
 
 
     private List<Sphere> interpretData(BufferedReader reader, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+        maxItensity = -1;
         Log.d(LOG_TAG, "Start Interpretation...");
         List<Sphere> coordinates;
         int frequencies = -1;
@@ -95,6 +95,7 @@ public class FFSInterpreter implements IInterpreter {
 
     @Override
     public List<Sphere> interpretDataAsStream(Stream<String> stream, double scalingFactor, int samples, InterpretationMode mode) throws FFSInterpretException {
+        maxItensity = -1;
         List<Sphere> coordinates;
 
         //TODO: Currently the first frequency is chosen. This should be specified in the parameter list

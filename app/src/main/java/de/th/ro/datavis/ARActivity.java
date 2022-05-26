@@ -170,7 +170,7 @@ public class ARActivity extends BaseActivity implements
         } catch (FFSInterpretException | FileNotFoundException e) {
             e.printStackTrace();
             return null;
-        }catch (SecurityException se){
+        } catch(SecurityException se){
             Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
             return null;
         }
@@ -246,7 +246,6 @@ public class ARActivity extends BaseActivity implements
         Log.d(TAG, "update: the bottomsheet called an update");
 
         deleteAllSheres();
-        this.anchorNode.setParent(arFragment.getArSceneView().getScene());
         processRenderList(anchorNode, renderableList, loadCoordinates(bottomSheet.getMode()));
     }
 
