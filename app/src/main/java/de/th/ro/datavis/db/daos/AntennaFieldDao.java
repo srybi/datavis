@@ -16,6 +16,9 @@ public interface AntennaFieldDao {
     @Query("SELECT * FROM antennafield")
     LiveData<List<AntennaField>> getAll();
 
+    @Query("SELECT * FROM antennafield")
+    List<AntennaField> getAll_Background();
+
     @Query("SELECT * FROM antennafield where antennaId = :antennaID")
     List<AntennaField> findByAntennaId_BackGround(int antennaID);
 
