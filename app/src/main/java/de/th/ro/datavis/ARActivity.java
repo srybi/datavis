@@ -20,6 +20,7 @@ import com.google.ar.core.Plane;
 import com.google.ar.core.Session;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
+import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.Sceneform;
 import com.google.ar.sceneform.math.Vector3;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.th.ro.datavis.interfaces.IInterpreter;
+import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.models.Sphere;
@@ -53,15 +55,17 @@ public class ARActivity extends BaseActivity implements
         FragmentOnAttachListener,
         BaseArFragment.OnTapArPlaneListener,
         BaseArFragment.OnSessionConfigurationListener,
-        ArFragment.OnViewCreatedListener{
+        ArFragment.OnViewCreatedListener,
+        IObserver {
 
 
     private ArFragment arFragment;
-    private InterpretationMode mode = InterpretationMode.Linear;
     private Map<String, Renderable> renderableList = new HashMap<>();
     private IInterpreter ffsInterpreter;
     private BottomSheet bottomSheet;
     private GestureDetector gestureDetector;
+    private AnchorNode anchorNode;
+    private TransformableNode middleNode;
     private Uri fileUri;
     private String TAG = "myTag";
 
@@ -86,12 +90,6 @@ public class ARActivity extends BaseActivity implements
 
         Bundle b = getIntent().getExtras();
         String uriString = b.getString("fileUri");
-        try {
-            mode = InterpretationMode.valueOf(b.getString("interpretationMode"));
-
-        }catch (IllegalArgumentException ignored){
-
-        }
         fileUri = Uri.parse(uriString);
 
         ffsInterpreter = new FFSInterpreter();
@@ -162,11 +160,11 @@ public class ARActivity extends BaseActivity implements
         try {
             if(fileUri == null){
                 File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
-                coordinates = ffsInterpreter.interpretData(file, 0.2, mode);
+                coordinates = ffsInterpreter.interpretData(file, 0.2, bottomSheet.getMode());
             }else{
                 getContentResolver().takePersistableUriPermission(fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 InputStream inputStream = getContentResolver().openInputStream(fileUri);
-                coordinates = ffsInterpreter.interpretData(inputStream, 0.4, mode);
+                coordinates = ffsInterpreter.interpretData(inputStream, 0.4, bottomSheet.getMode());
             }
 
         } catch (FFSInterpretException | FileNotFoundException e) {
@@ -196,19 +194,25 @@ public class ARActivity extends BaseActivity implements
         // Create the Anchor.
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
+        //saving the anchorNode for removing later
+        this.anchorNode = anchorNode;
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-        processRenderList(anchorNode, renderableList, loadCoordinates(mode));
+        processRenderList(anchorNode, renderableList, loadCoordinates(bottomSheet.getMode()));
+        bottomSheet.subscribe(this);
     }
 
 
     private void processRenderList(AnchorNode anchorNode, Map<String, Renderable> list, List<Sphere> coords){
         Log.d(TAG, "Start processing RenderList");
         attachAntennaToAnchorNode(anchorNode, list.get("antenne"));
+
+        middleNode = new TransformableNode(arFragment.getTransformationSystem());
+        middleNode.setParent(anchorNode);
         int i = 0;
         for(Sphere s : coords){
             FFSIntensityColor intensityColor = ffsInterpreter.mapToColor(s.getIntensity());
-            attachSphereToAnchorNode(anchorNode, list.get(intensityColor.getName()+"Sphere"), s);
+            attachSphereToAnchorNode(middleNode, list.get(intensityColor.getName()+"Sphere"), s);
             i++;
             Log.d(TAG, "processRenderList: proccessing #" + i);
         }
@@ -226,14 +230,28 @@ public class ARActivity extends BaseActivity implements
     }
 
 
-    private void attachSphereToAnchorNode(AnchorNode anchorNode, Renderable renderable, Sphere sphere){
+    private void attachSphereToAnchorNode(TransformableNode middleNode, Renderable renderable, Sphere sphere){
         float yOffset = 0.1f;
         TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
         model.setLocalPosition(new Vector3((float) sphere.getX(), (float) sphere.getY() + yOffset, (float) sphere.getZ()));
-        model.setParent(anchorNode);
+        model.setParent(middleNode);
         model.setRenderable(renderable)
                 .animate(true).start();
         model.select();
+    }
+
+    //Observer Pattern
+    @Override
+    public void update() {
+        Log.d(TAG, "update: the bottomsheet called an update");
+
+        deleteAllSheres();
+        this.anchorNode.setParent(arFragment.getArSceneView().getScene());
+        processRenderList(anchorNode, renderableList, loadCoordinates(bottomSheet.getMode()));
+    }
+
+    private void deleteAllSheres(){
+        anchorNode.removeChild(middleNode);
     }
 
     //Used for gestureDetection
