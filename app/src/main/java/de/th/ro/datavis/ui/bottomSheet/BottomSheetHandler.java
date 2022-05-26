@@ -1,14 +1,9 @@
 package de.th.ro.datavis.ui.bottomSheet;
 
-import android.content.Context;
+
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.widget.LinearLayout;
-
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-
-import de.th.ro.datavis.R;
 
 public class BottomSheetHandler extends GestureDetector.SimpleOnGestureListener {
 
