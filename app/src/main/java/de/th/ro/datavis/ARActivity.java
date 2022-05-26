@@ -5,6 +5,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Config;
 import com.google.ar.core.HitResult;
@@ -66,13 +70,13 @@ public class ARActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
 
         Log.d(TAG, "StartUp ARActivity");
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_ar);
         getSupportFragmentManager().addFragmentOnAttachListener(this);
 
         if (savedInstanceState == null) {
             if (Sceneform.isSupported(this)) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.mainFragment, ArFragment.class, null)
+                        .add(R.id.arFragment, ArFragment.class, null)
                         .commit();
             }
         }
@@ -96,7 +100,7 @@ public class ARActivity extends BaseActivity implements
 
     @Override
     public void onAttachFragment(@NonNull FragmentManager fragmentManager, @NonNull Fragment fragment) {
-        if (fragment.getId() == R.id.mainFragment) {
+        if (fragment.getId() == R.id.arFragment) {
             arFragment = (ArFragment) fragment;
             arFragment.setOnSessionConfigurationListener(this);
             arFragment.setOnViewCreatedListener(this);
