@@ -1,13 +1,23 @@
-package de.th.ro.datavis.ui;
+package de.th.ro.datavis.ui.bottomSheet;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.widget.LinearLayout;
 
-public class SwipeDetector extends GestureDetector.SimpleOnGestureListener {
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+
+import de.th.ro.datavis.R;
+
+public class BottomSheetHandler extends GestureDetector.SimpleOnGestureListener {
 
     private String TAG = "SwipeDetector";
+    BottomSheet bottomSheet;
 
+    public BottomSheetHandler(BottomSheet bottomSheet){
+        this.bottomSheet = bottomSheet;
+    }
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         final int SWIPE_MIN_DISTANCE = 120;
@@ -19,9 +29,7 @@ public class SwipeDetector extends GestureDetector.SimpleOnGestureListener {
             if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
                     && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
                 Log.d(TAG, "Up to Down");
-            } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE
-                    && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                Log.d(TAG, "Down to Up");
+                bottomSheet.showBottomSheetDialog();
             }
         } catch (Exception e) {
             // nothing
@@ -33,4 +41,6 @@ public class SwipeDetector extends GestureDetector.SimpleOnGestureListener {
     public boolean onDown(MotionEvent event) {
         return true;
     }
+
+
 }

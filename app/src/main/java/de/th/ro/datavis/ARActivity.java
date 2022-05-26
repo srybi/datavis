@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,7 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Config;
 import com.google.ar.core.HitResult;
@@ -45,7 +43,8 @@ import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.models.Sphere;
-import de.th.ro.datavis.ui.SwipeDetector;
+import de.th.ro.datavis.ui.bottomSheet.BottomSheet;
+import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
@@ -61,6 +60,7 @@ public class ARActivity extends BaseActivity implements
     private InterpretationMode mode = InterpretationMode.Linear;
     private Map<String, Renderable> renderableList = new HashMap<>();
     private IInterpreter ffsInterpreter;
+    private BottomSheet bottomSheet;
     private GestureDetector gestureDetector;
     private Uri fileUri;
     private String TAG = "myTag";
@@ -81,7 +81,8 @@ public class ARActivity extends BaseActivity implements
             }
         }
 
-        gestureDetector = new GestureDetector(this, new SwipeDetector());
+        bottomSheet = new BottomSheet(this);
+        gestureDetector = new GestureDetector(this, new BottomSheetHandler(bottomSheet));
 
         Bundle b = getIntent().getExtras();
         String uriString = b.getString("fileUri");
@@ -241,21 +242,11 @@ public class ARActivity extends BaseActivity implements
         gestureDetector.onTouchEvent(event);
         return super.onTouchEvent(event);
     }
-
+    //Used for gestureDetection
     @Override
     public boolean dispatchTouchEvent(MotionEvent event){
         this.gestureDetector.onTouchEvent(event);
         return super.dispatchTouchEvent(event);
     }
 
-    private void showBottomSheetDialog() {
-
-        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
-        bottomSheetDialog.setContentView(R.layout.modal_bottom_sheet);
-
-        LinearLayout share = bottomSheetDialog.findViewById(R.id.shareLinearLayout);
-        LinearLayout download = bottomSheetDialog.findViewById(R.id.download);
-
-        bottomSheetDialog.show();
-    }
 }
