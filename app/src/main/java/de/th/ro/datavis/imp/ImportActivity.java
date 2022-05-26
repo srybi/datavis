@@ -37,10 +37,10 @@ public class ImportActivity extends BaseActivity{
     AppDatabase appDb;
 
     Antenna currentAntenna;
-    List<AntennaField> currentAntenaField;
+    List<AntennaField> currentAntenaFields;
     ImportView importView;
 
-    static boolean lockUIUpdate = false;
+    static boolean firstRun = true;
 
 
     @Override
@@ -60,9 +60,15 @@ public class ImportActivity extends BaseActivity{
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        firstRun=true;
+    }
+
     private void initImportView(){
 
-        importView = new ImportView(this, currentAntenna, currentAntenaField) {
+        importView = new ImportView(this, currentAntenna, currentAntenaFields) {
             @Override
             public void chooseExistingAntenna() {
                 // Antennen zeigen
@@ -80,7 +86,6 @@ public class ImportActivity extends BaseActivity{
 
             @Override
             public void addNewAntenna() {
-                lockUIUpdate = true;
                 openFileDialog_Android9(FileRequests.REQUEST_CODE_ANTENNA);
             }
 
@@ -95,6 +100,9 @@ public class ImportActivity extends BaseActivity{
                     Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();
                     return;
                 }
+
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFragmentActivity());
+                preferences.edit().putInt("ID", currentAntenna.id).apply();
 
                 openFileDialog_Android9(FileRequests.REQUEST_CODE_FFS);
             }
@@ -115,8 +123,6 @@ public class ImportActivity extends BaseActivity{
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-
-        lockUIUpdate = false;
         if(resultCode == Activity.RESULT_OK){
 
 
@@ -128,7 +134,6 @@ public class ImportActivity extends BaseActivity{
                 future.get();
 
                 initImportView();
-//                importView.updateData(this, currentAntenna, currentAntenaField);
 
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
@@ -191,7 +196,8 @@ public class ImportActivity extends BaseActivity{
         AntennaField antennaField = new AntennaField(uri, name, antennaId);
         appDb.antennaFieldDao().insert(antennaField);
 
-        updateAntennaField(appDb);
+        handelGetAntennaInBackground(appDb, antennaId);
+        handelNewlyInsertedAntennaField(appDb, antennaId);
 
     }
 
@@ -204,7 +210,7 @@ public class ImportActivity extends BaseActivity{
 
         fieldList = appDb.antennaFieldDao().findByAntennaId_BackGround(currentAntenna.id); // todo anpassen
 
-        this.currentAntenaField = fieldList;
+        this.currentAntenaFields = fieldList;
 
     }
 
@@ -223,14 +229,32 @@ public class ImportActivity extends BaseActivity{
 
     }
 
+    private void handelNewlyInsertedAntennaField(AppDatabase appDb, int antennaId){
+        // Background
+        List<AntennaField> data =new ArrayList<>();
+        data = appDb.antennaFieldDao().findByAntennaId_BackGround(antennaId);
+
+        this.currentAntenaFields = data;
+
+    }
+
+    private void handelGetAntennaInBackground(AppDatabase appDb, int antennaId){
+        // Background
+        List<Antenna> data =new ArrayList<>();
+        data = appDb.antennaDao().find_Background(antennaId);
+
+        this.currentAntenna = data.get(0);
+
+    }
+
 
     private void setDefaultAntennaData(){
 
-        if (currentAntenna != null || lockUIUpdate){
+        if (currentAntenna != null || !firstRun){
             return;
         }
 
-        lockUIUpdate = true;
+        firstRun = false;
 
         LiveData<List<Antenna>> antennas = new MutableLiveData<>(new ArrayList<>());
 
@@ -280,7 +304,7 @@ public class ImportActivity extends BaseActivity{
         LiveData<List<AntennaField>> antennaFields = new MutableLiveData<>(new ArrayList<>());
         antennaFields = appDb.antennaFieldDao().findByAntennaId_Main(antennaId);
         antennaFields.observe(this, fieldList -> {
-            currentAntenaField = fieldList;
+            currentAntenaFields = fieldList;
 
             // Update UI
             initImportView();

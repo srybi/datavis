@@ -73,7 +73,7 @@ public abstract class ImportView implements IImportOptions {
 
         String s = "Antenna " + antenna.filename;
         tvHeadLine.setText(s);
-        tvHeadLine.setText(s);
+
     }
 
     public void updateData(FragmentActivity fa, Antenna antenna, List<AntennaField> antennaFieldList){
