@@ -4,9 +4,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -30,7 +29,6 @@ import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.rendering.ShapeFactory;
-import com.google.ar.sceneform.utilities.ChangeId;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
@@ -47,6 +45,7 @@ import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.models.Sphere;
+import de.th.ro.datavis.ui.SwipeDetector;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
@@ -55,13 +54,14 @@ public class ARActivity extends BaseActivity implements
         FragmentOnAttachListener,
         BaseArFragment.OnTapArPlaneListener,
         BaseArFragment.OnSessionConfigurationListener,
-        ArFragment.OnViewCreatedListener {
+        ArFragment.OnViewCreatedListener{
 
 
     private ArFragment arFragment;
     private InterpretationMode mode = InterpretationMode.Linear;
     private Map<String, Renderable> renderableList = new HashMap<>();
     private IInterpreter ffsInterpreter;
+    private GestureDetector gestureDetector;
     private Uri fileUri;
     private String TAG = "myTag";
 
@@ -81,13 +81,8 @@ public class ARActivity extends BaseActivity implements
             }
         }
 
-        Button btn = (Button) findViewById(R.id.bottomSheetBtn);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showBottomSheetDialog();
-            }
-        });
+        gestureDetector = new GestureDetector(this, new SwipeDetector());
+
         Bundle b = getIntent().getExtras();
         String uriString = b.getString("fileUri");
         try {
@@ -238,6 +233,19 @@ public class ARActivity extends BaseActivity implements
         model.setRenderable(renderable)
                 .animate(true).start();
         model.select();
+    }
+
+    //Used for gestureDetection
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        gestureDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event){
+        this.gestureDetector.onTouchEvent(event);
+        return super.dispatchTouchEvent(event);
     }
 
     private void showBottomSheetDialog() {

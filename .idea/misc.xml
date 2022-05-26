@@ -4,8 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/projects/datavis/app/src/main/res/layout/activity_ar.xml" value="0.21419410004275333" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/activity_import.xml" value="0.21419410004275333" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/activity_main.xml" value="0.276268115942029" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/antenna_field_list_item.xml" value="0.31666666666666665" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/antenna_list_item.xml" value="0.21419410004275333" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/appbar_main.xml" value="0.2609375" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/bottom_sheet.xml" value="0.2609375" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/dialog_import_existing_antenna.xml" value="0.2609375" />

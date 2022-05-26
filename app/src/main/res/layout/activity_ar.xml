@@ -6,35 +6,6 @@
     tools:context=".ARActivity"
     android:orientation="vertical">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/Theme.Datavis.AppBarOverlay">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/ar_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/Theme.Datavis.PopupOverlay"
-            />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-
-    <Button
-        android:id="@+id/bottomSheetBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/purple_500"
-        android:fontFamily="serif"
-        android:text="Show Dialog"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="116dp"
-        tools:layout_editor_absoluteY="28dp" />
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/arFragment"
         android:layout_width="match_parent"
