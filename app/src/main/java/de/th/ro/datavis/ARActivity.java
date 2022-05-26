@@ -81,6 +81,13 @@ public class ARActivity extends BaseActivity implements
             }
         }
 
+        Button btn = (Button) findViewById(R.id.bottomSheetBtn);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showBottomSheetDialog();
+            }
+        });
         Bundle b = getIntent().getExtras();
         String uriString = b.getString("fileUri");
         try {
@@ -233,4 +240,14 @@ public class ARActivity extends BaseActivity implements
         model.select();
     }
 
+    private void showBottomSheetDialog() {
+
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(R.layout.modal_bottom_sheet);
+
+        LinearLayout share = bottomSheetDialog.findViewById(R.id.shareLinearLayout);
+        LinearLayout download = bottomSheetDialog.findViewById(R.id.download);
+
+        bottomSheetDialog.show();
+    }
 }
