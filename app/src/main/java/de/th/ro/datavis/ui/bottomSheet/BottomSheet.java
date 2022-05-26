@@ -12,18 +12,23 @@ import android.widget.ToggleButton;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.util.LinkedList;
+
 import de.th.ro.datavis.R;
+import de.th.ro.datavis.interfaces.IObserver;
+import de.th.ro.datavis.interfaces.ISubject;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 /**
  * This java class is the logical representation of modal_bottom_sheet.xml
  */
-public class BottomSheet {
+public class BottomSheet implements ISubject {
     //Log Tag
     final private String TAG = "BottomSheet";
 
     //Context needed for init
     private Context context;
+    private LinkedList<IObserver> observers;
 
     /**
      * List of all settings. All setting have their actual State and a changing state.
@@ -33,8 +38,13 @@ public class BottomSheet {
     private InterpretationMode changedMode;
 
 
+    public InterpretationMode getMode(){
+        return this.mode;
+    }
+
     public BottomSheet(Context ctx){
         this.context = ctx;
+        observers = new LinkedList<>();
         //default values
         mode = InterpretationMode.Logarithmic;
     }
@@ -69,11 +79,9 @@ public class BottomSheet {
 
                 if(checkChanges()){ //check if anything has changed
                     updateSetting(); //if so update settings
-                    /*
-                    for(Subscriber s in subs){
-                        s.updated();
+                    for(IObserver o : observers){
+                        o.update();
                     }
-                    */
                 }
                 bottomSheetDialog.dismiss(); //close bottom sheet
             }
@@ -122,4 +130,9 @@ public class BottomSheet {
         switchBtn.setChecked(isChecked);
     }
 
+    //Observer Pattern
+    @Override
+    public void subscribe(IObserver observer) {
+        observers.add(observer);
+    }
 }
