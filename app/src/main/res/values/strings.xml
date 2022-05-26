@@ -31,5 +31,8 @@
     <string name="btn_add_new_antenna">Add new antenna</string>
     <string name="btn_add_metaData">Add Metadata</string>
     <string name="btn_add_ffs">Add FFS</string>
+    <string name="apply_changes">Apply Changes</string>
+    <string name="log">Log</string>
+    <string name="linear">Linear</string>
 
 </resources>
