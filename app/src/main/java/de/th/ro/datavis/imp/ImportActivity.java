@@ -25,9 +25,11 @@ import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
+import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.activity.BaseActivity;
-import de.th.ro.datavis.util.constants.FileRequests;
+import de.th.ro.datavis.util.constants.*;
 import de.th.ro.datavis.util.dialog.DialogExistingAntenna;
+import de.th.ro.datavis.util.enums.MetadataType;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 
 public class ImportActivity extends BaseActivity{
@@ -37,6 +39,7 @@ public class ImportActivity extends BaseActivity{
     AppDatabase appDb;
 
     Antenna currentAntenna;
+    MetaData currentMetaData;
     List<AntennaField> currentAntenaFields;
     ImportView importView;
 
@@ -91,7 +94,7 @@ public class ImportActivity extends BaseActivity{
 
             @Override
             public void addMetaData() {
-
+                openFileDialog_Android9(FileRequests.REQUEST_CODE_METADATA);
             }
 
             @Override
@@ -152,7 +155,6 @@ public class ImportActivity extends BaseActivity{
             @Override
             public void run() {
                 try {
-
                     Uri uri = data.getData();
                     String name = FileHandler.queryName( getContentResolver(), uri);
 
@@ -160,11 +162,11 @@ public class ImportActivity extends BaseActivity{
 
                     if (requestCode == FileRequests.REQUEST_CODE_ANTENNA){
                         persistAntenna(appDb, uri, name);
-                    } else {
+                    } else if(requestCode == FileRequests.REQUEST_CODE_FFS) {
                         persistFFS(appDb, uri, name);
+                    } else {
+                            //TODO: Metadatapainpai
                     }
-
-
 
                 }catch(Exception e){
                     //TODO: Improve exception handling
@@ -201,6 +203,20 @@ public class ImportActivity extends BaseActivity{
 
     }
 
+    /**
+     * Persists Metadata by creating Metadata Objects with all relevant parameters
+     */
+    public void persistMetadata(AppDatabase appDb, Uri uri, int id, int antennaID, String filename, String freq, String tilt, String type){
+        // Background
+        MetaData meta = new MetaData(id, antennaID, filename, freq, tilt, type);
+        appDb.metadataDao().insert(meta);
+
+        handelNewlyInsertedMetadata(appDb);
+
+        //Update Method necessary?
+        //updateAntennaField(appDb);
+    }
+
 
 
 
@@ -235,6 +251,20 @@ public class ImportActivity extends BaseActivity{
         data = appDb.antennaFieldDao().findByAntennaId_BackGround(antennaId);
 
         this.currentAntenaFields = data;
+
+    }
+
+    private void handelNewlyInsertedMetadata(AppDatabase appDb){
+        // Background
+        List<MetaData> data =new ArrayList<>();
+        data = appDb.metadataDao().getAll_Background();
+
+        int size2 = data.size();
+
+        // Last Antenna
+        MetaData meta = data.get(size2 -1);
+
+        this.currentMetaData = meta;
 
     }
 
