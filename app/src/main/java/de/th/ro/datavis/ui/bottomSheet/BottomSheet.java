@@ -1,7 +1,9 @@
 package de.th.ro.datavis.ui.bottomSheet;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.icu.text.CaseMap;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
@@ -19,8 +22,10 @@ import com.google.android.material.slider.Slider;
 import java.util.LinkedList;
 
 import de.th.ro.datavis.R;
+import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interfaces.ISubject;
+import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 /**
@@ -44,6 +49,7 @@ public class BottomSheet implements ISubject {
      */
     private InterpretationMode mode;
     private InterpretationMode changedMode;
+    private String HPBW;
 
     private double frequency;
     private double changedFrequency;
@@ -56,7 +62,6 @@ public class BottomSheet implements ISubject {
     public BottomSheet(Context ctx){
         this.context = ctx;
         observers = new LinkedList<>();
-
         //default values
         mode = InterpretationMode.Logarithmic;
         frequency = 1;
@@ -70,6 +75,11 @@ public class BottomSheet implements ISubject {
         bottomSheetDialog.setContentView(R.layout.modal_bottom_sheet);
 
         //get all interactables
+        Switch modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
+        Button applyButton = bottomSheetDialog.findViewById(R.id.apply);
+
+        updateMetadataViews(new MetaData("2", "3","4"), bottomSheetDialog);
+
         modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
         frequencySlider = bottomSheetDialog.findViewById(R.id.sliderFrequency);
         applyButton = bottomSheetDialog.findViewById(R.id.apply);
@@ -108,11 +118,12 @@ public class BottomSheet implements ISubject {
                 bottomSheetDialog.dismiss(); //close bottom sheet
             }
         });
+        //AppDatabase.getInstance(context).metadataDao().findByMetadata_Main(AntennID, Tilt, Freq);
+
+
 
         bottomSheetDialog.show(); //open bottom sheet
     }
-
-
 
     /**
      * This function restores the bottom sheet with its currently used settings.
@@ -120,12 +131,18 @@ public class BottomSheet implements ISubject {
      */
     private void keepSettings(BottomSheetDialog btmSheetDialog){
         //mode switch
+        Switch modeSwitch = btmSheetDialog.findViewById(R.id.switchMode);
         if(mode == InterpretationMode.Linear){
             modeSwitch.setChecked(true);
         }
 
         //frequency slider
         frequencySlider.setValue((float) frequency);
+    }
+    private void updateMetadataViews(MetaData m, BottomSheetDialog b){
+
+        TextView hpbw = b.findViewById(R.id.meta_HPBW);
+
     }
 
     /**
