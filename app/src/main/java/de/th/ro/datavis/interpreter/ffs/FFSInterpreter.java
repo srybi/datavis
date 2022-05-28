@@ -108,7 +108,11 @@ public class FFSInterpreter implements IInterpreter {
                     return new FFSLine(dVals[0], dVals[1], dVals[2], dVals[3], dVals[4], dVals[5]);
                 }).collect(Collectors.toList());
 
-        coordinates = ffsLines.stream().map(l -> {
+        //Bugfix: If stepsize of file is greater than smaller than 3, the interpreter will use a stepsize of 3
+        final int stepSize = (ffsLines.get(1).getTheta() - ffsLines.get(0).getTheta()) < 3 ? 3 : 1;
+
+        //Bugfix: filter all negative intensities
+        coordinates = ffsLines.stream().filter(l -> (l.getPhi()%stepSize == 0) && (l.getTheta()%stepSize == 0)).filter(l -> Calc.calcIntensity(l, mode) > 0).map(l -> {
 
             double x = Calc.x_polarToCartesian(l, mode);
             double y = Calc.y_polarToCartesian(l, mode);
