@@ -35,9 +35,10 @@ public class MetadataInterpreter {
      * @return  Matrix of .csv Data
      * @throws CSVException
      */
-    public String[][] interpretCSV(InputStream in) throws CSVException {
+    public String[][] interpretCSV(InputStream in) throws IOException {
         InputStreamReader reader = new InputStreamReader(in);
         BufferedReader br = new BufferedReader(reader);
+        Log.d(LOG_TAG, "Interpreting csv as matrix...");
 
         List<String[]> rowList = new ArrayList<>();
         try {
@@ -47,16 +48,16 @@ public class MetadataInterpreter {
                 rowList.add(lineItems);
             }
         }
-        catch(IOException e){
-            throw new CSVException("Read CSV failed");
-        }
+        catch(IOException e){}
 
         String[][] matrix = new String[rowList.size()][];
         for (int i = 0; i < rowList.size(); i++) {
             String[] row = rowList.get(i);
             matrix[i] = row;
         }
+        Log.d(LOG_TAG, "Finished generating csv matrix...");
         return matrix;
+
     }
 
     /**
@@ -73,6 +74,7 @@ public class MetadataInterpreter {
                 lines.add(line);
             }
         } catch (IOException e){}
+
         return lines;
     }
 
@@ -89,6 +91,7 @@ public class MetadataInterpreter {
                 mList.add(m);
             }
         }
+        Log.d(LOG_TAG, "Finished making MetaData from matrix...");
         return mList;
     }
 

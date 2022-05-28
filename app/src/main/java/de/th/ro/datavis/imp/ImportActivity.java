@@ -14,6 +14,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -23,6 +27,7 @@ import java.util.concurrent.Future;
 
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
+import de.th.ro.datavis.interpreter.csv.MetadataInterpreter;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.MetaData;
@@ -30,6 +35,8 @@ import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.*;
 import de.th.ro.datavis.util.dialog.DialogExistingAntenna;
 import de.th.ro.datavis.util.enums.MetadataType;
+import de.th.ro.datavis.util.exceptions.CSVException;
+import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 
 public class ImportActivity extends BaseActivity{
@@ -94,6 +101,13 @@ public class ImportActivity extends BaseActivity{
 
             @Override
             public void addMetaData() {
+                if (currentAntenna == null){
+                    Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFragmentActivity());
+                preferences.edit().putInt("ID", currentAntenna.id).apply();
+
                 openFileDialog_Android9(FileRequests.REQUEST_CODE_METADATA);
             }
 
@@ -165,7 +179,7 @@ public class ImportActivity extends BaseActivity{
                     } else if(requestCode == FileRequests.REQUEST_CODE_FFS) {
                         persistFFS(appDb, uri, name);
                     } else {
-                            //TODO: Metadatapainpai
+                        persistMetadata(appDb, uri, name);
                     }
 
                 }catch(Exception e){
@@ -206,14 +220,41 @@ public class ImportActivity extends BaseActivity{
     /**
      * Persists Metadata
      */
-    public void persistMetadata(AppDatabase appDb, Uri uri, MetaData m){
+    public void persistMetadata(AppDatabase appDb, Uri uri, String name){
         // Background
-        appDb.metadataDao().insert(m);
 
+        List<MetaData> list = getCSVMetadata(uri);
+        for(MetaData e : list){
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            int antennaId = preferences.getInt("ID", 1);
+            e.setAntennaID(antennaId);
+            e.setType(uri.getLastPathSegment());
+            appDb.metadataDao().insert(e);
+        }
         handelNewlyInsertedMetadata(appDb);
-
         //Update Method necessary?
         //updateAntennaField(appDb);
+    }
+
+    public List<MetaData> getCSVMetadata(Uri uri){
+        List<MetaData> m = null;
+        MetadataInterpreter metaInt = new MetadataInterpreter();
+        try {
+            if(uri == null){
+                m.add(new MetaData("N/A","N/A","N/A"));
+            }else{
+                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                InputStream in = getContentResolver().openInputStream(uri);
+                m = metaInt.getMetadataFromLines(metaInt.interpretCSV(in));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch(SecurityException se){
+            Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        return m;
     }
 
 
