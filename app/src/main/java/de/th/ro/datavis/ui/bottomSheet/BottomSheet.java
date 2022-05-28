@@ -3,6 +3,7 @@ package de.th.ro.datavis.ui.bottomSheet;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -10,7 +11,10 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.ToggleButton;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.slider.Slider;
 
 import java.util.LinkedList;
 
@@ -30,12 +34,19 @@ public class BottomSheet implements ISubject {
     private Context context;
     private LinkedList<IObserver> observers;
 
+    private Switch modeSwitch;
+    private Slider frequencySlider;
+    private Button applyButton;
+
     /**
      * List of all settings. All setting have their actual State and a changing state.
      * - InterpretationMode
      */
     private InterpretationMode mode;
     private InterpretationMode changedMode;
+
+    private double frequency;
+    private double changedFrequency;
 
 
     public InterpretationMode getMode(){
@@ -45,8 +56,10 @@ public class BottomSheet implements ISubject {
     public BottomSheet(Context ctx){
         this.context = ctx;
         observers = new LinkedList<>();
+
         //default values
         mode = InterpretationMode.Logarithmic;
+        frequency = 1;
     }
 
     /**
@@ -57,8 +70,9 @@ public class BottomSheet implements ISubject {
         bottomSheetDialog.setContentView(R.layout.modal_bottom_sheet);
 
         //get all interactables
-        Switch modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
-        Button applyButton = bottomSheetDialog.findViewById(R.id.apply);
+        modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
+        frequencySlider = bottomSheetDialog.findViewById(R.id.sliderFrequency);
+        applyButton = bottomSheetDialog.findViewById(R.id.apply);
         //init with current setting
         keepSettings(bottomSheetDialog);
 
@@ -68,6 +82,14 @@ public class BottomSheet implements ISubject {
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 Log.d(TAG, "onCheckedChanged: handeling ModeSwitch");
                 handleModeSwitch(compoundButton, isChecked);
+            }
+        });
+
+        frequencySlider.addOnChangeListener(new Slider.OnChangeListener() {
+            @Override
+            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                Log.d(TAG, "onValueChange: handeling FrequencySlider");
+                handleFrequencySlider(value);
             }
         });
 
@@ -90,16 +112,20 @@ public class BottomSheet implements ISubject {
         bottomSheetDialog.show(); //open bottom sheet
     }
 
+
+
     /**
      * This function restores the bottom sheet with its currently used settings.
      * @param btmSheetDialog
      */
     private void keepSettings(BottomSheetDialog btmSheetDialog){
         //mode switch
-        Switch modeSwitch = btmSheetDialog.findViewById(R.id.switchMode);
         if(mode == InterpretationMode.Linear){
             modeSwitch.setChecked(true);
         }
+
+        //frequency slider
+        frequencySlider.setValue((float) frequency);
     }
 
     /**
@@ -108,9 +134,11 @@ public class BottomSheet implements ISubject {
      * @return if anything has changed
      */
     private boolean checkChanges(){
-        boolean modeChange = changedMode != mode;
         //boolean oderChange = changedSetting != setting;
-        return modeChange; // || oderChange;
+
+        boolean modeChange = changedMode != mode;
+        boolean frequencyChange = changedFrequency != frequency;
+        return modeChange || frequencyChange;
     }
 
     /**
@@ -118,6 +146,7 @@ public class BottomSheet implements ISubject {
      */
     private void updateSetting(){
         mode = changedMode;
+        frequency = changedFrequency;
     }
 
     private void handleModeSwitch(CompoundButton switchBtn, boolean isChecked){
@@ -128,6 +157,10 @@ public class BottomSheet implements ISubject {
             changedMode = InterpretationMode.Logarithmic;
         }
         switchBtn.setChecked(isChecked);
+    }
+
+    private void handleFrequencySlider(float value) {
+        changedFrequency = value;
     }
 
     //Observer Pattern

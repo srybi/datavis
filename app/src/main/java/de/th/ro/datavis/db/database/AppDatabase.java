@@ -5,17 +5,23 @@ import android.content.Context;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 
+import de.th.ro.datavis.db.Converters.Converter;
 import de.th.ro.datavis.db.daos.AntennaDao;
 import de.th.ro.datavis.db.daos.AntennaFieldDao;
+import de.th.ro.datavis.db.daos.AtomicFieldDao;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
+import de.th.ro.datavis.models.AtomicField;
 
-@Database(entities = {AntennaField.class, Antenna.class}, version = 3)
+@Database(entities = {AntennaField.class, Antenna.class, AtomicField.class}, version = 4)
+@TypeConverters({Converter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract AntennaFieldDao antennaFieldDao();
     public abstract AntennaDao antennaDao();
+    public abstract AtomicFieldDao atomicFieldDao();
 
     private static final String DB_NAME = "antenna_fields";
     private static AppDatabase instance;

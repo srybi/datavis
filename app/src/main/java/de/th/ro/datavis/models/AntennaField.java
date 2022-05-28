@@ -8,7 +8,9 @@ import androidx.room.PrimaryKey;
 
 import org.jetbrains.annotations.NotNull;
 
-@Entity
+import java.util.ArrayList;
+
+@Entity(tableName = "antenna_field")
 public class AntennaField {
     @PrimaryKey(autoGenerate = true)
     public int id;

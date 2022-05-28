@@ -3,43 +3,28 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/activity_ar.xml" value="0.21419410004275333" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/activity_import.xml" value="0.21419410004275333" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/activity_main.xml" value="0.276268115942029" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/antenna_field_list_item.xml" value="0.31666666666666665" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/antenna_list_item.xml" value="0.21419410004275333" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/appbar_main.xml" value="0.2609375" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/bottom_sheet.xml" value="0.2609375" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/dialog_import_existing_antenna.xml" value="0.2609375" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_ar.xml" value="0.2" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_import.xml" value="0.2609375" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_ar.xml" value="0.31666666666666665" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_main.xml" value="0.31666666666666665" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/modal_bottom_sheet.xml" value="0.25" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/view_model_title.xml" value="0.31666666666666665" />
-        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.211" />
-        <entry key="app/src/main/res/drawable/ic_instructions.xml" value="0.202" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1695" />
-        <entry key="app/src/main/res/layout/activity_app_instructions.xml" value="0.2006340579710145" />
         <entry key="app/src/main/res/layout/activity_ar.xml" value="0.23229166666666667" />
-        <entry key="app/src/main/res/layout/activity_import.xml" value="0.2006340579710145" />
-        <entry key="app/src/main/res/layout/activity_import_instructions.xml" value="0.2006340579710145" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/antenna_field_list_item.xml" value="0.2" />
-        <entry key="app/src/main/res/layout/antenna_list_item.xml" value="0.2006340579710145" />
         <entry key="app/src/main/res/layout/appbar_main.xml" value="0.23229166666666667" />
-        <entry key="app/src/main/res/layout/dialog_import_existing_antenna.xml" value="0.2006340579710145" />
-        <entry key="app/src/main/res/layout/fragment_app_instructions.xml" value="0.2006340579710145" />
         <entry key="app/src/main/res/layout/fragment_ar.xml" value="0.10885416666666667" />
-        <entry key="app/src/main/res/layout/fragment_import.xml" value="0.2006340579710145" />
-        <entry key="app/src/main/res/layout/fragment_import_instructions.xml" value="0.2006340579710145" />
         <entry key="app/src/main/res/layout/fragment_main.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/modal_bottom_sheet.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/sceneform_instructions_augmented_image.xml" value="0.21920289855072464" />
+        <entry key="app/src/main/res/layout/sceneform_ux_fragment_layout.xml" value="0.21920289855072464" />
         <entry key="app/src/main/res/layout/test.xml" value="0.23229166666666667" />
         <entry key="app/src/main/res/layout/view_model_title.xml" value="0.17135416666666667" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.31197916666666664" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="Android API 32 Platform" project-jdk-type="Android SDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android API 32 Platform" project-jdk-type="Android SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

@@ -35,4 +35,7 @@
     <string name="log">Log</string>
     <string name="linear">Linear</string>
 
+    <!-- Bottom Sheet -->
+    <string name="frequency">Frequency</string>
+
 </resources>

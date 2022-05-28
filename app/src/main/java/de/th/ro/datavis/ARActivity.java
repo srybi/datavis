@@ -44,6 +44,8 @@ import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
+import de.th.ro.datavis.models.AtomicField;
+import de.th.ro.datavis.models.Result;
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheet;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
@@ -160,11 +162,13 @@ public class ARActivity extends BaseActivity implements
         try {
             if(fileUri == null){
                 File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
-                coordinates = ffsInterpreter.interpretData(file, 0.2, bottomSheet.getMode());
+                Result<AtomicField> result = ffsInterpreter.interpretData(file, 0.2, bottomSheet.getMode());
+                coordinates = result.getData().spheres;
             }else{
                 getContentResolver().takePersistableUriPermission(fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 InputStream inputStream = getContentResolver().openInputStream(fileUri);
-                coordinates = ffsInterpreter.interpretData(inputStream, 0.4, bottomSheet.getMode());
+                Result<AtomicField> result = ffsInterpreter.interpretData(inputStream, 0.4, bottomSheet.getMode());
+                coordinates = result.getData().spheres;
             }
 
         } catch (FFSInterpretException | FileNotFoundException e) {

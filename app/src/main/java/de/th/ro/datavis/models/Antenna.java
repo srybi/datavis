@@ -7,7 +7,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity
+@Entity(tableName = "antenna")
 public class Antenna {
 
     @PrimaryKey(autoGenerate = true)
