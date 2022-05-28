@@ -204,12 +204,11 @@ public class ImportActivity extends BaseActivity{
     }
 
     /**
-     * Persists Metadata by creating Metadata Objects with all relevant parameters
+     * Persists Metadata
      */
-    public void persistMetadata(AppDatabase appDb, Uri uri, int id, int antennaID, String filename, String freq, String tilt, String type){
+    public void persistMetadata(AppDatabase appDb, Uri uri, MetaData m){
         // Background
-        MetaData meta = new MetaData(id, antennaID, filename, freq, tilt, type);
-        appDb.metadataDao().insert(meta);
+        appDb.metadataDao().insert(m);
 
         handelNewlyInsertedMetadata(appDb);
 

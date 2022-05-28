@@ -20,6 +20,7 @@ public class MetaData {
 
     public String freq;
     public String tilt;
+    public String value;
 
     public String HHPBW_deg, H10dBBW_deg, VHPBW_deg, Directivity_dBi = "N/A";
 
@@ -28,13 +29,10 @@ public class MetaData {
     // todo Fields
 
 
-    public MetaData(int id, int antennaID, String filename, String freq, String tilt, String type) {
-        this.id = id;
-        this.antennaID = antennaID;
-        this.filename = filename;
+    public MetaData(String freq, String tilt, String value) {
         this.freq = freq;
         this.tilt = tilt;
-        this.type = type;
+        this.value = value;
     }
 
     @Ignore
