@@ -62,8 +62,6 @@ public class ImportActivity extends BaseActivity{
         setContentView(R.layout.activity_import);
         setFragmentContainerView(R.id.importFragment);
 
-
-
         Toolbar toolbar = findViewById(R.id.import_toolbar);
         setSupportActionBar(toolbar);
 
@@ -146,17 +144,18 @@ public class ImportActivity extends BaseActivity{
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Log.d(LOG_TAG, "Activity result");
         if(resultCode == Activity.RESULT_OK){
-
+            Log.d(LOG_TAG, "Request Code: "+requestCode);
             //Files can only be read from Main/UI Thread
-            if(resultCode == FileRequests.REQUEST_CODE_METADATA){
+
+            /*if(requestCode == FileRequests.REQUEST_CODE_METADATA){
                 Uri uri = data.getData();
-                String name = FileHandler.queryName( getContentResolver(), uri);
+                String name = FileHandler.queryName(getContentResolver(), uri);
 
                 AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
-                persistMetadata(appDb, uri, name);
-            }
+                persistMetadata(appDb, uri, name, data);
+            }*/
 
             ExecutorService executorService  = Executors.newSingleThreadExecutor();
 
@@ -194,7 +193,7 @@ public class ImportActivity extends BaseActivity{
                     } else if(requestCode == FileRequests.REQUEST_CODE_FFS) {
                         persistFFS(appDb, uri, name);
                     } else {
-                        //persistMetadata(appDb, uri, name);
+                        persistMetadata(appDb, uri, name, data);
                     }
 
                 }catch(Exception e){
@@ -235,32 +234,32 @@ public class ImportActivity extends BaseActivity{
     /**
      * Persists Metadata
      */
-    public void persistMetadata(AppDatabase appDb, Uri uri, String name){
+    public void persistMetadata(AppDatabase appDb, Uri uri, String name, Intent data){
         // Background
-        List<MetaData> list = getCSVMetadata(uri);
+        List<MetaData> list = getCSVMetadata(data);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         int antennaId = preferences.getInt("ID", 1);
 
         for(MetaData e : list){
+            Log.d(LOG_TAG, "Saving Metadata");
             e.setAntennaID(antennaId);
-            //Log= uri.getLastPathSegment();
-            String filename = FileHandler.queryName( getContentResolver(), uri);
-            //.csv weg
-            e.setType(filename);
+            if(name.contains(".")) name.substring(0, name.lastIndexOf('.'));
+            e.setType(name);
             appDb.metadataDao().insert(e);
         }
         handelNewlyInsertedMetadata(appDb);
     }
 
-    public List<MetaData> getCSVMetadata(Uri uri){
+    public List<MetaData> getCSVMetadata(Intent data){
         List<MetaData> m = null;
 
         try {
-            if(uri == null){
+            if(data.getData() == null){
                 m.add(new MetaData("N/A","N/A","N/A"));
             }else{
-                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                InputStream in = getContentResolver().openInputStream(uri);
+                //getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                InputStream in = getContentResolver().openInputStream(data.getData());
+                Log.d(LOG_TAG, "Input Stream open");
                 m = metaInt.getMetadataFromLines(metaInt.interpretCSV(in));
             }
         } catch (IOException e) {
