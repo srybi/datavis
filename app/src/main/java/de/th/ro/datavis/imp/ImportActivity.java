@@ -62,6 +62,8 @@ public class ImportActivity extends BaseActivity{
         setContentView(R.layout.activity_import);
         setFragmentContainerView(R.id.importFragment);
 
+
+
         Toolbar toolbar = findViewById(R.id.import_toolbar);
         setSupportActionBar(toolbar);
 
@@ -147,6 +149,14 @@ public class ImportActivity extends BaseActivity{
 
         if(resultCode == Activity.RESULT_OK){
 
+            //Files can only be read from Main/UI Thread
+            if(resultCode == FileRequests.REQUEST_CODE_METADATA){
+                Uri uri = data.getData();
+                String name = FileHandler.queryName( getContentResolver(), uri);
+
+                AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
+                persistMetadata(appDb, uri, name);
+            }
 
             ExecutorService executorService  = Executors.newSingleThreadExecutor();
 
@@ -184,7 +194,7 @@ public class ImportActivity extends BaseActivity{
                     } else if(requestCode == FileRequests.REQUEST_CODE_FFS) {
                         persistFFS(appDb, uri, name);
                     } else {
-                        persistMetadata(appDb, uri, name);
+                        //persistMetadata(appDb, uri, name);
                     }
 
                 }catch(Exception e){

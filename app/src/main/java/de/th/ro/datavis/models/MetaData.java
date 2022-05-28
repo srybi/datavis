@@ -18,8 +18,6 @@ public class MetaData {
     @PrimaryKey(autoGenerate = true)
     public int id;
     public int antennaID;
-    public String filename;
-    public String uri;
     public String type;
 
     public String freq;
