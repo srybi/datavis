@@ -1,7 +1,9 @@
 package de.th.ro.datavis.ui.bottomSheet;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.icu.text.CaseMap;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,8 +18,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.LinkedList;
 
 import de.th.ro.datavis.R;
+import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interfaces.ISubject;
+import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 /**
@@ -35,6 +39,8 @@ public class BottomSheet implements ISubject {
      * List of all settings. All setting have their actual State and a changing state.
      * - InterpretationMode
      */
+
+
     private InterpretationMode mode;
     private InterpretationMode changedMode;
     private String HPBW;
@@ -61,7 +67,9 @@ public class BottomSheet implements ISubject {
         //get all interactables
         Switch modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
         Button applyButton = bottomSheetDialog.findViewById(R.id.apply);
-        TextView textView = bottomSheetDialog.findViewById(R.id.meta_HPBW);
+
+        updateMetadataViews(new MetaData("2", "3","4"), bottomSheetDialog);
+
         //init with current setting
         keepSettings(bottomSheetDialog);
 
@@ -89,6 +97,9 @@ public class BottomSheet implements ISubject {
                 bottomSheetDialog.dismiss(); //close bottom sheet
             }
         });
+        //AppDatabase.getInstance(context).metadataDao().findByMetadata_Main(AntennID, Tilt, Freq);
+
+
 
         bottomSheetDialog.show(); //open bottom sheet
     }
@@ -103,6 +114,11 @@ public class BottomSheet implements ISubject {
         if(mode == InterpretationMode.Linear){
             modeSwitch.setChecked(true);
         }
+    }
+    private void updateMetadataViews(MetaData m, BottomSheetDialog b){
+
+        TextView hpbw = b.findViewById(R.id.meta_HPBW);
+
     }
 
     /**

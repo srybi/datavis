@@ -33,7 +33,7 @@ public interface MetadataDao {
 
     //Identifies Metadata by AntennenID, Freq und Tilt
     @Query("SELECT * FROM metadata where id = :ID AND freq = :FREQ AND tilt = :TILT")
-    LiveData<List<MetaData>> find_Main(int ID, String FREQ, String TILT);
+    LiveData<List<MetaData>> findByMetadata_Main(int ID, String FREQ, String TILT);
 
     @Insert
     void insert(MetaData metaData);

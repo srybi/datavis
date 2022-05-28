@@ -50,6 +50,8 @@ public class ImportActivity extends BaseActivity{
     List<AntennaField> currentAntenaFields;
     ImportView importView;
 
+    MetadataInterpreter metaInt = new MetadataInterpreter();
+
     static boolean firstRun = true;
 
 
@@ -129,6 +131,9 @@ public class ImportActivity extends BaseActivity{
     private void openFileDialog_Android9(int requestCode){
         Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
         chooseFile.setType("*/*");
+        chooseFile.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         chooseFile = Intent.createChooser(chooseFile, "Choose a file");
 
         startActivityForResult(chooseFile, requestCode);
@@ -222,23 +227,24 @@ public class ImportActivity extends BaseActivity{
      */
     public void persistMetadata(AppDatabase appDb, Uri uri, String name){
         // Background
-
         List<MetaData> list = getCSVMetadata(uri);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int antennaId = preferences.getInt("ID", 1);
+
         for(MetaData e : list){
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            int antennaId = preferences.getInt("ID", 1);
             e.setAntennaID(antennaId);
-            e.setType(uri.getLastPathSegment());
+            //Log= uri.getLastPathSegment();
+            String filename = FileHandler.queryName( getContentResolver(), uri);
+            //.csv weg
+            e.setType(filename);
             appDb.metadataDao().insert(e);
         }
         handelNewlyInsertedMetadata(appDb);
-        //Update Method necessary?
-        //updateAntennaField(appDb);
     }
 
     public List<MetaData> getCSVMetadata(Uri uri){
         List<MetaData> m = null;
-        MetadataInterpreter metaInt = new MetadataInterpreter();
+
         try {
             if(uri == null){
                 m.add(new MetaData("N/A","N/A","N/A"));
@@ -251,7 +257,8 @@ public class ImportActivity extends BaseActivity{
             e.printStackTrace();
             return null;
         } catch(SecurityException se){
-            Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
+            se.printStackTrace();
+            //Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
             return null;
         }
         return m;
