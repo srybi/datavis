@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -28,21 +29,24 @@ public class FFSService {
     }
 
     void interpretData(InputStream stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException{
-        Result<AtomicField> field = interpreter.interpretData(stream, scalingFactor, mode);
+        Result<ArrayList<AtomicField>> field = interpreter.interpretData(stream, scalingFactor, mode);
         saveSpheresIfNotExist(field.getData());
     }
 
     void interpretData(File file, double scalingFactor, InterpretationMode mode) throws FFSInterpretException{
-        Result<AtomicField> field = interpreter.interpretData(file, scalingFactor, mode);
+        Result<ArrayList<AtomicField>> field = interpreter.interpretData(file, scalingFactor, mode);
         saveSpheresIfNotExist(field.getData());
     }
 
-    private void saveSpheresIfNotExist(AtomicField field) {
+    private void saveSpheresIfNotExist(ArrayList<AtomicField> fields) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                db.atomicFieldDao().insert(field);
+                for (AtomicField field : fields) {
+                    db.atomicFieldDao().insert(field);
+                }
             }
         });
     }
+
 }

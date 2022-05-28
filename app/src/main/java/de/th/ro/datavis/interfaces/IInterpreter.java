@@ -2,6 +2,7 @@ package de.th.ro.datavis.interfaces;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
@@ -15,9 +16,10 @@ public interface IInterpreter {
      * Gives back a Vextor3 List from a File, based on the given inputstream or file.
      * @return a List of Vector3's
      */
-    Result<AtomicField> interpretData(InputStream stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException;
-    Result<AtomicField> interpretData(File file, double scalingFactor, InterpretationMode mode) throws FFSInterpretException;
-    Result<AtomicField> interpretDataAsStream(Stream<String> stream, double scalingFactor, int samples, InterpretationMode mode) throws FFSInterpretException;
+    Result<ArrayList<AtomicField>> interpretData(InputStream stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException;
+    Result<ArrayList<AtomicField>> interpretData(File file, double scalingFactor, InterpretationMode mode) throws FFSInterpretException;
+    Result<AtomicField> interpretDataAsStream(Stream<String> stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException;
+
     FFSIntensityColor mapToColor(double intensity);
 
 }

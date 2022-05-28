@@ -162,16 +162,16 @@ public class ARActivity extends BaseActivity implements
         try {
             if(fileUri == null){
                 File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
-                Result<AtomicField> result = ffsInterpreter.interpretData(file, 0.2, bottomSheet.getMode());
-                coordinates = result.getData().spheres;
+                //Result<AtomicField> result = ffsInterpreter.interpretData(file, 0.2, bottomSheet.getMode());
+                //coordinates = result.getData().spheres;
             }else{
                 getContentResolver().takePersistableUriPermission(fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 InputStream inputStream = getContentResolver().openInputStream(fileUri);
-                Result<AtomicField> result = ffsInterpreter.interpretData(inputStream, 0.4, bottomSheet.getMode());
-                coordinates = result.getData().spheres;
+                //Result<AtomicField> result = ffsInterpreter.interpretData(inputStream, 0.4, bottomSheet.getMode());
+                //coordinates = result.getData().spheres;
             }
 
-        } catch (FFSInterpretException | FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;
         } catch(SecurityException se){

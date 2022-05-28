@@ -1,7 +1,5 @@
 package de.th.ro.datavis.interpreter.ffs;
 
-import static de.th.ro.datavis.models.Result.success;
-
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -37,16 +35,15 @@ public class FFSInterpreter implements IInterpreter {
 
 
     @Override
-    public Result<AtomicField> interpretData(InputStream stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+    public Result<ArrayList<AtomicField>> interpretData(InputStream stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
             InputStreamReader reader = new InputStreamReader(stream);
             BufferedReader bufferedReader = new BufferedReader(reader);
 
             return interpretData(bufferedReader, scalingFactor, mode);
-
     }
 
     @Override
-    public Result<AtomicField> interpretData(File file, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+    public Result<ArrayList<AtomicField>> interpretData(File file, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -97,6 +94,8 @@ public class FFSInterpreter implements IInterpreter {
             ArrayList<ArrayList<String>> values = new ArrayList<ArrayList<String>>();
             for (int i = 0; i < frequencies; i++) {
                 values.add(readAtomicField(reader, samples));
+
+                //Dont search for next atomicfield if we are at the last one
                 if(i < frequencies - 1)
                     findNextAtomicField(reader);
             }
@@ -131,8 +130,8 @@ public class FFSInterpreter implements IInterpreter {
     private ArrayList<AtomicField> interpretValues(ArrayList<ArrayList<String>> values, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
         ArrayList<AtomicField> atomicFields = new ArrayList<>();
         for(ArrayList<String> value : values){
-            AtomicField atomicField = interpretValue(value, scalingFactor, mode);
-            atomicFields.add(atomicField);
+            Result<AtomicField> atomicField = interpretValue(value, scalingFactor, mode);
+            atomicFields.add(atomicField.getData());
         }
         return atomicFields;
     }
