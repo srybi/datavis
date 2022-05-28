@@ -23,6 +23,8 @@ import java.util.concurrent.Future;
 
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
+import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
+import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.util.activity.BaseActivity;
@@ -35,6 +37,8 @@ public class ImportActivity extends BaseActivity{
     private final String LOG_TAG = "ImportActivity";
 
     AppDatabase appDb;
+
+    FFSService ffsService;
 
     Antenna currentAntenna;
     List<AntennaField> currentAntenaFields;
@@ -55,6 +59,7 @@ public class ImportActivity extends BaseActivity{
 
 
         appDb  = AppDatabase.getInstance(getApplicationContext());
+        ffsService = new FFSService(new FFSInterpreter(), this);
 
         setDefaultAntennaData();
 

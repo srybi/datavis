@@ -70,6 +70,9 @@ public class AtomicField {
         this.antennaId = antennaId;
         this.antennaFieldId = antennaFieldId;
     }
+    public AtomicField(){
+
+    }
 
 
 }

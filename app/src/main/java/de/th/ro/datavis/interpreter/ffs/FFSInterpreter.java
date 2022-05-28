@@ -59,13 +59,14 @@ public class FFSInterpreter implements IInterpreter {
     }
 
 
-    private Result<AtomicField> interpretData(BufferedReader reader, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+    private Result<ArrayList<AtomicField>> interpretData(BufferedReader reader, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
         AtomicField atomicField;
         maxItensity = -1;
         Log.d(LOG_TAG, "Start Interpretation...");
         List<Sphere> coordinates;
         int frequencies = -1;
         int samples = -1;
+        ArrayList<Double> frequencyValues = new ArrayList<>();
         boolean startFound = false;
 
         try {
@@ -87,28 +88,47 @@ public class FFSInterpreter implements IInterpreter {
                     startFound = true;
                     break;
                 }
+                if(Calc.calcLevenstheinDistance(line.trim(),(FFSConstants.RADACCSTMFREQ_HEADER.trim())) < MAX_HAMMING_DISTANCE){
+                    frequencyValues = extractFrequencyValues(reader, frequencies);
+                    break;
+                }
             }
 
             ArrayList<ArrayList<String>> values = new ArrayList<ArrayList<String>>();
             for (int i = 0; i < frequencies; i++) {
-                values.add(readAtomicField(reader, samples);
-                findNextAtomicField(reader);
+                values.add(readAtomicField(reader, samples));
+                if(i < frequencies - 1)
+                    findNextAtomicField(reader);
             }
 
             ArrayList<AtomicField> atomicFields = interpretValues(values, scalingFactor, mode);
+            Log.d(LOG_TAG, "Interpretation finished");
+            return Result.success(atomicFields);
 
-            Result<AtomicField> result = interpretDataAsStream(reader.lines(), scalingFactor, samples, mode);
-            atomicField = result.getData();
         } catch (Exception e) {
             //TODO: Specify exceptions, which can be thrown during the interpretation
             throw new FFSInterpretException(e.getMessage());
         }
 
-        Log.d(LOG_TAG, "Interpretation finished");
-        return Result.success(atomicField);
+
+
     }
 
-    private ArrayList<AtomicField> interpretValues(ArrayList<ArrayList<String>> values, double scalingFactor, InterpretationMode mode) {
+    private ArrayList<Double> extractFrequencyValues(BufferedReader reader, int frequencies) throws IOException {
+        int valuesPerFreq = 4 + 1; // 4 values per frequency + 1 for a empty line
+        ArrayList<Double> frequencyValues = new ArrayList<>();
+        for (int i = 0; i < frequencies; i++) {
+            for (int j = 0; j < valuesPerFreq; j++) {
+                if (j == 3) {
+                    frequencyValues.add(Double.parseDouble(reader.readLine().trim()));
+                }
+
+            }
+        }
+        return frequencyValues;
+    }
+
+    private ArrayList<AtomicField> interpretValues(ArrayList<ArrayList<String>> values, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
         ArrayList<AtomicField> atomicFields = new ArrayList<>();
         for(ArrayList<String> value : values){
             AtomicField atomicField = interpretValue(value, scalingFactor, mode);
@@ -117,8 +137,8 @@ public class FFSInterpreter implements IInterpreter {
         return atomicFields;
     }
 
-    private AtomicField interpretValue(ArrayList<String> value, double scalingFactor, InterpretationMode mode) {
-        AtomicField atomicField = new AtomicField(0,);
+    private Result<AtomicField> interpretValue(ArrayList<String> value, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+        return interpretDataAsStream(value.stream(),scalingFactor,mode);
     }
 
     private void findNextAtomicField(BufferedReader reader) {
@@ -149,14 +169,13 @@ public class FFSInterpreter implements IInterpreter {
     }
 
     @Override
-    public Result<AtomicField> interpretDataAsStream(Stream<String> stream, double scalingFactor, int samples, InterpretationMode mode) throws FFSInterpretException {
+    public Result<AtomicField> interpretDataAsStream(Stream<String> stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
         AtomicField atomicField = new AtomicField(1,1,mode, new ArrayList<>(), 1, 1);
         maxItensity = -1;
         List<Sphere> coordinates;
 
         //TODO: Currently the first frequency is chosen. This should be specified in the parameter list
         List<FFSLine> ffsLines = stream
-                .limit(samples)
                 .map(x -> {
                     String[] vals = x.trim().split("\\s+");
                     double[] dVals = Arrays.stream(vals).mapToDouble(Double::parseDouble).toArray();
