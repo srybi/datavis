@@ -8,6 +8,31 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="197dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/field_HPBW"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="12dp"
+            android:paddingLeft="12dp"
+            android:textSize="18sp"
+            android:text="@string/meta_HPBW" />
+
+        <TextView
+            android:id="@+id/meta_HPBW"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="12dp"
+            android:paddingTop="12dp"
+            android:text="N/A ..."
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/mode"
         android:background="?android:attr/selectableItemBackground"
@@ -37,11 +62,11 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/button"
         android:background="?android:attr/selectableItemBackground"
+        android:orientation="horizontal"
         android:padding="8dp">
 
         <Button
@@ -52,7 +77,6 @@
             android:textAlignment="center" />
 
     </LinearLayout>
-
 
 
 </LinearLayout>

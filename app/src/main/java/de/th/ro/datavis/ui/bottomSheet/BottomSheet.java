@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -36,6 +37,7 @@ public class BottomSheet implements ISubject {
      */
     private InterpretationMode mode;
     private InterpretationMode changedMode;
+    private String HPBW;
 
 
     public InterpretationMode getMode(){
@@ -59,6 +61,7 @@ public class BottomSheet implements ISubject {
         //get all interactables
         Switch modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
         Button applyButton = bottomSheetDialog.findViewById(R.id.apply);
+        TextView textView = bottomSheetDialog.findViewById(R.id.meta_HPBW);
         //init with current setting
         keepSettings(bottomSheetDialog);
 
