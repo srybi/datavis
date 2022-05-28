@@ -13,14 +13,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="Import Instructions"
+        android:text="@string/import_instructions"
         style="@style/HeadLine"
         />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:textSize="20dp"
-        android:text="1) Press the menu icon in the top right corner\n\n2) Press 'Import'\n\n3) Select an existing antenna or add a new one\n\n4) Add Metadata and .ffs files"
+        android:textSize="20sp"
+        android:text="@string/import_instructions_text"
         />
 </LinearLayout>

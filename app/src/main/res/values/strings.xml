@@ -34,5 +34,9 @@
     <string name="btn_add_new_antenna">Add new antenna</string>
     <string name="btn_add_metaData">Add Metadata</string>
     <string name="btn_add_ffs">Add FFS</string>
-    
+
+    <!-- Instructions -->
+    <string name="app_instructions_text">1) Press the Checkboxes of the antennas you want to display\n\n2) Press the button \'Open In AR\'\n\n3) Use the Bottom Sheet to get more information about the field strength of the antenna and to change frequency and tilt</string>
+    <string name="import_instructions_text">1) Press the menu icon in the top right corner\n\n2) Press \'Import\'\n\n3) Select an existing antenna or add a new one\n\n4) Add Metadata and .ffs files</string>
+
 </resources>

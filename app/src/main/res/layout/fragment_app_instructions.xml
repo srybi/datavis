@@ -13,14 +13,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="App Instructions"
+        android:text="@string/app_instructions"
         style="@style/HeadLine"
         />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:textSize="20dp"
-        android:text="1) Press the Checkboxes of the antennas you want to display\n\n2) Press the button 'Open In AR'\n\n3) Use the Bottom Sheet to get more information about the field strength of the antenna and to change frequency and tilt"
+        android:textSize="20sp"
+        android:text="@string/app_instructions_text"
         />
 </LinearLayout>
