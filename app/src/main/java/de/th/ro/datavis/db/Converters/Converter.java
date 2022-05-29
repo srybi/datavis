@@ -14,6 +14,7 @@ import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 public class Converter {
+
         @TypeConverter
         public static ArrayList<Sphere> fromString(String value) {
             Type listType = new TypeToken<List<Sphere>>() {}.getType();

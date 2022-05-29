@@ -20,11 +20,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.slider.Slider;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interfaces.ISubject;
+import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
@@ -43,6 +45,8 @@ public class BottomSheet implements ISubject {
     private Slider frequencySlider;
     private Button applyButton;
 
+    private List<Double> frequencies;
+
     /**
      * List of all settings. All setting have their actual State and a changing state.
      * - InterpretationMode
@@ -54,17 +58,24 @@ public class BottomSheet implements ISubject {
     private double frequency;
     private double changedFrequency;
 
+    private int tilt;
+    private int changedTilt;
+
 
     public InterpretationMode getMode(){
         return this.mode;
     }
 
-    public BottomSheet(Context ctx){
+    public BottomSheet(Context ctx, List<Double> frequencies){
         this.context = ctx;
         observers = new LinkedList<>();
         //default values
         mode = InterpretationMode.Logarithmic;
-        frequency = 1;
+        this.frequencies = frequencies;
+        this.frequency = frequencies.get(0);
+
+        tilt = 2;
+        changedTilt  = 2;
     }
 
     /**
@@ -85,6 +96,9 @@ public class BottomSheet implements ISubject {
         applyButton = bottomSheetDialog.findViewById(R.id.apply);
         //init with current setting
         keepSettings(bottomSheetDialog);
+
+        frequencySlider.setValueFrom(frequencies.get(0).floatValue());
+        frequencySlider.setValueTo(frequencies.get(frequencies.size()-1).floatValue());
 
         //handler for ModeSwitch
         modeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -138,6 +152,8 @@ public class BottomSheet implements ISubject {
 
         //frequency slider
         frequencySlider.setValue((float) frequency);
+
+        //tilt slider
     }
     private void updateMetadataViews(MetaData m, BottomSheetDialog b){
 
@@ -155,6 +171,7 @@ public class BottomSheet implements ISubject {
 
         boolean modeChange = changedMode != mode;
         boolean frequencyChange = changedFrequency != frequency;
+        boolean tiltChange = changedTilt != tilt;
         return modeChange || frequencyChange;
     }
 
@@ -164,6 +181,7 @@ public class BottomSheet implements ISubject {
     private void updateSetting(){
         mode = changedMode;
         frequency = changedFrequency;
+        tilt = changedTilt;
     }
 
     private void handleModeSwitch(CompoundButton switchBtn, boolean isChecked){
@@ -180,9 +198,20 @@ public class BottomSheet implements ISubject {
         changedFrequency = value;
     }
 
+    private void handleTiltSlider(int value) {
+        changedTilt = value;
+    }
+
     //Observer Pattern
     @Override
     public void subscribe(IObserver observer) {
         observers.add(observer);
+    }
+
+    public double getFrequency() {
+        return this.frequency;
+    }
+    public int getTilt() {
+        return this.tilt;
     }
 }

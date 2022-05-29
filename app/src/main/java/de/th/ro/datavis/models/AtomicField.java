@@ -59,6 +59,14 @@ public class AtomicField {
     public InterpretationMode interpretationMode;
     public List<Sphere> spheres;
 
+    public void setAntennaId(int antennaId) {
+        this.antennaId = antennaId;
+    }
+
+    public void setAntennaFieldId(int antennaFieldId) {
+        this.antennaFieldId = antennaFieldId;
+    }
+
     public int antennaId;
     public int antennaFieldId;
 

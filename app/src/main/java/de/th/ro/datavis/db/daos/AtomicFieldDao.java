@@ -8,6 +8,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.AtomicField;
@@ -32,8 +33,13 @@ public interface AtomicFieldDao {
     LiveData<List<AtomicField>> getAllAtomicFields();
 
     @Query("SELECT * from atomic_field WHERE interpretationMode = :interpretationMode AND antennaId = :antennaId AND tilt = :tilt AND frequency = :frequency")
-    LiveData<AtomicField> getAtomicFields(int antennaId, int tilt, double frequency, InterpretationMode interpretationMode);
+    LiveData<AtomicField> getAtomicFields(int antennaId, int tilt, double frequency, int interpretationMode);
 
+    @Query("SELECT * from atomic_field WHERE interpretationMode = :interpretationMode AND antennaId = :antennaId AND tilt = :tilt AND frequency = :frequency")
+    AtomicField getAtomicFields_Background(int antennaId, int tilt, double frequency, int interpretationMode);
+
+    @Query("SELECT frequency from atomic_field WHERE interpretationMode = :interpretationMode AND antennaId = :antennaId AND tilt = :tilt ")
+    List<Double> getFrequencies_Background(int antennaId, int tilt, int interpretationMode);
 
     @Query("SELECT * from atomic_field WHERE antennaId = :antennaId")
     LiveData<List<AtomicField>> getAtomicFieldsByAntennaFieldId(int antennaId);

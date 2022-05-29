@@ -36,7 +36,9 @@ import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
+import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
+import de.th.ro.datavis.ui.adapter.AntennaAdapter;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 import de.th.ro.datavis.util.fragment.BaseFragment;
 
@@ -44,12 +46,11 @@ import static android.os.Build.VERSION.SDK_INT;
 
 public class MainFragment extends BaseFragment {
 
-    private IInterpreter ffsInterpreter;
     private AppDatabase appDb;
 
     private ListView listView;
 
-    private LiveData<List<AntennaField>> antennaFields = new MutableLiveData<>(new ArrayList<>());
+    private LiveData<List<Antenna>> antennas = new MutableLiveData<>(new ArrayList<>());
 
     private FragmentActivity context;
 
@@ -93,7 +94,6 @@ public class MainFragment extends BaseFragment {
         }
 
         context = getActivity();
-        ffsInterpreter = new FFSInterpreter();
 
         initAntennaList();
         findButton();
@@ -107,8 +107,8 @@ public class MainFragment extends BaseFragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
-                AntennaField item = antennaFields.getValue().get(i);
-                intent.putExtra("fileUri", item.uri);
+                Antenna item = antennas.getValue().get(i);
+                intent.putExtra("antennaId", item.id);
                 intent.putExtra("interpretationMode", "Linear");
                 getActivity().startActivity(intent);
 
@@ -120,8 +120,8 @@ public class MainFragment extends BaseFragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
-                AntennaField item = antennaFields.getValue().get(i);
-                intent.putExtra("fileUri", item.uri);
+                Antenna item = antennas.getValue().get(i);
+                intent.putExtra("antennaId", item.id);
                 intent.putExtra("interpretationMode", "Logarithmic");
                 getActivity().startActivity(intent);
             }
@@ -130,12 +130,12 @@ public class MainFragment extends BaseFragment {
 
     public void initAntennaList(){
         appDb = AppDatabase.getInstance(getActivity().getApplicationContext());
-        antennaFields = appDb.antennaFieldDao().getAll();
+        antennas = appDb.antennaDao().getAll();
 
         findListView();
 
-        antennaFields.observe(getActivity(), list -> {
-            AntennaFieldAdapter adapter = new AntennaFieldAdapter(context.getApplicationContext(), list);
+        antennas.observe(getActivity(), list -> {
+            AntennaAdapter adapter = new AntennaAdapter(context.getApplicationContext(), list);
             listView.setAdapter(adapter);
         });
 

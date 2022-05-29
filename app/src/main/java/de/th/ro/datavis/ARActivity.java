@@ -1,6 +1,6 @@
 package de.th.ro.datavis;
 
-import android.content.Intent;
+
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +20,6 @@ import com.google.ar.core.Plane;
 import com.google.ar.core.Session;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
-import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.Sceneform;
 import com.google.ar.sceneform.math.Vector3;
@@ -32,9 +31,7 @@ import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,14 +41,13 @@ import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
-import de.th.ro.datavis.models.AtomicField;
-import de.th.ro.datavis.models.Result;
+import de.th.ro.datavis.interpreter.ffs.FFSService;
+
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheet;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.enums.InterpretationMode;
-import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 public class ARActivity extends BaseActivity implements
         FragmentOnAttachListener,
@@ -63,12 +59,16 @@ public class ARActivity extends BaseActivity implements
 
     private ArFragment arFragment;
     private Map<String, Renderable> renderableList = new HashMap<>();
+
     private IInterpreter ffsInterpreter;
+    private FFSService ffsService;
+
     private BottomSheet bottomSheet;
     private GestureDetector gestureDetector;
     private AnchorNode anchorNode;
     private TransformableNode middleNode;
-    private Uri fileUri;
+    private int antennaId;
+    private InterpretationMode interpretationMode;
     private String TAG = "myTag";
 
     @Override
@@ -87,14 +87,21 @@ public class ARActivity extends BaseActivity implements
             }
         }
 
-        bottomSheet = new BottomSheet(this);
-        gestureDetector = new GestureDetector(this, new BottomSheetHandler(bottomSheet));
+        ffsInterpreter = new FFSInterpreter();
+        ffsService = new FFSService(ffsInterpreter, this);
 
         Bundle b = getIntent().getExtras();
-        String uriString = b.getString("fileUri");
-        fileUri = Uri.parse(uriString);
+        antennaId = b.getInt("antennaId");
+        String modeString = b.getString("interpretationMode");
+        if(modeString.equals("Linear")){
+            interpretationMode = InterpretationMode.Linear;
+        }else{
+            interpretationMode = InterpretationMode.Logarithmic;
+        }
+        List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, 1, InterpretationMode.Logarithmic);
+        bottomSheet = new BottomSheet(this, frequencies);
+        gestureDetector = new GestureDetector(this, new BottomSheetHandler(bottomSheet));
 
-        ffsInterpreter = new FFSInterpreter();
 
 
         buildAntennaModel();
@@ -155,28 +162,16 @@ public class ARActivity extends BaseActivity implements
         }
     }
 
-    private List<Sphere> loadCoordinates(InterpretationMode mode){
+    private List<Sphere> loadCoordinates(InterpretationMode mode, double frequency, int tilt){
         List<Sphere> coordinates = null;
         Log.d(TAG, "Start coordinate Loading...");
 
         try {
-            if(fileUri == null){
-                File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
-                //Result<AtomicField> result = ffsInterpreter.interpretData(file, 0.2, bottomSheet.getMode());
-                //coordinates = result.getData().spheres;
-            }else{
-                getContentResolver().takePersistableUriPermission(fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                InputStream inputStream = getContentResolver().openInputStream(fileUri);
-                //Result<AtomicField> result = ffsInterpreter.interpretData(inputStream, 0.4, bottomSheet.getMode());
-                //coordinates = result.getData().spheres;
-            }
+            coordinates = ffsService.getSpheresByPrimaryKey(antennaId, frequency, tilt, mode);
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        } catch(SecurityException se){
-            Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
-            return null;
+        } catch(Exception e){
+            Toast.makeText(this, "Unable to load the coordinates from the database.", Toast.LENGTH_SHORT).show();
+            return new ArrayList<Sphere>();
         }
 
         Log.d(TAG, "Coordinate Loading done");
@@ -202,7 +197,9 @@ public class ARActivity extends BaseActivity implements
         this.anchorNode = anchorNode;
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-        processRenderList(anchorNode, renderableList, loadCoordinates(bottomSheet.getMode()));
+        // AntennaId hardcoded, since its is currently not possible to choose an antenna
+        List<Sphere> list = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
+        processRenderList(anchorNode, renderableList, list);
         bottomSheet.subscribe(this);
     }
 
@@ -250,7 +247,7 @@ public class ARActivity extends BaseActivity implements
         Log.d(TAG, "update: the bottomsheet called an update");
 
         deleteAllSheres();
-        processRenderList(anchorNode, renderableList, loadCoordinates(bottomSheet.getMode()));
+        processRenderList(anchorNode, renderableList, loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt()));
     }
 
     private void deleteAllSheres(){

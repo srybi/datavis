@@ -28,6 +28,8 @@ import java.util.concurrent.Future;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interpreter.csv.MetadataInterpreter;
+import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
+import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.MetaData;
@@ -194,7 +196,7 @@ public class ImportActivity extends BaseActivity{
                     if (requestCode == FileRequests.REQUEST_CODE_ANTENNA){
                         persistAntenna(appDb, uri, name);
                     } else if(requestCode == FileRequests.REQUEST_CODE_FFS) {
-                        persistFFS(appDb, uri, name);
+                        persistFFS(appDb, uri, name, data);
                     } else {
                         persistMetadata(appDb, uri, name, data);
                     }
@@ -221,13 +223,26 @@ public class ImportActivity extends BaseActivity{
     }
 
 
-    public void persistFFS(AppDatabase appDb, Uri uri, String name){
+    public void persistFFS(AppDatabase appDb, Uri uri, String name, Intent intent){
         // Background
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         int antennaId = preferences.getInt("ID", 1);
 
         AntennaField antennaField = new AntennaField(uri, name, antennaId);
         appDb.antennaFieldDao().insert(antennaField);
+
+        InputStream in = null;
+        try {
+            in = getContentResolver().openInputStream(intent.getData());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ffsService.interpretData(in,0.4, antennaId);
+        } catch (FFSInterpretException e) {
+            e.printStackTrace();
+        }
 
         handelGetAntennaInBackground(appDb, antennaId);
         handelNewlyInsertedAntennaField(appDb, antennaId);
