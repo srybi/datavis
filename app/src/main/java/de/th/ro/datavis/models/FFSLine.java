@@ -1,7 +1,15 @@
 package de.th.ro.datavis.models;
 
 public class FFSLine {
-     private double phi;
+    public double getPhi() {
+        return phi;
+    }
+
+    public double getTheta() {
+        return theta;
+    }
+
+    private double phi;
      private double theta;
      private double rePhi;
      private double imPhi;

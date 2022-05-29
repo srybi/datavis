@@ -13,13 +13,16 @@ import de.th.ro.datavis.models.AntennaField;
 
 @Dao
 public interface AntennaFieldDao {
-    @Query("SELECT * FROM antennafield")
+    @Query("SELECT * FROM antenna_field")
     LiveData<List<AntennaField>> getAll();
 
-    @Query("SELECT * FROM antennafield where antennaId = :antennaID")
+    @Query("SELECT * FROM antenna_field")
+    List<AntennaField> getAll_Background();
+
+    @Query("SELECT * FROM antenna_field where antennaId = :antennaID")
     List<AntennaField> findByAntennaId_BackGround(int antennaID);
 
-    @Query("SELECT * FROM antennafield where antennaId = :antennaID")
+    @Query("SELECT * FROM antenna_field where antennaId = :antennaID")
     LiveData<List<AntennaField>> findByAntennaId_Main(int antennaID);
 
     @Insert

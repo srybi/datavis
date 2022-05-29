@@ -1,9 +1,10 @@
 package de.th.ro.datavis;
 
-import android.content.Intent;
+
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
@@ -22,84 +23,97 @@ import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.Sceneform;
 import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.rendering.ShapeFactory;
-import com.google.ar.sceneform.rendering.ViewRenderable;
-import com.google.ar.sceneform.utilities.ChangeId;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.th.ro.datavis.interfaces.IInterpreter;
+import de.th.ro.datavis.interfaces.IObserver;
+import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
+import de.th.ro.datavis.interpreter.ffs.FFSService;
+
+import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.Sphere;
+import de.th.ro.datavis.ui.bottomSheet.BottomSheet;
+import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.enums.InterpretationMode;
-import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 public class ARActivity extends BaseActivity implements
         FragmentOnAttachListener,
         BaseArFragment.OnTapArPlaneListener,
         BaseArFragment.OnSessionConfigurationListener,
-        ArFragment.OnViewCreatedListener {
+        ArFragment.OnViewCreatedListener,
+        IObserver {
 
 
     private ArFragment arFragment;
-    private ViewRenderable viewRenderable;
+    private Map<String, Renderable> renderableList = new HashMap<>();
 
-    private List<Renderable> renderableList = new ArrayList<>();
-    private ChangeId modelChangeID;
     private IInterpreter ffsInterpreter;
-    private Uri fileUri;
+    private FFSService ffsService;
+
+    private BottomSheet bottomSheet;
+    private GestureDetector gestureDetector;
+    private AnchorNode anchorNode;
+    private TransformableNode middleNode;
+    private int antennaId;
+    private InterpretationMode interpretationMode;
     private String TAG = "myTag";
+
+    private double maxIntensity = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Log.d(TAG, "StartUp ARActivity");
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_ar);
         getSupportFragmentManager().addFragmentOnAttachListener(this);
 
         if (savedInstanceState == null) {
             if (Sceneform.isSupported(this)) {
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.mainFragment, ArFragment.class, null)
+                        .add(R.id.arFragment, ArFragment.class, null)
                         .commit();
             }
         }
 
-        Bundle b = getIntent().getExtras();
-        String uriString = b.getString("fileUri");
-        InterpretationMode mode = InterpretationMode.Linear;
-        try {
-            mode = InterpretationMode.valueOf(b.getString("interpretationMode"));
-
-        }catch (IllegalArgumentException ignored){
-
-        }
-        fileUri = Uri.parse(uriString);
-
         ffsInterpreter = new FFSInterpreter();
+        ffsService = new FFSService(ffsInterpreter, this);
 
-        List<Sphere> coordinates = loadCoordinates(mode);
+        Bundle b = getIntent().getExtras();
+        antennaId = b.getInt("antennaId");
+        String modeString = b.getString("interpretationMode");
+        if(modeString.equals("Linear")){
+            interpretationMode = InterpretationMode.Linear;
+        }else{
+            interpretationMode = InterpretationMode.Logarithmic;
+        }
+        List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, 2, InterpretationMode.Logarithmic);
+        bottomSheet = new BottomSheet(this, frequencies);
+        gestureDetector = new GestureDetector(this, new BottomSheetHandler(bottomSheet));
+
+
+
         buildAntennaModel();
-        buildSphereList(coordinates);
-
+        buildSpheres();
     }
 
     @Override
     public void onAttachFragment(@NonNull FragmentManager fragmentManager, @NonNull Fragment fragment) {
-        if (fragment.getId() == R.id.mainFragment) {
+        if (fragment.getId() == R.id.arFragment) {
             arFragment = (ArFragment) fragment;
             arFragment.setOnSessionConfigurationListener(this);
             arFragment.setOnViewCreatedListener(this);
@@ -130,8 +144,7 @@ public class ARActivity extends BaseActivity implements
                 .setAsyncLoadEnabled(true)
                 .build()
                 .thenAccept(model -> {
-                    renderableList.add(model);
-                    modelChangeID = model.getId();
+                    renderableList.put("antenne", model);
                     Log.d(TAG, "Antenna model done");
                 })
                 .exceptionally(throwable -> {
@@ -141,58 +154,29 @@ public class ARActivity extends BaseActivity implements
                 });
     }
 
-    private void buildSphereList(List<Sphere> coordinates){
-        float sphereRadius = 0.0065f;
-
-        if(coordinates != null) {
-            //here new Color should be set depending on the intensity of the coordinates
-            int i = 0;
-            int count = 0;
-            for(Sphere s : coordinates) {
-                if(count % (int)(coordinates.size()/2000) == 0) {
-                    MaterialFactory.makeTransparentWithColor(this, ffsInterpreter.getIntensityColor(s.getIntensity()))
-                            .thenAccept(
-                                    material -> {
-                                        float yOffset = 0.1f;
-                                        //here a vector 3 should be created
-                                        Vector3 vec = new Vector3((float) s.getX(), (float) s.getY() + yOffset, (float) s.getZ());
-
-                                        ModelRenderable sphere = ShapeFactory.makeSphere(sphereRadius, vec, material);
-
-                                        renderableList.add(sphere);
-
-                                    });
-                    if (i == 2000) {
-                        break;
-                    }
-                    i++;
-                }
-                count++;
-            }
-
-         }
+    private void buildSpheres(){
+        for(FFSIntensityColor intensityColor : FFSIntensityColor.values()){
+            MaterialFactory.makeTransparentWithColor(this, intensityColor.getColor())
+                    .thenAccept(
+                            material -> {
+                                ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
+                                renderableList.put(intensityColor.getName() + "Sphere", sphere);
+                            });
+        }
     }
 
-    private List<Sphere> loadCoordinates(InterpretationMode mode){
+    private List<Sphere> loadCoordinates(InterpretationMode mode, double frequency, int tilt){
         List<Sphere> coordinates = null;
         Log.d(TAG, "Start coordinate Loading...");
 
         try {
-            if(fileUri == null){
-                File file = new File("/storage/self/primary/Download/20220331_Felddaten_Beispiel.ffs");
-                coordinates = ffsInterpreter.interpretData(file, 0.2, mode);
-            }else{
-                getContentResolver().takePersistableUriPermission(fileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                InputStream inputStream = getContentResolver().openInputStream(fileUri);
-                coordinates = ffsInterpreter.interpretData(inputStream, 0.4, mode);
-            }
+            AtomicField field = ffsService.getSpheresByPrimaryKey(antennaId, frequency, tilt, mode);
+            maxIntensity = field.maxIntensity;
+            coordinates = field.spheres;
 
-        } catch (FFSInterpretException | FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }catch (SecurityException se){
-            Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
-            return null;
+        } catch(Exception e){
+            Toast.makeText(this, "Unable to load the coordinates from the database.", Toast.LENGTH_SHORT).show();
+            return new ArrayList<Sphere>();
         }
 
         Log.d(TAG, "Coordinate Loading done");
@@ -209,44 +193,83 @@ public class ARActivity extends BaseActivity implements
 
     @Override
     public void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
-//        if (model == null ) {
-//            Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-
         Log.d(TAG, "Plane Tab");
 
         // Create the Anchor.
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
+        //saving the anchorNode for removing later
+        this.anchorNode = anchorNode;
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-        processRenderList(anchorNode, renderableList);
-
-
+        // AntennaId hardcoded, since its is currently not possible to choose an antenna
+        List<Sphere> list = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
+        processRenderList(anchorNode, renderableList, list);
+        bottomSheet.subscribe(this);
     }
 
 
-    private void processRenderList(AnchorNode anchorNode, List<Renderable> list){
+    private void processRenderList(AnchorNode anchorNode, Map<String, Renderable> list, List<Sphere> coords){
         Log.d(TAG, "Start processing RenderList");
-        for (Renderable renderable : list){
-            attachReferableToAnchorNode(anchorNode, renderable);
+        attachAntennaToAnchorNode(anchorNode, list.get("antenne"));
+
+        middleNode = new TransformableNode(arFragment.getTransformationSystem());
+        middleNode.setParent(anchorNode);
+        int i = 0;
+        for(Sphere s : coords){
+            FFSIntensityColor intensityColor = ffsService.mapToColor(s.getIntensity(), maxIntensity);
+            attachSphereToAnchorNode(middleNode, list.get(intensityColor.getName()+"Sphere"), s);
+            i++;
+            Log.d(TAG, "processRenderList: proccessing #" + i);
         }
         Log.d(TAG, "Processing RenderList Done");
     }
 
-
-    private void attachReferableToAnchorNode(AnchorNode anchorNode, Renderable renderable){
+    private void attachAntennaToAnchorNode(AnchorNode anchorNode, Renderable renderable) {
         TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
-        if(renderable.getId() == modelChangeID){
-            model.getScaleController().setMaxScale(0.20f);
-            model.getScaleController().setMinScale(0.15f);
-        }
+        model.getScaleController().setMaxScale(0.20f);
+        model.getScaleController().setMinScale(0.15f);
         model.setParent(anchorNode);
         model.setRenderable(renderable)
                 .animate(true).start();
         model.select();
+    }
 
+
+    private void attachSphereToAnchorNode(TransformableNode middleNode, Renderable renderable, Sphere sphere){
+        float yOffset = 0.1f;
+        TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
+        model.setLocalPosition(new Vector3((float) sphere.getX(), (float) sphere.getY() + yOffset, (float) sphere.getZ()));
+        model.setParent(middleNode);
+        model.setRenderable(renderable)
+                .animate(true).start();
+        model.select();
+    }
+
+    //Observer Pattern
+    @Override
+    public void update() {
+        Log.d(TAG, "update: the bottomsheet called an update");
+
+        deleteAllSheres();
+        processRenderList(anchorNode, renderableList, loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt()));
+    }
+
+    private void deleteAllSheres(){
+        anchorNode.removeChild(middleNode);
+    }
+
+    //Used for gestureDetection
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        gestureDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+    //Used for gestureDetection
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event){
+        this.gestureDetector.onTouchEvent(event);
+        return super.dispatchTouchEvent(event);
     }
 
 }

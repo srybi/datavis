@@ -21,6 +21,12 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+
+    <include
+        android:id="@+id/fragment_import"
+        layout="@layout/fragment_import" />
+
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/importFragment"
         android:layout_width="match_parent"

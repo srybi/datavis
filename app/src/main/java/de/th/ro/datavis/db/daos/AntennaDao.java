@@ -16,6 +16,9 @@ public interface AntennaDao {
     @Query("SELECT * FROM antenna")
     LiveData<List<Antenna>> getAll();
 
+    @Query("SELECT * FROM antenna")
+    List<Antenna> getAll_Background();
+
     @Query("SELECT * FROM antenna where id = :ID")
     LiveData<List<Antenna>> find_Main(int ID);
 

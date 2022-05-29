@@ -6,7 +6,11 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+
+@Entity(tableName = "antenna_field")
 public class AntennaField {
     @PrimaryKey(autoGenerate = true)
     public int id;
@@ -32,5 +36,14 @@ public class AntennaField {
         this.uri = uri.toString();
         this.filename = filename;
         this.antennaId = antennaId;
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return "AntennaField{" +
+                "id=" + id +
+                ", filename='" + filename + '\'' +
+                '}';
     }
 }

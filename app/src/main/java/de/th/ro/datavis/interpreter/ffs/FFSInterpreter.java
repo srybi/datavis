@@ -1,13 +1,13 @@
 package de.th.ro.datavis.interpreter.ffs;
 
 import android.util.Log;
-
-import com.google.ar.sceneform.rendering.Color;
+import android.util.Pair;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -18,8 +18,11 @@ import java.util.stream.Stream;
 
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.calc.Calc;
+import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.FFSLine;
+import de.th.ro.datavis.models.Result;
 import de.th.ro.datavis.models.Sphere;
+import de.th.ro.datavis.util.Helper;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
@@ -34,34 +37,35 @@ public class FFSInterpreter implements IInterpreter {
 
 
     @Override
-    public List<Sphere> interpretData(InputStream stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(InputStream stream, double scalingFactor, int antennaId) throws FFSInterpretException {
             InputStreamReader reader = new InputStreamReader(stream);
             BufferedReader bufferedReader = new BufferedReader(reader);
 
-            return interpretData(bufferedReader, scalingFactor, mode);
-
+            return interpretData(bufferedReader, scalingFactor, antennaId);
     }
 
     @Override
-    public List<Sphere> interpretData(File file, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
-
+    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(File file, double scalingFactor, int antennaId) throws FFSInterpretException {
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-            return interpretData(bufferedReader, scalingFactor, mode);
+            return interpretData(bufferedReader, scalingFactor, antennaId);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return new ArrayList<Sphere>();
+            return Result.error("File Not Found.");
         }
     }
 
 
-    private List<Sphere> interpretData(BufferedReader reader, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+    private Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(BufferedReader reader, double scalingFactor, int antennaId) throws FFSInterpretException {
+        AtomicField atomicField;
+        maxItensity = -1;
         Log.d(LOG_TAG, "Start Interpretation...");
         List<Sphere> coordinates;
         int frequencies = -1;
         int samples = -1;
+        ArrayList<Double> frequencyValues = new ArrayList<>();
         boolean startFound = false;
 
         try {
@@ -83,25 +87,103 @@ public class FFSInterpreter implements IInterpreter {
                     startFound = true;
                     break;
                 }
+                if(Calc.calcLevenstheinDistance(line.trim(),(FFSConstants.RADACCSTMFREQ_HEADER.trim())) < MAX_HAMMING_DISTANCE){
+                    frequencyValues = extractFrequencyValues(reader, frequencies);
+                }
             }
 
-            coordinates = interpretDataAsStream(reader.lines(), scalingFactor, samples, mode);
+            ArrayList<ArrayList<String>> values = new ArrayList<ArrayList<String>>();
+            for (int i = 0; i < frequencies; i++) {
+                values.add(readAtomicField(reader, samples));
+
+                //Dont search for next atomicfield if we are at the last one
+                if(i < frequencies - 1)
+                    findNextAtomicField(reader);
+            }
+
+            ArrayList<AtomicField> atomicFieldsLog = interpretValues(values,frequencyValues, scalingFactor, InterpretationMode.Logarithmic, antennaId);
+            ArrayList<AtomicField> atomicFieldsLin = interpretValues(values,frequencyValues, scalingFactor, InterpretationMode.Linear, antennaId);
+            Log.d(LOG_TAG, "Interpretation finished");
+            return Result.success(Pair.create(atomicFieldsLog, atomicFieldsLin));
+
         } catch (Exception e) {
             //TODO: Specify exceptions, which can be thrown during the interpretation
             throw new FFSInterpretException(e.getMessage());
         }
 
-        Log.d(LOG_TAG, "Interpretation finished");
-        return coordinates;
+
+
+    }
+
+    private ArrayList<Double> extractFrequencyValues(BufferedReader reader, int frequencies) throws IOException {
+        int valuesPerFreq = 4 + 1; // 4 values per frequency + 1 for a empty line
+        ArrayList<Double> frequencyValues = new ArrayList<>();
+        for (int i = 0; i < frequencies; i++) {
+            for (int j = 0; j < valuesPerFreq; j++) {
+                if (j == 3) {
+                    frequencyValues.add(Double.parseDouble(reader.readLine().trim()));
+                }else{
+                    reader.readLine();
+                }
+
+            }
+        }
+        return frequencyValues;
+    }
+
+    private ArrayList<AtomicField> interpretValues(ArrayList<ArrayList<String>> values, ArrayList<Double> frequencies, double scalingFactor, InterpretationMode mode, int antennaId) throws FFSInterpretException {
+        ArrayList<AtomicField> atomicFields = new ArrayList<>();
+        for(Pair<ArrayList<String>, Double> pair : Helper.zip(values, frequencies)){
+            Result<AtomicField> atomicField = interpretValue(pair.first, scalingFactor, mode);
+            AtomicField field = atomicField.getData();
+            //convert to gHz
+            double frequency = pair.second/1000000000;
+            field.setFrequency(frequency);
+            field.setAntennaId(antennaId);
+            atomicFields.add(field);
+        }
+        return atomicFields;
+    }
+
+    private Result<AtomicField> interpretValue(ArrayList<String> value, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+        return interpretDataAsStream(value.stream(),scalingFactor,mode);
+    }
+
+    private void findNextAtomicField(BufferedReader reader) {
+        String line;
+        try {
+            while((line = reader.readLine()) != null){
+                if(Calc.calcLevenstheinDistance(line.trim(),(FFSConstants.VALUES_HEADER.trim())) < MAX_HAMMING_DISTANCE){
+                    return;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private ArrayList<String> readAtomicField(BufferedReader reader, int samples) {
+        ArrayList<String> values = new ArrayList<String>();
+        String line;
+        try {
+            for (int i = 0; i < samples; i++) {
+                line = reader.readLine();
+                values.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return values;
     }
 
     @Override
-    public List<Sphere> interpretDataAsStream(Stream<String> stream, double scalingFactor, int samples, InterpretationMode mode) throws FFSInterpretException {
+    public Result<AtomicField> interpretDataAsStream(Stream<String> stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+        maxItensity = -1;
+        AtomicField atomicField = new AtomicField(2,1,mode, new ArrayList<>(),maxItensity , 1, 1);
         List<Sphere> coordinates;
 
         //TODO: Currently the first frequency is chosen. This should be specified in the parameter list
         List<FFSLine> ffsLines = stream
-                .limit(samples)
                 .map(x -> {
                     String[] vals = x.trim().split("\\s+");
                     double[] dVals = Arrays.stream(vals).mapToDouble(Double::parseDouble).toArray();
@@ -109,54 +191,54 @@ public class FFSInterpreter implements IInterpreter {
                     return new FFSLine(dVals[0], dVals[1], dVals[2], dVals[3], dVals[4], dVals[5]);
                 }).collect(Collectors.toList());
 
-        coordinates = ffsLines.stream().map(l -> {
+        //Bugfix: If stepsize of file is greater than smaller than 3, the interpreter will use a stepsize of 3
+        final int stepSize = (ffsLines.get(1).getTheta() - ffsLines.get(0).getTheta()) < 3 ? 3 : 1;
+
+        //Bugfix: filter all negative intensities
+        coordinates = ffsLines.stream().filter(l -> (l.getPhi()%stepSize == 0) && (l.getTheta()%stepSize == 0)).filter(l -> Calc.calcIntensity(l, mode) > 0).map(l -> {
 
             double x = Calc.x_polarToCartesian(l, mode);
             double y = Calc.y_polarToCartesian(l, mode);
             double z = Calc.z_polarToCartesian(l, mode);
             double intensity = Calc.calcIntensity(l, mode);
-            if(intensity > maxItensity){
-                maxItensity = intensity;
+            if(intensity > atomicField.maxIntensity){
+                atomicField.maxIntensity = intensity;
             }
             return new Sphere(x*scalingFactor, y*scalingFactor, z*scalingFactor, intensity);
         }).collect(Collectors.toList());
 
-        return coordinates;
+        atomicField.setSpheres(coordinates);
+        return Result.success(atomicField);
     }
 
 
     @Override
-    public Color getIntensityColor(double intensity) {
+    public FFSIntensityColor mapToColor(double intensity) {
         //wie in CST
         double minIntensity = maxItensity - 1;
         double stepSize = (maxItensity - Math.abs(minIntensity))/6;
 
         if(intensity > maxItensity - (stepSize * 1)){
             //#FE0000 red
-            return new Color(1f, 0f, 0f);
+            return FFSIntensityColor.RED;
         }
         if(intensity > maxItensity - stepSize * 2){
             //#e6793a orange
-            return new Color(getRGBPercentage(230), getRGBPercentage(121), getRGBPercentage(58));
+            return FFSIntensityColor.ORANGE;
         }
         if(intensity > maxItensity - stepSize * 3){
             //#FFF205 yellow
-            return new Color(1f, 0.95f, 0.02f);
+            return FFSIntensityColor.YELLOW;
         }
         if(intensity > maxItensity - stepSize * 4){
             //#7CFF01 green
-            return new Color(0.49f, 1f, 0f);
+            return FFSIntensityColor.GREEN;
         }
         if(intensity > maxItensity - stepSize * 5){
             //#3befe5 baby blue
-            return new Color(getRGBPercentage(59), getRGBPercentage(239), getRGBPercentage(229));
+            return FFSIntensityColor.BABYBLUE;
         }
         //#01FFF4  blue
-        return new Color(0f, 1f, 0.96f);
-
-    }
-
-    private float getRGBPercentage(int value){
-        return (float)(value/225);
+        return FFSIntensityColor.BLUE;
     }
 }

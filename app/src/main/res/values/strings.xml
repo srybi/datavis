@@ -22,6 +22,9 @@
     <string name="open_ar">Open AR</string>
     <string name="upload_field">Upload File</string>
 
+    <!-- BottomSheet -->
+    <string name="meta_HPBW">HPBW</string>
+
     <!-- MainMenu -->
     <string name="instructions">Instructions</string>
     <string name="import_instructions">Import Instructions</string>
@@ -34,6 +37,12 @@
     <string name="btn_add_new_antenna">Add new antenna</string>
     <string name="btn_add_metaData">Add Metadata</string>
     <string name="btn_add_ffs">Add FFS</string>
+    <string name="apply_changes">Apply Changes</string>
+    <string name="log">Log</string>
+    <string name="linear">Linear</string>
+
+    <!-- Bottom Sheet -->
+    <string name="frequency">Frequency</string>
 
     <!-- Instructions -->
     <string name="app_instructions_text">1) Press the Checkboxes of the antennas you want to display\n\n2) Press the button \'Open In AR\'\n\n3) Use the Bottom Sheet to get more information about the field strength of the antenna and to change frequency and tilt</string>
