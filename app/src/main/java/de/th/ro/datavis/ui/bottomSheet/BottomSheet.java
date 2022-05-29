@@ -15,25 +15,35 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.slider.Slider;
 
+import java.io.DataOutput;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.th.ro.datavis.R;
+import de.th.ro.datavis.db.daos.MetadataDao;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interfaces.ISubject;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
+import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.MetaData;
+import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 /**
  * This java class is the logical representation of modal_bottom_sheet.xml
  */
-public class BottomSheet implements ISubject {
+public class BottomSheet implements ISubject{
     //Log Tag
     final private String TAG = "BottomSheet";
 
@@ -53,7 +63,10 @@ public class BottomSheet implements ISubject {
      */
     private InterpretationMode mode;
     private InterpretationMode changedMode;
-    private String HPBW;
+    private LiveData<MetaData> HPBW = new MutableLiveData<>();
+    private String Squint;
+
+    private final AppDatabase db;
 
     private double frequency;
     private double changedFrequency;
@@ -76,6 +89,7 @@ public class BottomSheet implements ISubject {
         this.frequency = frequencies.get(0);
         this.changedFrequency = frequencies.get(0);
 
+        db = AppDatabase.getInstance(ctx);
         tilt = 2;
         changedTilt  = 2;
     }
@@ -91,7 +105,24 @@ public class BottomSheet implements ISubject {
         Switch modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
         Button applyButton = bottomSheetDialog.findViewById(R.id.apply);
 
-        updateMetadataViews(new MetaData("2", "3","4"), bottomSheetDialog);
+        Log.d(TAG, Double.toString(frequency));
+
+        try {
+            Log.d(TAG, "Meta ID: " + db.metadataDao().findByMetadata_Background(1, frequency, tilt , "HHPBW_deg"));
+            HPBW = db.metadataDao().findByMetadata_Background(1, frequency, tilt, "HHPBW_deg");
+        } catch (Exception e) { e.printStackTrace();}
+
+        //Create Observer for Metadata
+        final Observer<MetaData> nameObserver = new Observer<MetaData>() {
+            @Override
+            public void onChanged(@Nullable final MetaData changeMetaData) {
+                // Update the UI, in this case, a TextView.
+                updateMetadataViews(bottomSheetDialog, changeMetaData);
+            }
+        };
+        HPBW.observe((AppCompatActivity)context,nameObserver);
+
+        Log.d(TAG, "Call Metadata");
 
         modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
         frequencySlider = bottomSheetDialog.findViewById(R.id.sliderFrequency);
@@ -143,8 +174,6 @@ public class BottomSheet implements ISubject {
                 bottomSheetDialog.dismiss(); //close bottom sheet
             }
         });
-        //AppDatabase.getInstance(context).metadataDao().findByMetadata_Main(AntennID, Tilt, Freq);
-
 
 
         bottomSheetDialog.show(); //open bottom sheet
@@ -169,9 +198,13 @@ public class BottomSheet implements ISubject {
 
         //tilt slider
     }
-    private void updateMetadataViews(MetaData m, BottomSheetDialog b){
-
+    private void updateMetadataViews(BottomSheetDialog b, MetaData changeMetaData){
+        //TODO
+        Log.d(TAG, "Update Metadata");
         TextView hpbw = b.findViewById(R.id.meta_HPBW);
+        try {        hpbw.setText(changeMetaData.getValue());
+        } catch (Exception e){         Log.d(TAG, "Couldn't match Metadata");}
+
 
     }
 

@@ -9,31 +9,30 @@ import androidx.room.Update;
 
 import java.util.List;
 
+import de.th.ro.datavis.models.Antenna;
+import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.MetaData;
 
 @Dao
 public interface MetadataDao {
-    @Query("SELECT * FROM metadata")
+    @Query("SELECT * FROM MetaData")
     LiveData<List<MetaData>> getAll();
 
-    @Query("SELECT * FROM metadata")
+    @Query("SELECT * FROM MetaData")
     List<MetaData> getAll_Background();
 
-    @Query("SELECT * FROM metadata where id = :ID")
-    LiveData<List<MetaData>> find_Main(int ID);
+    @Query("SELECT * FROM MetaData where id = :ID")
+    MetaData find_Main(int ID);
 
-    @Query("SELECT * FROM metadata where id = :ID")
+    @Query("SELECT * FROM MetaData where id = :ID")
     List<MetaData> find_Background(int ID);
 
-    @Query("SELECT * FROM metadata where freq = :FREQ")
-    LiveData<List<MetaData>> find_Main(String FREQ);
-
-    @Query("SELECT * FROM metadata where tilt = :TILT")
-    List<MetaData> find_Background(String TILT);
-
     //Identifies Metadata by AntennenID, Freq und Tilt
-    @Query("SELECT * FROM metadata where id = :ID AND freq = :FREQ AND tilt = :TILT")
-    LiveData<List<MetaData>> findByMetadata_Main(int ID, String FREQ, String TILT);
+    @Query("SELECT * FROM MetaData where antennaID = :antennaID AND freq = :freq AND tilt = :tilt AND type = :type LIMIT 1")
+    MetaData findByMetadata_Main(int antennaID, double freq, int tilt, String type);
+
+    @Query("SELECT * FROM MetaData where antennaID = :antennaID AND freq = :freq AND tilt = :tilt AND type = :type LIMIT 1")
+    LiveData<MetaData> findByMetadata_Background(int antennaID, double freq, int tilt, String type);
 
     @Insert
     void insert(MetaData metaData);

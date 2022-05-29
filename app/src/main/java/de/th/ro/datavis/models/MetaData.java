@@ -20,8 +20,8 @@ public class MetaData {
     public int antennaID;
     public String type;
 
-    public String freq;
-    public String tilt;
+    public double freq;
+    public int tilt;
     public String value;
 
 
@@ -29,7 +29,7 @@ public class MetaData {
 
     //ID, Tilt, Freq, Value, Type
 
-    public MetaData(String freq, String tilt, String value) {
+    public MetaData(double freq, int tilt, String value) {
         this.freq = freq;
         this.tilt = tilt;
         this.value = value;
@@ -38,6 +38,11 @@ public class MetaData {
     @Ignore
     public MetaData(int antennaID) {
         this.antennaID = antennaID;
+    }
+
+    @Override
+    public String toString() {
+        return "Metadata "+this.type+"("+id+")" + " Freq: "+this.freq+" Tilt: "+this.tilt+" = "+this.value;
     }
 
 
@@ -57,19 +62,19 @@ public class MetaData {
         this.antennaID = antennaID;
     }
 
-    public String getFreq() {
+    public double getFreq() {
         return freq;
     }
 
-    public void setFreq(String freq) {
+    public void setFreq(double freq) {
         this.freq = freq;
     }
 
-    public String getTilt() {
+    public int getTilt() {
         return tilt;
     }
 
-    public void setTilt(String tilt) {
+    public void setTilt(int tilt) {
         this.tilt = tilt;
     }
 

@@ -23,7 +23,8 @@
     <string name="upload_field">Upload File</string>
 
     <!-- BottomSheet -->
-    <string name="meta_HPBW">HPBW</string>
+    <string name="meta_HPBW">HPBW:</string>
+    <string name="meta_Squint">Squint:</string>
 
     <!-- MainMenu -->
     <string name="instructions">Instructions</string>
