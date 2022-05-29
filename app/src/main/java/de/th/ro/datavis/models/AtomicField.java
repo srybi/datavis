@@ -59,6 +59,10 @@ public class AtomicField {
     public InterpretationMode interpretationMode;
     public List<Sphere> spheres;
 
+
+
+    public double maxIntensity;
+
     public void setAntennaId(int antennaId) {
         this.antennaId = antennaId;
     }
@@ -70,11 +74,12 @@ public class AtomicField {
     public int antennaId;
     public int antennaFieldId;
 
-    public AtomicField(int tilt, double frequency, InterpretationMode interpretationMode, List<Sphere> spheres, int antennaId, int antennaFieldId) {
+    public AtomicField(int tilt, double frequency, InterpretationMode interpretationMode, List<Sphere> spheres, double maxIntensity, int antennaId, int antennaFieldId) {
         this.tilt = tilt;
         this.frequency = frequency;
         this.interpretationMode = interpretationMode;
         this.spheres = spheres;
+        this.maxIntensity = maxIntensity;
         this.antennaId = antennaId;
         this.antennaFieldId = antennaFieldId;
     }

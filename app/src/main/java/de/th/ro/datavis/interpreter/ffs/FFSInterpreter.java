@@ -178,7 +178,7 @@ public class FFSInterpreter implements IInterpreter {
 
     @Override
     public Result<AtomicField> interpretDataAsStream(Stream<String> stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
-        AtomicField atomicField = new AtomicField(2,1,mode, new ArrayList<>(), 1, 1);
+        AtomicField atomicField = new AtomicField(2,1,mode, new ArrayList<>(),maxItensity , 1, 1);
         maxItensity = -1;
         List<Sphere> coordinates;
 
@@ -202,7 +202,7 @@ public class FFSInterpreter implements IInterpreter {
             double z = Calc.z_polarToCartesian(l, mode);
             double intensity = Calc.calcIntensity(l, mode);
             if(intensity > maxItensity){
-                maxItensity = intensity;
+                atomicField.maxIntensity = intensity;
             }
             return new Sphere(x*scalingFactor, y*scalingFactor, z*scalingFactor, intensity);
         }).collect(Collectors.toList());

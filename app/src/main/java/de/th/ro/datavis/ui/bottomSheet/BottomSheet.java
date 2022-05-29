@@ -95,10 +95,16 @@ public class BottomSheet implements ISubject {
         frequencySlider = bottomSheetDialog.findViewById(R.id.sliderFrequency);
         applyButton = bottomSheetDialog.findViewById(R.id.apply);
         //init with current setting
+
+        float from = frequencies.get(0).floatValue();
+        float to = frequencies.get(frequencies.size()-1).floatValue();
+
+        frequencySlider.setValueFrom(from);
+        frequencySlider.setValueTo(to);
+
         keepSettings(bottomSheetDialog);
 
-        frequencySlider.setValueFrom(frequencies.get(0).floatValue());
-        frequencySlider.setValueTo(frequencies.get(frequencies.size()-1).floatValue());
+
 
         //handler for ModeSwitch
         modeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

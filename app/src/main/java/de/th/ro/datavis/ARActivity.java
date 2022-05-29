@@ -43,6 +43,7 @@ import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
 
+import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheet;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
@@ -71,6 +72,8 @@ public class ARActivity extends BaseActivity implements
     private InterpretationMode interpretationMode;
     private String TAG = "myTag";
 
+    private double maxIntensity = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,7 +101,7 @@ public class ARActivity extends BaseActivity implements
         }else{
             interpretationMode = InterpretationMode.Logarithmic;
         }
-        List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, 1, InterpretationMode.Logarithmic);
+        List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, 2, InterpretationMode.Logarithmic);
         bottomSheet = new BottomSheet(this, frequencies);
         gestureDetector = new GestureDetector(this, new BottomSheetHandler(bottomSheet));
 
@@ -167,7 +170,9 @@ public class ARActivity extends BaseActivity implements
         Log.d(TAG, "Start coordinate Loading...");
 
         try {
-            coordinates = ffsService.getSpheresByPrimaryKey(antennaId, frequency, tilt, mode);
+            AtomicField field = ffsService.getSpheresByPrimaryKey(antennaId, frequency, tilt, mode);
+            maxIntensity = field.maxIntensity;
+            coordinates = field.spheres;
 
         } catch(Exception e){
             Toast.makeText(this, "Unable to load the coordinates from the database.", Toast.LENGTH_SHORT).show();
@@ -212,7 +217,7 @@ public class ARActivity extends BaseActivity implements
         middleNode.setParent(anchorNode);
         int i = 0;
         for(Sphere s : coords){
-            FFSIntensityColor intensityColor = ffsInterpreter.mapToColor(s.getIntensity());
+            FFSIntensityColor intensityColor = ffsService.mapToColor(s.getIntensity(), maxIntensity);
             attachSphereToAnchorNode(middleNode, list.get(intensityColor.getName()+"Sphere"), s);
             i++;
             Log.d(TAG, "processRenderList: proccessing #" + i);
