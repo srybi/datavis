@@ -261,7 +261,7 @@ public class ImportActivity extends BaseActivity{
         for(MetaData e : list){
             Log.d(LOG_TAG, "Saving Metadata");
             e.setAntennaID(antennaId);
-            if(name.contains(".")) name.substring(0, name.lastIndexOf('.'));
+            if(name.contains(".")) name=name.substring(0, name.lastIndexOf('.'));
             e.setType(name);
             appDb.metadataDao().insert(e);
         }
@@ -273,7 +273,7 @@ public class ImportActivity extends BaseActivity{
 
         try {
             if(data.getData() == null){
-                m.add(new MetaData("N/A","N/A","N/A"));
+                m.add(new MetaData(0,0,"N/A"));
             }else{
                 //getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 InputStream in = getContentResolver().openInputStream(data.getData());

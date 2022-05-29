@@ -43,6 +43,8 @@ public class CalculationTest {
     private FFSLine testLineA2 = new FFSLine(0,1,0,1,0,1);
     private FFSLine testLineA3 = new FFSLine(0,0,0,0,0,0);
 
+    private FFSLine plusLine = new FFSLine(0,90,1.646985e-01,-6.423237e-02,7.819997e-02,2.736012e-01);
+
 
     @Test
     public void GetLineParameters(){
@@ -60,6 +62,16 @@ public class CalculationTest {
         assertEquals(2, Calc.calcIntensity(testLineA1, Linear),0.00001);
         assertEquals(1.4142135623, Calc.calcIntensity(testLineA2, Linear),0.00001);
         assertEquals(0, Calc.calcIntensity(testLineA3, Linear),0.00001);
+    }
+    @Test
+    public void PlusMinus(){
+        System.out.println(Math.pow(-2,2));
+        assertEquals(0.334998, Calc.calcIntensity(plusLine,Linear),0.0001);
+        assertEquals(-0.2964662097598077, Calc.calcIntensity(plusLine,Logarithmic),0.0001);
+        assertEquals(0.33499887344214724,Calc.x_polarToCartesian(plusLine, Linear),0.0001);
+        System.out.println("x:" + Calc.x_polarToCartesian(plusLine,Logarithmic));
+        assertEquals(0, Calc.y_polarToCartesian(plusLine, Linear),0.0001);
+        assertEquals(0, Calc.z_polarToCartesian(plusLine, Linear),0.0001);
     }
 
     @Test

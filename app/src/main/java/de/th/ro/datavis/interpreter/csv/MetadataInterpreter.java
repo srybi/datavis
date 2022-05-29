@@ -87,7 +87,7 @@ public class MetadataInterpreter {
         List<MetaData> mList = new ArrayList<>();
         for(int i=1; i<matrix.length; i++) {
             for(int j=1; j<matrix[i].length; j++) {
-                MetaData m = new MetaData(matrix[i][0],matrix[0][j],matrix[i][j]);
+                MetaData m = new MetaData(Double.parseDouble(matrix[i][0]),Integer.parseInt(matrix[0][j]),matrix[i][j]);
                 mList.add(m);
             }
         }
