@@ -134,6 +134,10 @@ public class BottomSheet implements ISubject{
 
             frequencySlider.setValueFrom(from);
             frequencySlider.setValueTo(to);
+
+            //dynamically calculate step size for slider
+            frequencySlider.setStepSize((float)(frequencies.get(1) - frequencies.get(0)));
+
         }else{
             frequencySlider.setEnabled(false);
         }
