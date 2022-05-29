@@ -25,6 +25,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.slider.Slider;
 
 import java.io.DataOutput;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +39,7 @@ import de.th.ro.datavis.interfaces.ISubject;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.MetaData;
+import de.th.ro.datavis.util.Helper;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
@@ -97,6 +100,7 @@ public class BottomSheet implements ISubject{
     /**
      * Method to open the bottom Sheet
      */
+    @SuppressLint("DefaultLocale")
     public void showBottomSheetDialog() {
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
         bottomSheetDialog.setContentView(R.layout.modal_bottom_sheet);
@@ -136,7 +140,11 @@ public class BottomSheet implements ISubject{
             frequencySlider.setValueTo(to);
 
             //dynamically calculate step size for slider
-            frequencySlider.setStepSize((float)(frequencies.get(1) - frequencies.get(0)));
+            double stepSize = (float)(frequencies.get(1) - frequencies.get(0));
+
+            double truncatedDouble = Helper.scaleDouble(3, stepSize);
+
+            frequencySlider.setStepSize((float)truncatedDouble);
 
         }else{
             frequencySlider.setEnabled(false);
@@ -231,7 +239,7 @@ public class BottomSheet implements ISubject{
      */
     private void updateSetting(){
         mode = changedMode;
-        frequency = changedFrequency;
+        frequency = Helper.scaleDouble(3,changedFrequency);
         tilt = changedTilt;
     }
 
