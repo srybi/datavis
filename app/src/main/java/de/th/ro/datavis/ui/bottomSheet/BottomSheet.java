@@ -71,6 +71,7 @@ public class BottomSheet implements ISubject {
         observers = new LinkedList<>();
         //default values
         mode = InterpretationMode.Logarithmic;
+        changedMode = InterpretationMode.Logarithmic;
         this.frequencies = frequencies;
         this.frequency = frequencies.get(0);
         this.changedFrequency = frequencies.get(0);
