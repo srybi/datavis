@@ -73,6 +73,7 @@ public class BottomSheet implements ISubject {
         mode = InterpretationMode.Logarithmic;
         this.frequencies = frequencies;
         this.frequency = frequencies.get(0);
+        this.changedFrequency = frequencies.get(0);
 
         tilt = 2;
         changedTilt  = 2;
@@ -95,13 +96,15 @@ public class BottomSheet implements ISubject {
         frequencySlider = bottomSheetDialog.findViewById(R.id.sliderFrequency);
         applyButton = bottomSheetDialog.findViewById(R.id.apply);
         //init with current setting
+        if(frequencies.size() > 1) {
+            float from = frequencies.get(0).floatValue();
+            float to = frequencies.get(frequencies.size() - 1).floatValue();
 
-        float from = frequencies.get(0).floatValue();
-        float to = frequencies.get(frequencies.size()-1).floatValue();
-
-        frequencySlider.setValueFrom(from);
-        frequencySlider.setValueTo(to);
-
+            frequencySlider.setValueFrom(from);
+            frequencySlider.setValueTo(to);
+        }else{
+            frequencySlider.setEnabled(false);
+        }
         keepSettings(bottomSheetDialog);
 
 
@@ -114,14 +117,15 @@ public class BottomSheet implements ISubject {
                 handleModeSwitch(compoundButton, isChecked);
             }
         });
-
-        frequencySlider.addOnChangeListener(new Slider.OnChangeListener() {
-            @Override
-            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                Log.d(TAG, "onValueChange: handeling FrequencySlider");
-                handleFrequencySlider(value);
-            }
-        });
+        if(frequencies.size() > 1) {
+            frequencySlider.addOnChangeListener(new Slider.OnChangeListener() {
+                @Override
+                public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                    Log.d(TAG, "onValueChange: handeling FrequencySlider");
+                    handleFrequencySlider(value);
+                }
+            });
+        }
 
         //handler for applyButton
         applyButton.setOnClickListener(new View.OnClickListener() {
@@ -156,8 +160,11 @@ public class BottomSheet implements ISubject {
             modeSwitch.setChecked(true);
         }
 
+
         //frequency slider
-        frequencySlider.setValue((float) frequency);
+        if(frequencies.size() > 1) {
+            frequencySlider.setValue((float) frequency);
+        }
 
         //tilt slider
     }
