@@ -28,6 +28,8 @@ import de.th.ro.datavis.util.enums.InterpretationMode;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 public class FFSService {
+    private final String TAG = "FFSService";
+
     private final IInterpreter interpreter;
     private final ExecutorService executor;
     private final AppDatabase db;
@@ -119,32 +121,32 @@ public class FFSService {
     }
 
     public FFSIntensityColor mapToColor(double intensity, double maxItensity) {
-        //wie in CST
-        double minIntensity = maxItensity - 1;
-        double stepSize = (maxItensity - Math.abs(minIntensity))/6;
+        //Schon wieder eine übergangslösung. Wenn Interpretation mode = Linear, dann minIntensity = 0, sonst werden die negativen Intensitäten sowieso rausgeschmissen
+        //Muss überarbeitet werden sobald bei Log. Darstellung negative Intensitäten mitberücksichtig werden
+        double stepSize = (maxItensity) / 6;
+        Log.d(TAG, "mapToColor: " + intensity);
 
-        if(intensity > maxItensity - (stepSize * 1)){
-            //#FE0000 red
-            return FFSIntensityColor.RED;
+        if (intensity < maxItensity - (stepSize * 5)) {
+            //#01FFF4  blue
+            return FFSIntensityColor.BLUE;
         }
-        if(intensity > maxItensity - stepSize * 2){
-            //#e6793a orange
-            return FFSIntensityColor.ORANGE;
-        }
-        if(intensity > maxItensity - stepSize * 3){
-            //#FFF205 yellow
-            return FFSIntensityColor.YELLOW;
-        }
-        if(intensity > maxItensity - stepSize * 4){
-            //#7CFF01 green
-            return FFSIntensityColor.GREEN;
-        }
-        if(intensity > maxItensity - stepSize * 5){
+        if (intensity < maxItensity - (stepSize * 4)) {
             //#3befe5 baby blue
             return FFSIntensityColor.BABYBLUE;
         }
-        //#01FFF4  blue
-        return FFSIntensityColor.BLUE;
+        if (intensity < maxItensity - (stepSize * 3)) {
+            //#7CFF01 green
+            return FFSIntensityColor.GREEN;
+        }
+        if (intensity < maxItensity - (stepSize * 2)) {
+            //#FFF205 yellow
+            return FFSIntensityColor.YELLOW;
+        }
+        if (intensity < maxItensity - (stepSize * 1)) {
+            //#e6793a orange
+            return FFSIntensityColor.ORANGE;
+        }
+        return FFSIntensityColor.RED;
     }
 
 }
