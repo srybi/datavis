@@ -22,6 +22,7 @@ import de.th.ro.datavis.instructions.AppInstructionsActivity;
 import de.th.ro.datavis.instructions.ImportInstructionsActivity;
 import de.th.ro.datavis.main.MainFragment;
 import de.th.ro.datavis.models.AntennaField;
+import de.th.ro.datavis.ui.settings.SettingsActivity;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 
@@ -101,7 +102,8 @@ public class MainActivity extends BaseActivity{
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 // switch to settings
-
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
                 return false;
             }
         });

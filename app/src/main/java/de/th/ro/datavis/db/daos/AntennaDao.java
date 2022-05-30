@@ -33,4 +33,7 @@ public interface AntennaDao {
 
     @Delete
     void delete(Antenna antenna);
+
+    @Query("DELETE FROM antenna")
+    void deleteAll();
 }

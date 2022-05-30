@@ -10,14 +10,20 @@
         <entry key="..\:/projects/datavis/app/src/main/res/layout/view_model_title.xml" value="0.31666666666666665" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1695" />
         <entry key="app/src/main/res/layout/activity_ar.xml" value="0.23229166666666667" />
-        <entry key="app/src/main/res/layout/activity_import_instructions.xml" value="0.10364583333333334" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/antenna_field_list_item.xml" value="0.2" />
+        <entry key="app/src/main/res/layout/antenna_list_item.xml" value="0.14447463768115942" />
+        <entry key="app/src/main/res/layout/antenna_settings_list_item.xml" value="0.335" />
         <entry key="app/src/main/res/layout/appbar_main.xml" value="0.23229166666666667" />
-        <entry key="app/src/main/res/layout/fragment_app_instructions.xml" value="0.10364583333333334" />
+        <entry key="app/src/main/res/layout/atomicfield_settings_list_item.xml" value="0.1484375" />
+        <entry key="app/src/main/res/layout/fragment_antenna.xml" value="0.14447463768115942" />
         <entry key="app/src/main/res/layout/fragment_ar.xml" value="0.10885416666666667" />
-        <entry key="app/src/main/res/layout/fragment_import_instructions.xml" value="0.10364583333333334" />
+        <entry key="app/src/main/res/layout/fragment_ffs.xml" value="0.14447463768115942" />
+        <entry key="app/src/main/res/layout/fragment_import.xml" value="0.14447463768115942" />
         <entry key="app/src/main/res/layout/fragment_main.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_metadata.xml" value="0.14447463768115942" />
+        <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.14447463768115942" />
+        <entry key="app/src/main/res/layout/metadata_settings_list_item.xml" value="0.1484375" />
         <entry key="app/src/main/res/layout/modal_bottom_sheet.xml" value="0.25" />
         <entry key="app/src/main/res/layout/sceneform_instructions_augmented_image.xml" value="0.21920289855072464" />
         <entry key="app/src/main/res/layout/sceneform_ux_fragment_layout.xml" value="0.21920289855072464" />
