@@ -21,7 +21,6 @@ import java.util.concurrent.Future;
 
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
-import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AtomicField;
 
 public class AtomicFieldSettingsAdapter extends ArrayAdapter<AtomicField> {
@@ -34,16 +33,17 @@ public class AtomicFieldSettingsAdapter extends ArrayAdapter<AtomicField> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         AtomicField field = getItem(position);
         if(convertView == null){
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.atomicfield_settings_list_item, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_atomicfield_settings, parent, false);
         }
+
         TextView tvAntId = (TextView) convertView.findViewById(R.id.text_view_field_antenna_id);
-        tvAntId.setText(String.valueOf(field.antennaId));
+        tvAntId.setText("Antenna Id: "+field.antennaId);
         TextView tvFreq = (TextView) convertView.findViewById(R.id.text_view_field_freq);
-        tvFreq.setText(String.valueOf(field.frequency));
+        tvFreq.setText("Freq: " +field.frequency);
         TextView tvTilt = (TextView) convertView.findViewById(R.id.text_view_field_tilt);
-        tvTilt.setText(String.valueOf(field.tilt));
+        tvTilt.setText("Tilt: "+field.tilt);
         TextView tvIntMode = (TextView) convertView.findViewById(R.id.text_view_field_int_mode);
-        tvIntMode.setText(String.valueOf(field.frequency));
+        tvIntMode.setText(String.valueOf(field.interpretationMode));
 
         ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.button_field_delete);
         View finalConvertView = convertView;

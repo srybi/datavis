@@ -1,8 +1,11 @@
 package de.th.ro.datavis.models;
 
+import static androidx.room.ForeignKey.CASCADE;
+
 import android.net.Uri;
 
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
@@ -10,7 +13,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-@Entity(tableName = "antenna_field")
+@Entity(tableName = "antenna_field", foreignKeys ={ @ForeignKey(entity = Antenna.class,
+        parentColumns = "id",
+        childColumns = "antennaId",
+        onDelete = CASCADE)})
 public class AntennaField {
     @PrimaryKey(autoGenerate = true)
     public int id;

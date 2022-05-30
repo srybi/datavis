@@ -26,7 +26,7 @@ public class AntennaFieldAdapter extends ArrayAdapter<AntennaField> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         AntennaField field = getItem(position);
          if(convertView == null){
-             convertView = LayoutInflater.from(getContext()).inflate(R.layout.antenna_field_list_item, parent, false);
+             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_antenna_field, parent, false);
          }
          TextView tvName = (TextView) convertView.findViewById(R.id.field_name);
          tvName.setText(field.filename);

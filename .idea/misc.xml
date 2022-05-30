@@ -23,6 +23,7 @@
         <entry key="app/src/main/res/layout/fragment_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_metadata.xml" value="0.14447463768115942" />
         <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.14447463768115942" />
+        <entry key="app/src/main/res/layout/list_item_metadata_settings.xml" value="0.1" />
         <entry key="app/src/main/res/layout/metadata_settings_list_item.xml" value="0.1484375" />
         <entry key="app/src/main/res/layout/modal_bottom_sheet.xml" value="0.25" />
         <entry key="app/src/main/res/layout/sceneform_instructions_augmented_image.xml" value="0.21920289855072464" />

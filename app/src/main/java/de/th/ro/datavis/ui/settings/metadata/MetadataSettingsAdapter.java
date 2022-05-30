@@ -21,7 +21,6 @@ import java.util.concurrent.Future;
 
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
-import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.MetaData;
 
 public class MetadataSettingsAdapter extends ArrayAdapter<MetaData> {
@@ -34,18 +33,19 @@ public class MetadataSettingsAdapter extends ArrayAdapter<MetaData> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         MetaData data = getItem(position);
         if(convertView == null){
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.metadata_settings_list_item, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_metadata_settings, parent, false);
         }
+
         TextView tvAntId = (TextView) convertView.findViewById(R.id.text_view_metadata_antenna_id);
-        tvAntId.setText(String.valueOf(data.antennaID));
+        tvAntId.setText("Antenna Id: "+data.antennaID);
         TextView tvFreq = (TextView) convertView.findViewById(R.id.text_view_metadata_freq);
-        tvFreq.setText(String.valueOf(data.freq));
+        tvFreq.setText("Freq: "+data.freq);
         TextView tvTilt = (TextView) convertView.findViewById(R.id.text_view_metadata_tilt);
-        tvTilt.setText(String.valueOf(data.tilt));
+        tvTilt.setText("Tilt: "+data.tilt);
         TextView tvType = (TextView) convertView.findViewById(R.id.text_view_metadata_type);
-        tvType.setText(String.valueOf(data.type));
+        tvType.setText("Type: "+data.type);
         TextView tvValue = (TextView) convertView.findViewById(R.id.text_view_metadata_value);
-        tvValue.setText(data.value);
+        tvValue.setText("Value: "+data.value);
 
         ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.button_metadata_delete);
         View finalConvertView = convertView;
@@ -71,7 +71,6 @@ public class MetadataSettingsAdapter extends ArrayAdapter<MetaData> {
                 String metadataDescription = "Antenna ID: " +data.antennaID + "; Freq: " + data.freq + "; Tilt: " + data.tilt + "; Type: " + data.type + "; Value: " + data.value;
                 ab.setMessage(getContext().getString(R.string.clear_one_confirm) + " " + metadataDescription + " ?").setPositiveButton(R.string.yes, dialogClickListener)
                         .setNegativeButton(R.string.no, dialogClickListener).show();
-
             }
         });
 

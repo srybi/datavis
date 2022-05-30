@@ -18,7 +18,7 @@ import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.MetaData;
 
 @TypeConverters({Converter.class})
-@Database(entities = {AntennaField.class, Antenna.class, MetaData.class, AtomicField.class}, version = 13)
+@Database(entities = {AntennaField.class, Antenna.class, MetaData.class, AtomicField.class}, version = 15)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract AntennaFieldDao antennaFieldDao();

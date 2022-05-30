@@ -2,24 +2,19 @@ package de.th.ro.datavis.ui.settings.antenna;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -38,10 +33,10 @@ public class AntennaSettingsAdapter extends ArrayAdapter<Antenna> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         Antenna antenna = getItem(position);
         if(convertView == null){
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.antenna_settings_list_item, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_antenna_settings, parent, false);
         }
         TextView tvId = (TextView) convertView.findViewById(R.id.text_view_antenna_id);
-        tvId.setText(String.valueOf(antenna.id));
+        tvId.setText(String.valueOf("ID: "+antenna.id));
         TextView tvName = (TextView) convertView.findViewById(R.id.text_view_antenna_name);
         tvName.setText(antenna.filename);
 
