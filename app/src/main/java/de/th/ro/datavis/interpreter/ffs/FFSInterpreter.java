@@ -204,7 +204,7 @@ public class FFSInterpreter implements IInterpreter {
             if(intensity > atomicField.maxIntensity){
                 atomicField.maxIntensity = intensity;
             }
-            return new Sphere(x*scalingFactor, y*scalingFactor, z*scalingFactor, intensity);
+            return new Sphere(x, y, z, intensity);
         }).collect(Collectors.toList());
 
         atomicField.setSpheres(coordinates);

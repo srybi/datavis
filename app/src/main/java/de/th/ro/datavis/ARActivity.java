@@ -31,7 +31,6 @@ import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +41,6 @@ import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
-
 import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheet;
@@ -73,6 +71,7 @@ public class ARActivity extends BaseActivity implements
     private String TAG = "myTag";
 
     private double maxIntensity = -1;
+    private float scalingFactor = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,12 +214,15 @@ public class ARActivity extends BaseActivity implements
 
         middleNode = new TransformableNode(arFragment.getTransformationSystem());
         middleNode.setParent(anchorNode);
+
+        scalingFactor = calcScalingFactor(maxIntensity);
+        Log.d(TAG, "ScalingFactor " + scalingFactor);
         int i = 0;
         for(Sphere s : coords){
             FFSIntensityColor intensityColor = ffsService.mapToColor(s.getIntensity(), maxIntensity);
-            attachSphereToAnchorNode(middleNode, list.get(intensityColor.getName()+"Sphere"), s);
+            attachSphereToAnchorNode(middleNode, list.get(intensityColor.getName()+"Sphere"), s, scalingFactor);
             i++;
-            Log.d(TAG, "processRenderList: proccessing #" + i);
+            //Log.d(TAG, "processRenderList: proccessing #" + i);
         }
         Log.d(TAG, "Processing RenderList Done");
     }
@@ -236,14 +238,27 @@ public class ARActivity extends BaseActivity implements
     }
 
 
-    private void attachSphereToAnchorNode(TransformableNode middleNode, Renderable renderable, Sphere sphere){
+    private void attachSphereToAnchorNode(TransformableNode middleNode, Renderable renderable, Sphere sphere, float scalingFactor){
         float yOffset = 0.1f;
         TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
-        model.setLocalPosition(new Vector3((float) sphere.getX(), (float) sphere.getY() + yOffset, (float) sphere.getZ()));
+        model.setLocalPosition(new Vector3((float) sphere.getX() * scalingFactor, (float) sphere.getY() * scalingFactor + yOffset, (float) sphere.getZ() * scalingFactor));
         model.setParent(middleNode);
         model.setRenderable(renderable)
                 .animate(true).start();
         model.select();
+    }
+
+    /**
+     * This calculates a Scaling Factor in reference to the given maxIntensity.
+     * @param maxIntensity maxIntensity of the SphereList
+     * @return a ScalingFactor based on the maxIntensity
+     */
+    private float calcScalingFactor(double maxIntensity){
+
+        float target = 0.5f;
+        float factor = (float) (target / maxIntensity);
+
+        return factor;
     }
 
     //Observer Pattern
