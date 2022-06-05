@@ -21,12 +21,6 @@ public interface MetadataDao {
     @Query("SELECT * FROM MetaData")
     List<MetaData> getAll_Background();
 
-    @Query("SELECT * FROM MetaData where id = :ID")
-    MetaData find_Main(int ID);
-
-    @Query("SELECT * FROM MetaData where id = :ID")
-    List<MetaData> find_Background(int ID);
-
     //Identifies Metadata by AntennenID, Freq und Tilt
     @Query("SELECT * FROM MetaData WHERE antennaID = :antennaID AND freq = :freq AND tilt = :tilt AND type LIKE :type")
     MetaData findByMetadata_Main(int antennaID, double freq, double tilt, String type);

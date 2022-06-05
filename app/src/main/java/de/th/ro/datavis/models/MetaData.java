@@ -15,7 +15,6 @@ import androidx.room.PrimaryKey;
 })
 public class MetaData {
 
-    public int id;
     public int antennaID;
     @NonNull
     public String type;
@@ -24,11 +23,7 @@ public class MetaData {
     public int tilt;
     public String value;
 
-
-    // todo Fields
-
-    //ID, Tilt, Freq, Value, Type
-
+    //ID, Tilt, Freq, Value
     public MetaData(double freq, int tilt, String value) {
         this.freq = freq;
         this.tilt = tilt;
@@ -42,17 +37,9 @@ public class MetaData {
 
     @Override
     public String toString() {
-        return "Metadata "+this.type+"("+id+")" + " Freq: "+this.freq+" Tilt: "+this.tilt+" = "+this.value;
+        return "Metadata "+this.type+ " Freq: "+this.freq+" Tilt: "+this.tilt+" = "+this.value;
     }
 
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public int getAntennaID() {
         return antennaID;
