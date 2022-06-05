@@ -1,6 +1,7 @@
 package de.th.ro.datavis.imp;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -351,7 +352,8 @@ public class ImportActivity extends BaseActivity{
      */
     public void persistMetadata(AppDatabase appDb, Uri uri, String name, Intent data){
         // Background
-        List<MetaData> list = getCSVMetadata(data);
+
+        List<MetaData> list = metaInt.getCSVMetadata(uri, this.getContentResolver());
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         int antennaId = preferences.getInt("ID", 1);
 
@@ -365,28 +367,7 @@ public class ImportActivity extends BaseActivity{
         handelNewlyInsertedMetadata(appDb);
     }
 
-    public List<MetaData> getCSVMetadata(Intent data){
-        List<MetaData> m = null;
 
-        try {
-            if(data.getData() == null){
-                m.add(new MetaData(0,0,"N/A"));
-            }else{
-                //getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                InputStream in = getContentResolver().openInputStream(data.getData());
-                Log.d(LOG_TAG, "Input Stream open");
-                m = metaInt.getMetadataFromLines(metaInt.interpretCSV(in));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } catch(SecurityException se){
-            se.printStackTrace();
-            //Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
-            return null;
-        }
-        return m;
-    }
 
 
 

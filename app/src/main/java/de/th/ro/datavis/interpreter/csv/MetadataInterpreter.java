@@ -1,5 +1,8 @@
 package de.th.ro.datavis.interpreter.csv;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
@@ -28,6 +31,52 @@ public class MetadataInterpreter {
     private static final String LOG_TAG = "MetaIntrp";
 
     public MetadataInterpreter() {}
+
+    public List<MetaData> getCSVMetadata(Intent data, ContentResolver c){
+        List<MetaData> m = null;
+
+        try {
+            if(data.getData() == null){
+                m.add(new MetaData(0,0,"N/A"));
+            }else{
+                InputStream in = c.openInputStream(data.getData());
+                Log.d(LOG_TAG, "Input Stream open");
+                m = getMetadataFromLines(interpretCSV(in));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch(SecurityException se){
+            se.printStackTrace();
+            //Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        return m;
+    }
+    public List<MetaData> getCSVMetadata(Uri uri, ContentResolver c){
+        List<MetaData> m = null;
+
+        try {
+            if(uri == null){
+                Log.d(LOG_TAG, "File not found");
+                m.add(new MetaData(0,0,"N/A"));
+            }else{
+
+                InputStream in = c.openInputStream(uri);
+                //getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Log.d(LOG_TAG, "Input Stream open");
+                m = getMetadataFromLines(interpretCSV(in));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch(SecurityException se){
+            se.printStackTrace();
+            //Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        return m;
+    }
 
     /**
      *
