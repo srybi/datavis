@@ -24,8 +24,11 @@
     <string name="upload_field">Upload File</string>
 
     <!-- BottomSheet -->
-    <string name="meta_HPBW">HPBW:</string>
-    <string name="meta_Squint">Squint:</string>
+    <string name="meta_NF">NF</string>
+    <string name="meta_Nullfill_dB">Nullfill</string>
+    <string name="meta_Squint_deg">Squint</string>
+    <string name="meta_Tilt_deg">Tilt real</string>
+    <string name="meta_TiltDeviation_deg">Tilt deviation</string>
 
     <!-- MainMenu -->
     <string name="instructions">Instructions</string>

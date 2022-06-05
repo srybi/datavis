@@ -66,7 +66,10 @@ public class BottomSheet implements ISubject{
      */
     private InterpretationMode mode;
     private InterpretationMode changedMode;
-    private LiveData<MetaData> HPBW = new MutableLiveData<>();
+    private LiveData<MetaData> Nullfill_dB= new MutableLiveData<>();
+    private LiveData<MetaData> Squint_deg = new MutableLiveData<>();
+    private LiveData<MetaData> Tilt_deg = new MutableLiveData<>();
+    private LiveData<MetaData> TiltDeviation_deg = new MutableLiveData<>();
     private String Squint;
 
     private final AppDatabase db;
@@ -111,22 +114,13 @@ public class BottomSheet implements ISubject{
 
         Log.d(TAG, Double.toString(frequency));
 
+        //fetches Metadata
         try {
-            Log.d(TAG, "Meta ID: " + db.metadataDao().findByMetadata_Background(1, frequency, tilt , "HHPBW_deg"));
-            HPBW = db.metadataDao().findByMetadata_Background(1, frequency, tilt, "HHPBW_deg");
+            readMetaDataFromDB();
         } catch (Exception e) { e.printStackTrace();}
 
         //Create Observer for Metadata
-        final Observer<MetaData> nameObserver = new Observer<MetaData>() {
-            @Override
-            public void onChanged(@Nullable final MetaData changeMetaData) {
-                // Update the UI, in this case, a TextView.
-                updateMetadataViews(bottomSheetDialog, changeMetaData);
-            }
-        };
-        HPBW.observe((AppCompatActivity)context,nameObserver);
-
-        Log.d(TAG, "Call Metadata");
+        createMetaDataObserver(bottomSheetDialog);
 
         modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
         frequencySlider = bottomSheetDialog.findViewById(R.id.sliderFrequency);
@@ -213,10 +207,19 @@ public class BottomSheet implements ISubject{
     private void updateMetadataViews(BottomSheetDialog b, MetaData changeMetaData){
         //TODO
         Log.d(TAG, "Update Metadata");
-        TextView hpbw = b.findViewById(R.id.meta_HPBW);
-        try {        hpbw.setText(changeMetaData.getValue());
-        } catch (Exception e){         Log.d(TAG, "Couldn't match Metadata");}
+        TextView nullfill_dB = b.findViewById(R.id.meta_Nullfill_dB);
+        TextView squint_deg = b.findViewById(R.id.meta_Squint_deg);
+        TextView tilt_deg = b.findViewById(R.id.meta_Tilt_deg);
+        TextView tiltDeviation_deg = b.findViewById(R.id.meta_TiltDeviation_deg);
 
+        try{
+            nullfill_dB.setText(changeMetaData.getValue());
+            squint_deg.setText(changeMetaData.getValue());
+            tilt_deg.setText(changeMetaData.getValue());
+            tiltDeviation_deg.setText(changeMetaData.getValue());
+        } catch (Exception e){
+            Log.d(TAG, "Couldn't match Metadata");
+        }
 
     }
 
@@ -251,6 +254,29 @@ public class BottomSheet implements ISubject{
             changedMode = InterpretationMode.Logarithmic;
         }
         switchBtn.setChecked(isChecked);
+    }
+
+    private void readMetaDataFromDB(){
+        Nullfill_dB = db.metadataDao().findByMetadata_Background(1, frequency, tilt, "Nullfill_dB");
+        Squint_deg = db.metadataDao().findByMetadata_Background(1, frequency, tilt, "Squint_deg");
+        Tilt_deg = db.metadataDao().findByMetadata_Background(1, frequency, tilt, "Tilt_deg");
+        TiltDeviation_deg = db.metadataDao().findByMetadata_Background(1, frequency, tilt, "TiltDeviation_deg");
+    }
+
+    private void createMetaDataObserver(BottomSheetDialog bsd){
+        final Observer<MetaData> nameObserver = new Observer<MetaData>() {
+            @Override
+            public void onChanged(@Nullable final MetaData changeMetaData) {
+                // Update the UI, in this case, a TextView.
+                updateMetadataViews(bsd, changeMetaData);
+            }
+        };
+        Nullfill_dB.observe((AppCompatActivity)context,nameObserver);
+        Squint_deg.observe((AppCompatActivity)context,nameObserver);
+        Tilt_deg.observe((AppCompatActivity)context,nameObserver);
+        TiltDeviation_deg.observe((AppCompatActivity)context,nameObserver);
+
+        Log.d(TAG, "Call Metadata");
     }
 
     private void handleFrequencySlider(float value) {
