@@ -1,30 +1,24 @@
 package de.th.ro.datavis.interpreter.csv;
 
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.provider.DocumentsContract;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
-import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.MetaData;
-import de.th.ro.datavis.util.enums.MetadataType;
-import de.th.ro.datavis.util.exceptions.CSVException;
+import de.th.ro.datavis.util.constants.MetadataType;
+import de.th.ro.datavis.util.filehandling.FileHandler;
 
 public class MetadataInterpreter {
 
@@ -32,57 +26,59 @@ public class MetadataInterpreter {
 
     public MetadataInterpreter() {}
 
-    public List<MetaData> getCSVMetadata(Intent data, ContentResolver c){
-        List<MetaData> m = null;
-
-        try {
-            if(data.getData() == null){
-                m.add(new MetaData(0,0,"N/A"));
-            }else{
-                InputStream in = c.openInputStream(data.getData());
-                Log.d(LOG_TAG, "Input Stream open");
-                m = getMetadataFromLines(interpretCSV(in));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } catch(SecurityException se){
-            se.printStackTrace();
-            //Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
-            return null;
-        }
-        return m;
-    }
+    /*
+     * Checks if uris null and handles exceptions
+     * Calls getMetadataFromLines() and interpretCSV()
+     * Sets antenna Type based on filename
+     */
     public List<MetaData> getCSVMetadata(Uri uri, ContentResolver c){
         List<MetaData> m = null;
-
         try {
             if(uri == null){
                 Log.d(LOG_TAG, "File not found");
                 m.add(new MetaData(0,0,"N/A"));
             }else{
-
                 InputStream in = c.openInputStream(uri);
-                //getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 Log.d(LOG_TAG, "Input Stream open");
                 m = getMetadataFromLines(interpretCSV(in));
+                //Set Type
+                String name = FileHandler.queryName(c, uri);
+                if(name.contains(".")) name=name.substring(0, name.lastIndexOf('.'));
+                for(MetaData mD :m){
+                    mD.setType(name);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         } catch(SecurityException se){
             se.printStackTrace();
-            //Toast.makeText(this, "Unable to load the file, due to missing permissions.", Toast.LENGTH_SHORT).show();
             return null;
         }
         return m;
     }
 
     /**
+     * @param matrix - Takes a matrix generated from .csv
+     * @return - returns Metadata information, including tilt etc.
+     * Excluding Filename, AntennaID
+     */
+    public List<MetaData> getMetadataFromLines(String[][] matrix) {
+        List<MetaData> mList = new ArrayList<>();
+        for(int i=1; i<matrix.length; i++) {
+            for(int j=1; j<matrix[i].length; j++) {
+                MetaData m = new MetaData(Double.parseDouble(matrix[i][0]),Integer.parseInt(matrix[0][j]),matrix[i][j]);
+                mList.add(m);
+            }
+        }
+        Log.d(LOG_TAG, "Finished making MetaData from matrix...");
+        return mList;
+    }
+
+    /**
      *
      * @param in InputStream from file
      * @return  Matrix of .csv Data
-     * @throws CSVException
      */
     public String[][] interpretCSV(InputStream in) throws IOException {
         InputStreamReader reader = new InputStreamReader(in);
@@ -106,13 +102,10 @@ public class MetadataInterpreter {
         }
         Log.d(LOG_TAG, "Finished generating csv matrix...");
         return matrix;
-
     }
 
     /**
-     *
-     * @param in - Input Stream
-     * @return Simple List of lines of the .csv Data
+     * Obsolete
      */
     public List<String> interpretMetaData(InputStream in) throws IOException {
         InputStreamReader reader = new InputStreamReader(in);
@@ -128,20 +121,61 @@ public class MetadataInterpreter {
     }
 
     /**
-     * @param matrix - Takes .csv matrix
-     * @return - Gives out Metadata information, including tilt etc.
-     * Excluding Filename, AntennaID
+     * Takes the directory URI, iterates through the files and builds a list of all .csv
+     * @param rootUri Directory URI
+     * @return List of URIs of .csv files
      */
-    public List<MetaData> getMetadataFromLines(String[][] matrix) {
-        List<MetaData> mList = new ArrayList<>();
-        for(int i=1; i<matrix.length; i++) {
-            for(int j=1; j<matrix[i].length; j++) {
-                MetaData m = new MetaData(Double.parseDouble(matrix[i][0]),Integer.parseInt(matrix[0][j]),matrix[i][j]);
-                mList.add(m);
+    public ArrayList<Uri> traverseDirectoryEntries(Uri rootUri, ContentResolver cr) {
+        ArrayList<Uri> listUri = new ArrayList<>();
+        Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(rootUri,
+                DocumentsContract.getTreeDocumentId(rootUri));
+        // Keep track of our directory hierarchy
+        List<Uri> dirNodes = new LinkedList<>();
+        dirNodes.add(childrenUri);
+
+        while(!dirNodes.isEmpty()) {
+            childrenUri = dirNodes.remove(0); // get the item from top
+            Log.d(LOG_TAG, "node uri: " + childrenUri);
+            Cursor c = cr.query(childrenUri, new String[]{
+                            DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                            DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                            DocumentsContract.Document.COLUMN_MIME_TYPE},
+                    null, null, null);
+            try {
+
+                while (c.moveToNext()) {
+                    final String docId = c.getString(0);
+                    String name = c.getString(1);
+                    if(name.contains(".")) name=name.substring(0, name.lastIndexOf('.'));
+                    final String mime = c.getString(2);
+                    Log.d(LOG_TAG, "docId: " + docId + ", name: " + name + ", mime: " + mime);
+                    if (//name.contains(".csv")&&
+                            isCSV(mime)&&isMetaDataImportable(name)) {
+                        final Uri newNode = DocumentsContract.buildDocumentUriUsingTree(rootUri, docId);
+                        listUri.add(newNode);
+                    }
+                }
+
+            } finally {
+                try {
+                    c.close();
+                } catch(RuntimeException re) {
+                    re.printStackTrace();
+                    Log.d(LOG_TAG, "cursor in directory did not close");
+                }
             }
         }
-        Log.d(LOG_TAG, "Finished making MetaData from matrix...");
-        return mList;
+        Log.d(LOG_TAG, "gathered URIs");
+        return listUri;
+    }
+    /*
+     * Utility to check MIME type
+     */
+    private static boolean isCSV(String mimeType) {
+        return "text/comma-separated-values".equals(mimeType);
+    }
+    private static boolean isMetaDataImportable(String type) {
+        return(MetadataType.MetaDataTypeList.contains(type));
     }
 
 }

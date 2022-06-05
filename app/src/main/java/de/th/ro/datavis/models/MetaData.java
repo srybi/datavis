@@ -8,8 +8,6 @@ import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import de.th.ro.datavis.util.enums.MetadataType;
-
 @Entity(foreignKeys = {
         @ForeignKey(entity = Antenna.class , parentColumns = "id", childColumns="antennaID", onDelete = CASCADE)
 })

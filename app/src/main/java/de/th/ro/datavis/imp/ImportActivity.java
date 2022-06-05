@@ -1,29 +1,22 @@
 package de.th.ro.datavis.imp;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.DocumentsContract;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.documentfile.provider.DocumentFile;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -41,8 +34,6 @@ import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.*;
 import de.th.ro.datavis.util.dialog.DialogExistingAntenna;
-import de.th.ro.datavis.util.enums.MetadataType;
-import de.th.ro.datavis.util.exceptions.CSVException;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 
@@ -51,14 +42,12 @@ public class ImportActivity extends BaseActivity{
     private final String LOG_TAG = "ImportActivity";
 
     AppDatabase appDb;
-
     FFSService ffsService;
 
     Antenna currentAntenna;
     MetaData currentMetaData;
     List<AntennaField> currentAntenaFields;
     ImportView importView;
-
     MetadataInterpreter metaInt = new MetadataInterpreter();
 
     static boolean firstRun = true;
@@ -123,6 +112,7 @@ public class ImportActivity extends BaseActivity{
                 openFileDialog_Android9(FileRequests.REQUEST_CODE_METADATA);
             }
 
+            @Override
             public void addMetaDataFolder() {
                 if (currentAntenna == null){
                     Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();
@@ -159,6 +149,7 @@ public class ImportActivity extends BaseActivity{
 
         startActivityForResult(chooseFile, requestCode);
     }
+
     private void openFolderDialog(int requestCode){
         Intent browseIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         browseIntent.addFlags(
@@ -177,16 +168,6 @@ public class ImportActivity extends BaseActivity{
         Log.d(LOG_TAG, "Activity result");
         if(resultCode == Activity.RESULT_OK){
             Log.d(LOG_TAG, "Request Code: "+requestCode);
-            //Files can only be read from Main/UI Thread
-
-            /*if(requestCode == FileRequests.REQUEST_CODE_METADATA){
-                Uri uri = data.getData();
-                String name = FileHandler.queryName(getContentResolver(), uri);
-
-                AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
-                persistMetadata(appDb, uri, name, data);
-            }*/
-
             ExecutorService executorService  = Executors.newSingleThreadExecutor();
 
             Future future = executorService.submit( getHandelResultRunnable( data, requestCode) );
@@ -207,14 +188,12 @@ public class ImportActivity extends BaseActivity{
 
     }
 
-
     public Runnable getHandelResultRunnable(Intent data, int requestCode){
         return new Runnable() {
             @Override
             public void run() {
                 try {
                     Uri uri = data.getData();
-
 
                     AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
 
@@ -225,10 +204,9 @@ public class ImportActivity extends BaseActivity{
                         String name = FileHandler.queryName( getContentResolver(), uri);
                         persistFFS(appDb, uri, name, data);
                     } else if(requestCode == FileRequests.REQUEST_CODE_METADATA) {
-                        String name = FileHandler.queryName( getContentResolver(), uri);
-                        persistMetadata(appDb, uri, name, data);
+                        persistMetadata(appDb, uri);
                     } else {
-                        persistMetadataFolder(appDb, uri, data);
+                        persistMetadataFolder(appDb, uri);
                     }
 
                 }catch(Exception e){
@@ -278,81 +256,13 @@ public class ImportActivity extends BaseActivity{
         handelNewlyInsertedAntennaField(appDb, antennaId);
 
     }
-
-    /*
-    Simple method to iterate through all files of a folder
-    Calls persistMetadata
-     */
-    public void persistMetadataFolder(AppDatabase appDb, Uri rootUri, Intent data) {
-        ArrayList<Uri> listUri = traverseDirectoryEntries(rootUri);
-        Log.d(LOG_TAG, "listlen: "+listUri.size());
-        for(Uri u: listUri){
-            String nameUri = FileHandler.queryName(getContentResolver(), u);
-        }
-        for(Uri u: listUri){
-            String nameUri = FileHandler.queryName(getContentResolver(), u);
-            Log.d(LOG_TAG, "Persist Uri: " + nameUri + " " +u);
-            persistMetadata(appDb, u, nameUri, data);
-        }
-    }
-
-
     /**
-     * Takes the directory URI, iterates through the files and builds a list of all .csv
-     * @param rootUri
-     * @return
+     * Uses MetadataInterpreter to run through a .csv
+     * then adds antennaID
+     * then persists it
      */
-    ArrayList<Uri> traverseDirectoryEntries(Uri rootUri) {
-        ArrayList<Uri> listUri = new ArrayList<>();
-        Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(rootUri,
-                DocumentsContract.getTreeDocumentId(rootUri));
-        // Keep track of our directory hierarchy
-        List<Uri> dirNodes = new LinkedList<>();
-        dirNodes.add(childrenUri);
-
-        while(!dirNodes.isEmpty()) {
-            childrenUri = dirNodes.remove(0); // get the item from top
-            Log.d(LOG_TAG, "node uri: " + childrenUri);
-            Cursor c = getContentResolver().query(childrenUri, new String[]{
-                            DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-                            DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-                            DocumentsContract.Document.COLUMN_MIME_TYPE},
-                    null, null, null);
-             try {
-
-                while (c.moveToNext()) {
-                    final String docId = c.getString(0);
-                    final String name = c.getString(1);
-                    final String mime = c.getString(2);
-                    Log.d(LOG_TAG, "docId: " + docId + ", name: " + name + ", mime: " + mime);
-                    if (name.contains(".csv")) {
-                        final Uri newNode = DocumentsContract.buildDocumentUriUsingTree(rootUri, docId);
-                        listUri.add(newNode);
-                    }
-                }
-
-
-            } finally {
-                try {
-                    c.close();
-                } catch(RuntimeException re) {
-                    re.printStackTrace();
-                }
-            }
-        }
-        Log.d(LOG_TAG, "gathered URIs");
-        return listUri;
-    }
-    private static boolean isDirectory(String mimeType) {
-        return DocumentsContract.Document.MIME_TYPE_DIR.equals(mimeType);
-    }
-
-    /**
-     * Persists Metadata
-     */
-    public void persistMetadata(AppDatabase appDb, Uri uri, String name, Intent data){
+    public void persistMetadata(AppDatabase appDb, Uri uri){
         // Background
-
         List<MetaData> list = metaInt.getCSVMetadata(uri, this.getContentResolver());
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         int antennaId = preferences.getInt("ID", 1);
@@ -360,16 +270,24 @@ public class ImportActivity extends BaseActivity{
         for(MetaData e : list){
             Log.d(LOG_TAG, "Saving Metadata");
             e.setAntennaID(antennaId);
-            if(name.contains(".")) name=name.substring(0, name.lastIndexOf('.'));
-            e.setType(name);
             appDb.metadataDao().insert(e);
         }
         handelNewlyInsertedMetadata(appDb);
     }
 
-
-
-
+    /*
+     * Calls MetadataInterpreter to iterate through files in a folder
+     * Calls persistMetadata
+     */
+    public void persistMetadataFolder(AppDatabase appDb, Uri rootUri) {
+        ArrayList<Uri> listUri = metaInt.traverseDirectoryEntries(rootUri, this.getContentResolver());
+        Log.d(LOG_TAG, "directory list length: "+listUri.size());
+        for(Uri u: listUri){
+            //String nameUri = FileHandler.queryName(getContentResolver(), u);
+            Log.d(LOG_TAG, "persisting Uri: " +u.toString());
+            persistMetadata(appDb, u);
+        }
+    }
 
 
     private void updateAntennaField(AppDatabase appDb){
