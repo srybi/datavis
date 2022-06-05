@@ -79,9 +79,6 @@ public class BottomSheet implements ISubject{
     private int changedTilt;
 
     private LiveData<MetaData> Nullfill_dB, Squint_deg, Tilt_deg, TiltDeviation_deg = new MutableLiveData<>();
-    MediatorLiveData liveDataMerger = new MediatorLiveData<>();
-
-
 
 
     public InterpretationMode getMode(){
@@ -212,32 +209,6 @@ public class BottomSheet implements ISubject{
     }
 
 
-    //An update method per field
-    private void updateNullfill_dBView(BottomSheetDialog b, MetaData changeMetaData){
-        TextView nullfill_dB = b.findViewById(R.id.meta_Nullfill_dB);
-        try {
-            nullfill_dB.setText(changeMetaData.getValue());
-        } catch (Exception e){ Log.d(TAG, "couldn't find nullfill"); }
-    }
-    private void updateSquint_degView(BottomSheetDialog b, MetaData changeMetaData){
-        TextView squint_deg = b.findViewById(R.id.meta_Squint_deg);
-        try {
-            squint_deg.setText(changeMetaData.getValue());
-        } catch (Exception e){ Log.d(TAG, "couldn't find squint"); }
-    }
-    private void updateTilt_degView(BottomSheetDialog b, MetaData changeMetaData){
-        TextView tilt_deg = b.findViewById(R.id.meta_Tilt_deg);
-        try {
-            tilt_deg.setText(changeMetaData.getValue());
-        } catch (Exception e){ Log.d(TAG, "couldn't find Tilt"); }
-    }
-    private void updateTiltDeviation_degView(BottomSheetDialog b, MetaData changeMetaData){
-        TextView tiltDeviation_deg = b.findViewById(R.id.meta_TiltDeviation_deg);
-        try {
-            tiltDeviation_deg.setText(changeMetaData.getValue());
-        } catch (Exception e){ Log.d(TAG, "couldn't find tiltdev"); }
-    }
-
 
     /**
      * This function checks if the bottom sheet has changed while being open.
@@ -291,6 +262,33 @@ public class BottomSheet implements ISubject{
         Observer<MetaData> tiltDevOps = changeMetaData -> { updateTiltDeviation_degView(bsd, changeMetaData);};
         TiltDeviation_deg.observe((AppCompatActivity)context, tiltDevOps);
     }
+    //An update method per field
+    private void updateNullfill_dBView(BottomSheetDialog b, MetaData changeMetaData){
+        TextView nullfill_dB = b.findViewById(R.id.meta_Nullfill_dB);
+        try {
+            nullfill_dB.setText(changeMetaData.getValue());
+        } catch (Exception e){ Log.d(TAG, "couldn't find nullfill"); }
+    }
+    private void updateSquint_degView(BottomSheetDialog b, MetaData changeMetaData){
+        TextView squint_deg = b.findViewById(R.id.meta_Squint_deg);
+        try {
+            squint_deg.setText(changeMetaData.getValue());
+        } catch (Exception e){ Log.d(TAG, "couldn't find squint"); }
+    }
+    private void updateTilt_degView(BottomSheetDialog b, MetaData changeMetaData){
+        TextView tilt_deg = b.findViewById(R.id.meta_Tilt_deg);
+        try {
+            tilt_deg.setText(changeMetaData.getValue());
+        } catch (Exception e){ Log.d(TAG, "couldn't find Tilt"); }
+    }
+    private void updateTiltDeviation_degView(BottomSheetDialog b, MetaData changeMetaData){
+        TextView tiltDeviation_deg = b.findViewById(R.id.meta_TiltDeviation_deg);
+        try {
+            tiltDeviation_deg.setText(changeMetaData.getValue());
+        } catch (Exception e){ Log.d(TAG, "couldn't find tiltdev"); }
+    }
+
+
 
     private void handleFrequencySlider(float value) {
         changedFrequency = value;

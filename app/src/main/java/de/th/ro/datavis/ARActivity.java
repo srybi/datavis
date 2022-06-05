@@ -6,13 +6,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Config;
 import com.google.ar.core.HitResult;
@@ -37,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
@@ -44,6 +51,7 @@ import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
 
 import de.th.ro.datavis.models.AtomicField;
+import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheet;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
@@ -71,6 +79,9 @@ public class ARActivity extends BaseActivity implements
     private int antennaId;
     private InterpretationMode interpretationMode;
     private String TAG = "myTag";
+    private final AppDatabase db = AppDatabase.getInstance(this);
+
+    private LiveData<MetaData> HHPBW_deg, VHPBW_deg, Directivity_dBi = new MutableLiveData<>();
 
     private double maxIntensity = -1;
 
@@ -105,7 +116,13 @@ public class ARActivity extends BaseActivity implements
         bottomSheet = new BottomSheet(this, frequencies);
         gestureDetector = new GestureDetector(this, new BottomSheetHandler(bottomSheet));
 
+        //TODO
+        try {
+            readMetaDataFromDB();
+        } catch (Exception e) { e.printStackTrace();}
+        //Create Observer for Metadata
 
+        createMetaDataObserver();
 
         buildAntennaModel();
         buildSpheres();
@@ -270,6 +287,41 @@ public class ARActivity extends BaseActivity implements
     public boolean dispatchTouchEvent(MotionEvent event){
         this.gestureDetector.onTouchEvent(event);
         return super.dispatchTouchEvent(event);
+    }
+
+    //Metadata reading
+    private void readMetaDataFromDB(){
+        //TODO: AntennaID hardcoded
+        HHPBW_deg = db.metadataDao().findByMetadata_Background(1, bottomSheet.getFrequency(), bottomSheet.getTilt(), "HHPBW_deg");
+        VHPBW_deg = db.metadataDao().findByMetadata_Background(1, bottomSheet.getFrequency(), bottomSheet.getTilt(), "VHPBW_deg");
+        Directivity_dBi = db.metadataDao().findByMetadata_Background(1, bottomSheet.getFrequency(), bottomSheet.getTilt(), "Directivity_dBi");
+    }
+
+    private void createMetaDataObserver(){
+        Observer<MetaData> nullFillObs = changeMetaData -> { updateHHPBW_degView(changeMetaData);};
+        HHPBW_deg.observe(this, nullFillObs);
+        Observer<MetaData> squintObs = changeMetaData -> { updateVHPBW_degView(changeMetaData);};
+        VHPBW_deg.observe(this, squintObs);
+        Observer<MetaData> tiltObs = changeMetaData -> { updateDirectivity_dBiView(changeMetaData);};
+        Directivity_dBi.observe(this, tiltObs);
+    }
+    private void updateHHPBW_degView(MetaData changeMetaData){
+        TextView HHPBW_deg = findViewById(R.id.meta_HHPBW_deg);
+        try {
+            HHPBW_deg.setText("HHPBW: " + changeMetaData.getValue());
+        } catch (Exception e){ Log.d(TAG, "couldn't find hhpbw"); }
+    }
+    private void updateVHPBW_degView(MetaData changeMetaData){
+        TextView VHPBW_deg = findViewById(R.id.meta_VHPBW_deg);
+        try {
+            VHPBW_deg.setText("VHPBW: " + changeMetaData.getValue());
+        } catch (Exception e){ Log.d(TAG, "couldn't find vhpbw"); }
+    }
+    private void updateDirectivity_dBiView(MetaData changeMetaData){
+        TextView Directivity_dBi = findViewById(R.id.meta_Directivity_dBi);
+        try {
+            Directivity_dBi.setText("Directivity_dBi: " + changeMetaData.getValue());
+        } catch (Exception e){ Log.d(TAG, "couldn't find directivity"); }
     }
 
 }
