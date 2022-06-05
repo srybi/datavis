@@ -79,7 +79,7 @@ public class ImportActivity extends BaseActivity{
 
     private void initImportView(){
 
-        importView = new ImportView(this, currentAntenna, currentAntenaFields) {
+        importView = new ImportView(this, currentAntenna, currentAntenaFields, currentMetaData) {
             @Override
             public void chooseExistingAntenna() {
                 // Antennen zeigen

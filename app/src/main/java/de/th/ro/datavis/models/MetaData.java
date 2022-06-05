@@ -3,19 +3,21 @@ package de.th.ro.datavis.models;
 
 import static androidx.room.ForeignKey.CASCADE;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity(foreignKeys = {
+@Entity(primaryKeys = {"antennaID", "freq", "tilt", "type"},
+        foreignKeys = {
         @ForeignKey(entity = Antenna.class , parentColumns = "id", childColumns="antennaID", onDelete = CASCADE)
 })
 public class MetaData {
 
-    @PrimaryKey(autoGenerate = true)
     public int id;
     public int antennaID;
+    @NonNull
     public String type;
 
     public double freq;

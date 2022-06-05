@@ -13,6 +13,7 @@ import de.th.ro.datavis.interfaces.IImportOptions;
 import de.th.ro.datavis.main.AntennaFieldAdapter;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
+import de.th.ro.datavis.models.MetaData;
 
 public abstract class ImportView implements IImportOptions {
 
@@ -26,16 +27,18 @@ public abstract class ImportView implements IImportOptions {
     private Button btnAddMetaDataFolder;
 
     TextView tvHeadLine;
+    TextView tvMetaIndicator;
 
     FragmentActivity fragmentActivity;
 
 
-    public ImportView(FragmentActivity fa, Antenna antenna, List<AntennaField> fieldList) {
+    public ImportView(FragmentActivity fa, Antenna antenna, List<AntennaField> fieldList, MetaData metaData) {
 
         fragmentActivity = fa;
         initButtons(fa);
         initAntennaHeadLine(fa, antenna);
         initListView(fa, fieldList);
+        initMetaDataIndicator(fa, metaData);
 
     }
 
@@ -79,9 +82,23 @@ public abstract class ImportView implements IImportOptions {
 
     }
 
-    public void updateData(FragmentActivity fa, Antenna antenna, List<AntennaField> antennaFieldList){
+    private void initMetaDataIndicator(FragmentActivity fa, MetaData m){
+
+        tvMetaIndicator = fa.findViewById(R.id.tv_metadataIndicator);
+        if (m == null){
+            return;
+        }
+        tvMetaIndicator = fragmentActivity.findViewById(R.id.tv_metadataIndicator);
+        String s = "MetaData Added";
+        tvMetaIndicator.setText(s);
+
+    }
+
+
+    public void updateData(FragmentActivity fa, Antenna antenna, List<AntennaField> antennaFieldList, MetaData metaData){
         initAntennaHeadLine(fa, antenna);
         initListView(fa, antennaFieldList);
+        initMetaDataIndicator(fa, metaData);
     }
 
 

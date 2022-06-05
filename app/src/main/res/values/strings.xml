@@ -13,6 +13,7 @@
     <!-- Misc -->
     <string name="antenna">Antenna</string>
     <string name="metaData">Metadata</string>
+    <string name="metaDataIndicator">No Metadata</string>
     <string name="farFieldSource">Farfield Source</string>
 
     <!-- Main -->
