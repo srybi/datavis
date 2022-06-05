@@ -268,7 +268,6 @@ public class ImportActivity extends BaseActivity{
         int antennaId = preferences.getInt("ID", 1);
 
         for(MetaData e : list){
-            Log.d(LOG_TAG, "Saving Metadata");
             e.setAntennaID(antennaId);
             appDb.metadataDao().insert(e);
         }

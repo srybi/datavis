@@ -28,11 +28,11 @@ public interface MetadataDao {
     List<MetaData> find_Background(int ID);
 
     //Identifies Metadata by AntennenID, Freq und Tilt
-    @Query("SELECT * FROM MetaData where antennaID = :antennaID AND freq = :freq AND tilt = :tilt AND type = :type LIMIT 1")
-    MetaData findByMetadata_Main(int antennaID, double freq, int tilt, String type);
+    @Query("SELECT * FROM MetaData WHERE antennaID = :antennaID AND freq = :freq AND tilt = :tilt AND type LIKE :type")
+    MetaData findByMetadata_Main(int antennaID, double freq, double tilt, String type);
 
-    @Query("SELECT * FROM MetaData where antennaID = :antennaID AND freq = :freq AND tilt = :tilt AND type = :type LIMIT 1")
-    LiveData<MetaData> findByMetadata_Background(int antennaID, double freq, int tilt, String type);
+    @Query("SELECT * FROM MetaData WHERE antennaID = :antennaID AND freq = :freq AND tilt = :tilt AND type LIKE :type")
+    LiveData<MetaData> findByMetadata_Background(int antennaID, double freq, double tilt, String type);
 
     @Insert
     void insert(MetaData metaData);
