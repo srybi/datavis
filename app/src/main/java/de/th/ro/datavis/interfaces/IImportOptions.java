@@ -9,6 +9,8 @@ public interface IImportOptions {
 
     void addMetaData();
 
+    void addMetaDataFolder();
+
     void addFFS();
 
 }

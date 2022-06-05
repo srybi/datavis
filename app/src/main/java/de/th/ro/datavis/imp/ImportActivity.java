@@ -3,14 +3,17 @@ package de.th.ro.datavis.imp;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -19,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -118,6 +122,17 @@ public class ImportActivity extends BaseActivity{
                 openFileDialog_Android9(FileRequests.REQUEST_CODE_METADATA);
             }
 
+            public void addMetaDataFolder() {
+                if (currentAntenna == null){
+                    Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFragmentActivity());
+                preferences.edit().putInt("ID", currentAntenna.id).apply();
+
+                openFolderDialog(FileRequests.REQUEST_CODE_METADATAFOLDER);
+            }
+
             @Override
             public void addFFS() {
                 if (currentAntenna == null){
@@ -143,7 +158,16 @@ public class ImportActivity extends BaseActivity{
 
         startActivityForResult(chooseFile, requestCode);
     }
-
+    private void openFolderDialog(int requestCode){
+        Intent browseIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        browseIntent.addFlags(
+                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                        | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
+                        | Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        );
+        startActivityForResult(browseIntent, requestCode);
+    }
 
 
     @Override
@@ -189,16 +213,21 @@ public class ImportActivity extends BaseActivity{
             public void run() {
                 try {
                     Uri uri = data.getData();
-                    String name = FileHandler.queryName( getContentResolver(), uri);
+
 
                     AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
 
                     if (requestCode == FileRequests.REQUEST_CODE_ANTENNA){
+                        String name = FileHandler.queryName( getContentResolver(), uri);
                         persistAntenna(appDb, uri, name);
                     } else if(requestCode == FileRequests.REQUEST_CODE_FFS) {
+                        String name = FileHandler.queryName( getContentResolver(), uri);
                         persistFFS(appDb, uri, name, data);
-                    } else {
+                    } else if(requestCode == FileRequests.REQUEST_CODE_METADATA) {
+                        String name = FileHandler.queryName( getContentResolver(), uri);
                         persistMetadata(appDb, uri, name, data);
+                    } else {
+                        persistMetadataFolder(appDb, uri, data);
                     }
 
                 }catch(Exception e){
@@ -247,6 +276,74 @@ public class ImportActivity extends BaseActivity{
         handelGetAntennaInBackground(appDb, antennaId);
         handelNewlyInsertedAntennaField(appDb, antennaId);
 
+    }
+
+    /*
+    Simple method to iterate through all files of a folder
+    Calls persistMetadata
+     */
+    public void persistMetadataFolder(AppDatabase appDb, Uri rootUri, Intent data) {
+        ArrayList<Uri> listUri = traverseDirectoryEntries(rootUri);
+        Log.d(LOG_TAG, "listlen: "+listUri.size());
+        for(Uri u: listUri){
+            String nameUri = FileHandler.queryName(getContentResolver(), u);
+        }
+        for(Uri u: listUri){
+            String nameUri = FileHandler.queryName(getContentResolver(), u);
+            Log.d(LOG_TAG, "Persist Uri: " + nameUri + " " +u);
+            persistMetadata(appDb, u, nameUri, data);
+        }
+    }
+
+
+    /**
+     * Takes the directory URI, iterates through the files and builds a list of all .csv
+     * @param rootUri
+     * @return
+     */
+    ArrayList<Uri> traverseDirectoryEntries(Uri rootUri) {
+        ArrayList<Uri> listUri = new ArrayList<>();
+        Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(rootUri,
+                DocumentsContract.getTreeDocumentId(rootUri));
+        // Keep track of our directory hierarchy
+        List<Uri> dirNodes = new LinkedList<>();
+        dirNodes.add(childrenUri);
+
+        while(!dirNodes.isEmpty()) {
+            childrenUri = dirNodes.remove(0); // get the item from top
+            Log.d(LOG_TAG, "node uri: " + childrenUri);
+            Cursor c = getContentResolver().query(childrenUri, new String[]{
+                            DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                            DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                            DocumentsContract.Document.COLUMN_MIME_TYPE},
+                    null, null, null);
+             try {
+
+                while (c.moveToNext()) {
+                    final String docId = c.getString(0);
+                    final String name = c.getString(1);
+                    final String mime = c.getString(2);
+                    Log.d(LOG_TAG, "docId: " + docId + ", name: " + name + ", mime: " + mime);
+                    if (name.contains(".csv")) {
+                        final Uri newNode = DocumentsContract.buildDocumentUriUsingTree(rootUri, docId);
+                        listUri.add(newNode);
+                    }
+                }
+
+
+            } finally {
+                try {
+                    c.close();
+                } catch(RuntimeException re) {
+                    re.printStackTrace();
+                }
+            }
+        }
+        Log.d(LOG_TAG, "gathered URIs");
+        return listUri;
+    }
+    private static boolean isDirectory(String mimeType) {
+        return DocumentsContract.Document.MIME_TYPE_DIR.equals(mimeType);
     }
 
     /**

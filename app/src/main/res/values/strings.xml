@@ -37,6 +37,7 @@
     <string name="btn_choose_existing">Choose Existing</string>
     <string name="btn_add_new_antenna">Add new antenna</string>
     <string name="btn_add_metaData">Add Metadata</string>
+    <string name="btn_add_metaFolder">Add MetadataFolder</string>
     <string name="btn_add_ffs">Add FFS</string>
     <string name="apply_changes">Apply Changes</string>
     <string name="log">Log</string>
