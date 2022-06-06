@@ -68,7 +68,8 @@ public class FFSService {
                     try {
                         db.atomicFieldDao().insert(field);
                     }catch (SQLiteConstraintException e){
-                        Log.d("FFSService", "Field already exists");
+                        e.printStackTrace();
+                        Log.d("FFSService", "SQL Error: " + e.getMessage());
                     }
                 }
                 //Save all linear spheres
@@ -76,7 +77,8 @@ public class FFSService {
                     try {
                         db.atomicFieldDao().insert(field);
                     }catch (SQLiteConstraintException e){
-                        Log.d("FFSService", "Field already exists");
+                        e.printStackTrace();
+                        Log.d("FFSService", "SQL Error: " + e.getMessage());
                     }
                 }
             }
