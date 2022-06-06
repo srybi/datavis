@@ -49,18 +49,13 @@ public class MainActivity extends BaseActivity{
 
     }
 
-
-
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         MenuItem itemImportInstructions = menu.findItem(R.id.import_instructions);
         MenuItem itemAppInstructions = menu.findItem(R.id.app_instructions);
-        MenuItem itemImport = menu.findItem(R.id.action_import);
-        MenuItem itemSettings = menu.findItem(R.id.action_settings);
+        //replace these two with actuall buttons
 
         itemImportInstructions.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -85,29 +80,6 @@ public class MainActivity extends BaseActivity{
                 return false;
             }
         });
-
-        itemImport.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                // switch to import
-
-                Intent intent = new Intent(getApplicationContext(), ImportActivity.class);
-                startActivity(intent);
-
-                return false;
-            }
-        });
-
-        itemSettings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                // switch to settings
-                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-                startActivity(intent);
-                return false;
-            }
-        });
-
         return true;
     }
 
