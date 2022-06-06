@@ -204,41 +204,10 @@ public class FFSInterpreter implements IInterpreter {
             if(intensity > atomicField.maxIntensity){
                 atomicField.maxIntensity = intensity;
             }
-            return new Sphere(x*scalingFactor, y*scalingFactor, z*scalingFactor, intensity);
+            return new Sphere(x, y, z, intensity);
         }).collect(Collectors.toList());
 
         atomicField.setSpheres(coordinates);
         return Result.success(atomicField);
-    }
-
-
-    @Override
-    public FFSIntensityColor mapToColor(double intensity) {
-        //wie in CST
-        double minIntensity = maxItensity - 1;
-        double stepSize = (maxItensity - Math.abs(minIntensity))/6;
-
-        if(intensity > maxItensity - (stepSize * 1)){
-            //#FE0000 red
-            return FFSIntensityColor.RED;
-        }
-        if(intensity > maxItensity - stepSize * 2){
-            //#e6793a orange
-            return FFSIntensityColor.ORANGE;
-        }
-        if(intensity > maxItensity - stepSize * 3){
-            //#FFF205 yellow
-            return FFSIntensityColor.YELLOW;
-        }
-        if(intensity > maxItensity - stepSize * 4){
-            //#7CFF01 green
-            return FFSIntensityColor.GREEN;
-        }
-        if(intensity > maxItensity - stepSize * 5){
-            //#3befe5 baby blue
-            return FFSIntensityColor.BABYBLUE;
-        }
-        //#01FFF4  blue
-        return FFSIntensityColor.BLUE;
     }
 }
