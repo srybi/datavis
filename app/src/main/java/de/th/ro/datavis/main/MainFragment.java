@@ -34,11 +34,11 @@ import java.util.concurrent.Executors;
 import de.th.ro.datavis.ARActivity;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
-import de.th.ro.datavis.interfaces.IInterpreter;
-import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
+import de.th.ro.datavis.imp.ImportActivity;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.ui.adapter.AntennaAdapter;
+import de.th.ro.datavis.ui.settings.SettingsActivity;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 import de.th.ro.datavis.util.fragment.BaseFragment;
 
@@ -96,8 +96,8 @@ public class MainFragment extends BaseFragment {
         context = getActivity();
 
         initAntennaList();
+        //find two buttons
         findButton();
-        findTriggerButton();
 
     }
 
@@ -143,29 +143,33 @@ public class MainFragment extends BaseFragment {
 
 
     private void findButton(){
-        Button button = getActivity().findViewById(R.id.btn_ar_main);
-        button.setOnClickListener(new View.OnClickListener() {
+        Button btn_import = getActivity().findViewById(R.id.btn_import);
+        Button btn_delete = getActivity().findViewById(R.id.btn_delete);
+        btn_import.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
-                getActivity().startActivity(intent);
+                Intent intent = new Intent(context.getApplicationContext(), ImportActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btn_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context.getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
             }
         });
 
     }
 
-    private void findTriggerButton(){
-        Button button = getActivity().findViewById(R.id.btn_ffs_interpret);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openFileDialog(view);
-            }
-        });
 
-    }
-
-
+    /**
+     *==========================================
+     *      All of the functions below          |
+     *      are never used. -srybi              |
+     *==========================================
+     */
 
     public void openFileDialog(View view){
 
