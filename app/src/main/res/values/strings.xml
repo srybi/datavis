@@ -17,11 +17,11 @@
     <string name="farFieldSource">Farfield Source</string>
 
     <!-- Main -->
-    <string name="introduction">Upload a file using the Upload File Button.</string>
-    <string name="howtoChooseFile">Long Press the item to start rendering in linear mode. Press the item to use the logarithmic mode</string>
-    <string name="howtoAr">Tap on a plane to place the antenna. This might take a few seconds. Be patient</string>
-    <string name="open_ar">Open AR</string>
-    <string name="upload_field">Upload File</string>
+    <string name="introduction">Visualize antennas and electric fields in AR.</string>
+    <string name="howToinstructions">Click on the question mark to receive app instructions.</string>
+    <string name="howtoAr">Click on one of the items to start the visualization. If there are none, click Import.</string>
+    <string name="import_btn">Import</string>
+    <string name="delete_btn">Manage</string>
 
     <!-- AR Activity -->
     <string name="HHPBW_deg">HPBW:</string>
