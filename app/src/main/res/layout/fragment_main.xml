@@ -22,6 +22,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"
         android:orientation="vertical">
+
     <TextView
         android:id="@+id/datavis_intro"
         android:layout_width="wrap_content"
@@ -32,12 +33,12 @@
         android:text="@string/introduction" />
 
         <TextView
-            android:id="@+id/datavis_howtoTap"
+            android:id="@+id/datavis_instructions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="5dp"
             android:textSize="18sp"
-            android:text="@string/howtoChooseFile" />
+            android:text="@string/howToinstructions" />
 
     <TextView
         android:id="@+id/datavis_howto"
@@ -51,31 +52,29 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/rel_layout_ar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/rel_layout_ar"
-        android:orientation="vertical"
+        android:layout_below="@id/lin_layout_ar"
         android:layout_marginStart="20dp"
+        android:layout_marginTop="60dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginTop="80dp"
-        android:layout_below="@id/lin_layout_ar">
+        android:orientation="vertical">
 
         <Button
-            android:id="@+id/btn_ar_main"
+            android:id="@+id/btn_import"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/open_ar"
-            android:textColor="@color/white"
-            android:enabled="false"
-            />
+            android:text="@string/import_btn"
+            android:textColor="@color/white" />
 
         <Button
-            android:id="@+id/btn_ffs_interpret"
+            android:id="@+id/btn_delete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/upload_field"
-            android:textColor="@color/white"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginTop="5dp"
+            android:text="@string/delete_btn"
+            android:textColor="@color/white" />
 
         <ListView
             android:id="@+id/list_antenna_fields"
