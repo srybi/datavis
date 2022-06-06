@@ -88,6 +88,27 @@
     </LinearLayout>
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tilt"
+            android:layout_gravity="center"/>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sliderTilt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:stepSize="1"
+            app:labelBehavior="floating" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
