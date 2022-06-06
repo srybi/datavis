@@ -41,6 +41,9 @@ public interface AtomicFieldDao {
     @Query("SELECT frequency from atomic_field WHERE interpretationMode = :interpretationMode AND antennaId = :antennaId AND tilt = :tilt ")
     List<Double> getFrequencies_Background(int antennaId, int tilt, int interpretationMode);
 
+    @Query("SELECT tilt from atomic_field WHERE interpretationMode = :interpretationMode AND antennaId = :antennaId AND frequency = :frequency ")
+    List<Integer> getTilts_Background(int antennaId, double frequency, int interpretationMode);
+
     @Query("SELECT * from atomic_field WHERE antennaId = :antennaId")
     LiveData<List<AtomicField>> getAtomicFieldsByAntennaFieldId(int antennaId);
 

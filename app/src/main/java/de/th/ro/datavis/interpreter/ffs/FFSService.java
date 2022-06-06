@@ -36,6 +36,7 @@ public class FFSService {
 
     private AtomicField atomicField;
     private List<Double> frequencies;
+    private List<Integer> tilts;
 
     private Context context;
 
@@ -127,6 +128,25 @@ public class FFSService {
         try {
             future.get();
             return frequencies;
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    public List<Integer> TiltsForAntenna(int antennaId, double frequency, InterpretationMode mode) {
+
+        Future future = executor.submit(new Runnable(){
+            @Override
+            public void run() {
+                int modeInt = mode.ordinal();
+                tilts = db.atomicFieldDao().getTilts_Background(antennaId, frequency, modeInt);
+            }
+        });
+
+        try {
+            future.get();
+            return tilts;
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
