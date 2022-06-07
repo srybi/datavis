@@ -373,6 +373,9 @@ public class ImportActivity extends BaseActivity{
         Antenna insert = new Antenna("Antenna #");
         //Background
         executeRunnable(addNewAntennaConfig(insert));
+        //Reset other options
+        currentAntenaFields = null;
+        currentMetaData = null;
         initImportView();
     }
 
