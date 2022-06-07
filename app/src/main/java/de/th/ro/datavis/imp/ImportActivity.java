@@ -21,7 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -206,7 +205,7 @@ public class ImportActivity extends BaseActivity{
                 AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
                 //changing default antenna name
                 int currentSize = appDb.antennaDao().getAll_Background().size();
-                antenna.name = antenna.name + (currentSize+1);
+                antenna.description = antenna.description + (currentSize+1);
                 appDb.antennaDao().insert(antenna);
                 handleNewlyInsertedAntenna(appDb);
             }
@@ -386,7 +385,7 @@ public class ImportActivity extends BaseActivity{
             @Override
             public void handelAntennaItemClick(Antenna antenna) {
 
-                Toast.makeText(getApplicationContext(), "Antenna " + antenna.name, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Antenna " + antenna.description, Toast.LENGTH_LONG).show();
                 currentAntenna = antenna;
                 loadAntennaFieldsByAntennaId(currentAntenna.id);
 

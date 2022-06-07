@@ -14,14 +14,14 @@ public class Antenna {
     public int id;
     public String uri;
     public String filename;
-    public String name;
+    public String description;
 
 
-    public Antenna(int id, String uri, String filename, String name) {
+    public Antenna(int id, String uri, String filename, String description) {
         this.id = id;
         this.uri = uri;
         this.filename = filename;
-        this.name = name;
+        this.description = description;
     }
 
     @Ignore
@@ -31,8 +31,8 @@ public class Antenna {
     }
 
     @Ignore
-    public Antenna(String name){
-        this.name = name;
+    public Antenna(String description){
+        this.description = description;
     }
 
     public void setAntennaFile(String uri, String filename){
@@ -43,6 +43,6 @@ public class Antenna {
     @NonNull
     @Override
     public String toString() {
-        return String.format("id: %2d; name: %s; uri: %s; filename: %s", id, name, uri, filename);
+        return String.format("id: %2d; description: %s; uri: %s; filename: %s", id, description, uri, filename);
     }
 }
