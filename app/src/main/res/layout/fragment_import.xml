@@ -22,7 +22,7 @@
             android:text="Name" />
 
         <Button
-            android:id="@+id/showExisting"
+            android:id="@+id/btn_import_choose_antenna"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -50,10 +50,10 @@
         >
 
         <Button
-            android:id="@+id/btn_import_choose_antenna"
+            android:id="@+id/btn_add_default"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/btn_choose_existing"
+            android:text="@string/btn_add_default"
             android:textColor="@color/white"
             android:layout_marginRight="20dp"
             android:layout_weight="1"
