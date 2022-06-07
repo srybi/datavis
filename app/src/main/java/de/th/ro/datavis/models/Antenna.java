@@ -14,18 +14,21 @@ public class Antenna {
     public int id;
     public String uri;
     public String filename;
+    public String name;
 
 
     public Antenna(int id, String uri, String filename) {
         this.id = id;
         this.uri = uri;
         this.filename = filename;
+        this.name = "DEFAULT";
     }
 
     @Ignore
     public Antenna(Uri uri, String filename) {
         this.uri = uri.toString();
         this.filename = filename;
+        this.name = "DEFAULT";
     }
 
     @NonNull
