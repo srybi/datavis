@@ -22,9 +22,11 @@ public abstract class ImportView implements IImportOptions {
 
     private Button btnChooseAntena;
     private Button btnAddNewAntenna;
+    private Button btnAddDefaultAntenna;
     private Button btnAddMetaData;
     private Button btnAddFFS;
     private Button btnAddMetaDataFolder;
+
 
     TextView tvHeadLine;
     TextView tvMetaIndicator;
@@ -59,12 +61,15 @@ public abstract class ImportView implements IImportOptions {
 
         btnChooseAntena = fa.findViewById(R.id.btn_import_choose_antenna);
         btnAddNewAntenna = fa.findViewById(R.id.btn_import_add_antenna);
+        btnAddDefaultAntenna = fa.findViewById(R.id.btn_add_default);
         btnAddMetaData = fa.findViewById(R.id.btn_import_add_metadata);
         btnAddMetaDataFolder = fa.findViewById(R.id.btn_import_add_metadataFolder);
         btnAddFFS = fa.findViewById(R.id.btn_import_add_ffs);
 
+
         btnChooseAntena.setOnClickListener( v -> { chooseExistingAntenna(); });
         btnAddNewAntenna.setOnClickListener( v -> { addNewAntenna(); });
+        btnAddDefaultAntenna.setOnClickListener(v -> {addDefaultAntenna();});
         btnAddMetaData.setOnClickListener( v -> { addMetaData(); });
         btnAddMetaDataFolder.setOnClickListener( v -> { addMetaDataFolder(); });
         btnAddFFS.setOnClickListener( v -> { addFFS(); });

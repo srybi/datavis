@@ -7,6 +7,8 @@ public interface IImportOptions {
 
     void addNewAntenna();
 
+    void addDefaultAntenna();
+
     void addMetaData();
 
     void addMetaDataFolder();

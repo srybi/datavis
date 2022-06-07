@@ -109,6 +109,18 @@ public class ImportActivity extends BaseActivity{
                 openFileDialog(FileRequests.REQUEST_CODE_ANTENNA);
             }
 
+            public void addDefaultAntenna(){
+                ExecutorService executorService  = Executors.newSingleThreadExecutor();
+
+                Future future = executorService.submit(getSetDefaultAntennaRunnable());
+                try{
+                    future.get();
+                }catch (Exception e){
+                    Log.d(LOG_TAG, "addDefaultAntenna: " + e.getMessage());
+                }
+
+            }
+
             @Override
             public void addMetaData() {
                 if (currentAntenna == null){
@@ -239,6 +251,19 @@ public class ImportActivity extends BaseActivity{
                     e.printStackTrace();
                     Log.e(LOG_TAG, "Exception " + e.getMessage());
                 }
+            }
+        };
+    }
+
+    public Runnable getSetDefaultAntennaRunnable(){
+        return new Runnable() {
+            @Override
+            public void run() {
+                AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
+                Uri uri = Uri.parse("models/datavis_antenna_asm.glb");
+                String name = "datavis_default";
+
+                persistAntenna(appDb, uri, name);
             }
         };
     }
