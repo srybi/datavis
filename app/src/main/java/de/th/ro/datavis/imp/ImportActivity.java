@@ -359,19 +359,15 @@ public class ImportActivity extends BaseActivity{
             return;
         }
         firstRun = false;
-        LiveData<List<Antenna>> antennas = new MutableLiveData<>(new ArrayList<>());
-        // Get Antenna
-        antennas = appDb.antennaDao().getAll();
-        antennas.observe(this, list -> {
-            if (list.isEmpty()){
-                initImportView();
-                return;
-            }
-            currentAntenna = list.get(0);
+        executeRunnable(getAllAntennas());
+        if(allAntennas.isEmpty()){
+            initImportView();
+            return;
+        }else {
+            currentAntenna = allAntennas.get(0);
             loadAntennaFieldsByAntennaId(currentAntenna.id);
             initImportView();
-        });
-
+        }
     }
 
     /**
