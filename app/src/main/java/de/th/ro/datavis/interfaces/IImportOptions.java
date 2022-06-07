@@ -2,10 +2,11 @@ package de.th.ro.datavis.interfaces;
 
 public interface IImportOptions {
 
+    void insertNewConfig();
 
-    void chooseExistingAntenna();
+    void chooseExistingConfig();
 
-    void addNewAntenna();
+    void addImportAntenna();
 
     void addDefaultAntenna();
 

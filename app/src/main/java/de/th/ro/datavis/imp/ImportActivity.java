@@ -10,13 +10,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
@@ -47,7 +42,7 @@ import de.th.ro.datavis.util.filehandling.FileHandler;
 
 public class ImportActivity extends BaseActivity{
 
-    private final String LOG_TAG = "ImportActivity";
+    private final String TAG = "ImportActivity";
 
     AppDatabase appDb;
     FFSService ffsService;
@@ -55,7 +50,9 @@ public class ImportActivity extends BaseActivity{
     Antenna currentAntenna;
     MetaData currentMetaData;
     List<AntennaField> currentAntenaFields;
+
     ImportView importView;
+
     MetadataInterpreter metaInt = new MetadataInterpreter();
 
     static boolean firstRun = true;
@@ -76,7 +73,6 @@ public class ImportActivity extends BaseActivity{
         ffsService = new FFSService(new FFSInterpreter(), this);
 
         setDefaultAntennaData();
-
     }
 
     @Override
@@ -85,17 +81,20 @@ public class ImportActivity extends BaseActivity{
         firstRun=true;
     }
 
-    //Why is this a anonymous class?
     private void initImportView(){
 
         importView = new ImportView(this, currentAntenna, currentAntenaFields, currentMetaData) {
             @Override
-            public void chooseExistingAntenna() {
+            public void insertNewConfig(){
+                handleNewConfigInsert();
+            }
+
+            @Override
+            public void chooseExistingConfig() {
                 // Antennen zeigen
                 AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
-                LiveData<List<Antenna>> antennaList = new MutableLiveData<>(new ArrayList<>());
 
-                antennaList = appDb.antennaDao().getAll();
+                LiveData<List<Antenna>> antennaList = appDb.antennaDao().getAll();
 
                 antennaList.observe(getFragmentActivity(), list -> {
 
@@ -105,8 +104,9 @@ public class ImportActivity extends BaseActivity{
             }
 
             @Override
-            public void addNewAntenna() {
+            public void addImportAntenna() {
                 openFileDialog(FileRequests.REQUEST_CODE_ANTENNA);
+                //update antenna datenbank eintrag
             }
 
             public void addDefaultAntenna(){
@@ -116,9 +116,8 @@ public class ImportActivity extends BaseActivity{
                 try{
                     future.get();
                 }catch (Exception e){
-                    Log.d(LOG_TAG, "addDefaultAntenna: " + e.getMessage());
+                    Log.d(TAG, "addDefaultAntenna: " + e.getMessage());
                 }
-
             }
 
             @Override
@@ -160,71 +159,12 @@ public class ImportActivity extends BaseActivity{
         };
     }
 
-
-    public void openFileDialog(int requestCode){
-        if (SDK_INT >= Build.VERSION_CODES.Q) {
-            openFileDialog_Android11(requestCode);
-        } else {
-            openFileDialog_Android9(requestCode);
-        }
-    }
-
-    private void openFileDialog_Android9(int requestCode){
-        Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
-        chooseFile.setType("*/*");
-        chooseFile.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
-                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-        chooseFile = Intent.createChooser(chooseFile, "Choose a file");
-
-        startActivityForResult(chooseFile, requestCode);
-    }
-
-    private void openFolderDialog(int requestCode){
-        Intent browseIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        browseIntent.addFlags(
-                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-                        | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
-                        | Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        );
-        startActivityForResult(browseIntent, requestCode);
-    }
-
-    private void openFileDialog_Android11(int requestCode){
-        Intent data = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        data.setType("*/*");
-        data.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
-                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-        data = Intent.createChooser(data, "Choose a file");
-        startActivityForResult(data, requestCode);
-    }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(LOG_TAG, "Activity result");
-        if(resultCode == Activity.RESULT_OK){
-            Log.d(LOG_TAG, "Request Code: "+requestCode);
-            ExecutorService executorService  = Executors.newSingleThreadExecutor();
-
-            Future future = executorService.submit( getHandelResultRunnable( data, requestCode) );
-
-            try {
-                future.get();
-
-                initImportView();
-
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-                Log.e(LOG_TAG, "Exception " + e.getMessage());
-            }
-            // dD
-        }
-    }
-
+    /**
+     * Handles a chosen file and stores it (using a background thread)
+     * @param data
+     * @param requestCode
+     * @return
+     */
     public Runnable getHandelResultRunnable(Intent data, int requestCode){
         return new Runnable() {
             @Override
@@ -236,7 +176,7 @@ public class ImportActivity extends BaseActivity{
 
                     if (requestCode == FileRequests.REQUEST_CODE_ANTENNA){
                         String name = FileHandler.queryName( getContentResolver(), uri);
-                        persistAntenna(appDb, uri, name);
+                        updateAntenna(appDb, uri, name);
                     } else if(requestCode == FileRequests.REQUEST_CODE_FFS) {
                         String name = FileHandler.queryName( getContentResolver(), uri);
                         persistFFS(appDb, uri, name, data);
@@ -249,7 +189,7 @@ public class ImportActivity extends BaseActivity{
                 }catch(Exception e){
                     //TODO: Improve exception handling
                     e.printStackTrace();
-                    Log.e(LOG_TAG, "Exception " + e.getMessage());
+                    Log.e(TAG, "Exception " + e.getMessage());
                 }
             }
         };
@@ -261,25 +201,30 @@ public class ImportActivity extends BaseActivity{
             public void run() {
                 AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
                 Uri uri = Uri.parse("models/datavis_antenna_asm.glb");
-                String name = "datavis_default";
+                String filename = "datavis_default";
+                updateAntenna(appDb, uri, filename);
+            }
+        };
+    }
 
-                persistAntenna(appDb, uri, name);
+    public Runnable addNewAntennaConfig(Antenna antenna){
+        return new Runnable() {
+            @Override
+            public void run() {
+                AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
+                int currentSize = appDb.antennaDao().getAll_Background().size();
+                antenna.name = antenna.name + (currentSize+1);
+                appDb.antennaDao().insert(antenna);
             }
         };
     }
 
 
-    public void persistAntenna(AppDatabase appDb, Uri uri, String name){
+    public void updateAntenna(AppDatabase appDb, Uri uri, String filename){
         // Background
-        Antenna antenna = new Antenna(uri, name);
-        appDb.antennaDao().insert(antenna);
-
-        handelNewlyInsertedAntenna(appDb);
-
-        updateAntennaField(appDb);
-
+        currentAntenna.setAntennaFile(uri.toString(), filename);
+        appDb.antennaDao().update(currentAntenna);
     }
-
 
     public void persistFFS(AppDatabase appDb, Uri uri, String name, Intent intent){
         // Background
@@ -330,10 +275,10 @@ public class ImportActivity extends BaseActivity{
      */
     public void persistMetadataFolder(AppDatabase appDb, Uri rootUri) {
         ArrayList<Uri> listUri = metaInt.traverseDirectoryEntries(rootUri, this.getContentResolver());
-        Log.d(LOG_TAG, "directory list length: "+listUri.size());
+        Log.d(TAG, "directory list length: "+listUri.size());
         for(Uri u: listUri){
             //String nameUri = FileHandler.queryName(getContentResolver(), u);
-            Log.d(LOG_TAG, "persisting Uri: " +u.toString());
+            Log.d(TAG, "persisting Uri: " +u.toString());
             persistMetadata(appDb, u);
         }
     }
@@ -342,90 +287,88 @@ public class ImportActivity extends BaseActivity{
     private void updateAntennaField(AppDatabase appDb){
         // Background
         List<AntennaField> fieldList = new ArrayList<>();
-
         fieldList = appDb.antennaFieldDao().findByAntennaId_BackGround(currentAntenna.id); // todo anpassen
-
         this.currentAntenaFields = fieldList;
-
     }
 
-
+    /**
+     * Gets new Antenna from database and sets it as the current antenna
+     * @param appDb - database
+     */
     private void handelNewlyInsertedAntenna(AppDatabase appDb){
         // Background
-        List<Antenna> data =new ArrayList<>();
-        data = appDb.antennaDao().getAll_Background();
-
-        int size2 = data.size();
-
+        List<Antenna> data = appDb.antennaDao().getAll_Background();
         // Last Antenna
-        Antenna antenna = data.get(size2 -1);
-
-        this.currentAntenna = antenna;
-
+        currentAntenna = data.get(data.size() - 1);
     }
 
     private void handelNewlyInsertedAntennaField(AppDatabase appDb, int antennaId){
         // Background
         List<AntennaField> data =new ArrayList<>();
         data = appDb.antennaFieldDao().findByAntennaId_BackGround(antennaId);
-
         this.currentAntenaFields = data;
-
     }
 
     private void handelNewlyInsertedMetadata(AppDatabase appDb){
         // Background
         List<MetaData> data =new ArrayList<>();
         data = appDb.metadataDao().getAll_Background();
-
         int size2 = data.size();
-
         // Last Antenna
         MetaData meta = data.get(size2 -1);
-
         this.currentMetaData = meta;
-
     }
 
     private void handelGetAntennaInBackground(AppDatabase appDb, int antennaId){
         // Background
         List<Antenna> data =new ArrayList<>();
         data = appDb.antennaDao().find_Background(antennaId);
-
         this.currentAntenna = data.get(0);
-
     }
 
+    private void handleNewConfigInsert(){
+        Antenna insert = new Antenna("Antenna #");
+        //Background
+        ExecutorService executorService  = Executors.newSingleThreadExecutor();
+        Future future = executorService.submit(addNewAntennaConfig(insert));
+        try{
+            future.get();
+        }catch (Exception e){
+            Log.d(TAG, "handleNewConfigInsert: " + e.getMessage());
+        }
+        initImportView();
+    }
 
+    /**
+     * Method is called when the import activity is opened for the first time.
+     * Sets the currentAntenna to the first antenna in the DB. If DB is empty,
+     * the default ImportView will be shown.
+     */
     private void setDefaultAntennaData(){
-
         if (currentAntenna != null || !firstRun){
             return;
         }
-
         firstRun = false;
-
         LiveData<List<Antenna>> antennas = new MutableLiveData<>(new ArrayList<>());
-
         // Get Antenna
         antennas = appDb.antennaDao().getAll();
         antennas.observe(this, list -> {
-
             if (list.isEmpty()){
                 initImportView();
                 return;
             }
-
             currentAntenna = list.get(0);
-
             // Get Antennafield
             loadAntennaFieldsByAntennaId(currentAntenna.id);
-
-
         });
 
     }
 
+    /**
+     * Opens a dialog with all available antennas. If one is selected, the dialog will close and
+     * a new current antenna will be set
+     * @param antennaList - all available antennas from the database
+     */
     private void displayChooseAntennaDialog( List<Antenna> antennaList){
 
         DialogExistingAntenna dialog = new DialogExistingAntenna(this, "Antenna", R.layout.dialog_import_existing_antenna, antennaList) {
@@ -438,28 +381,95 @@ public class ImportActivity extends BaseActivity{
 
 
                 initImportView();
-
                 this.getDialog().dismiss();
             }
         };
-
         dialog.showDialog();
-
     }
 
-
     public void loadAntennaFieldsByAntennaId(int antennaId){
-
         LiveData<List<AntennaField>> antennaFields = new MutableLiveData<>(new ArrayList<>());
         antennaFields = appDb.antennaFieldDao().findByAntennaId_Main(antennaId);
         antennaFields.observe(this, fieldList -> {
             currentAntenaFields = fieldList;
-
             // Update UI
             initImportView();
         });
 
+    }
 
+    /**
+     *  ==================================
+     * |    The functions below are      |
+     * |    used for file handling       |
+     *  ==================================
+     */
+    public void openFileDialog(int requestCode){
+        if (SDK_INT >= Build.VERSION_CODES.Q) {
+            openFileDialog_Android11(requestCode);
+        } else {
+            openFileDialog_Android9(requestCode);
+        }
+    }
+
+    private void openFileDialog_Android9(int requestCode){
+        Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+        chooseFile.setType("*/*");
+        chooseFile.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        chooseFile = Intent.createChooser(chooseFile, "Choose a file");
+
+        startActivityForResult(chooseFile, requestCode);
+    }
+
+    private void openFolderDialog(int requestCode){
+        Intent browseIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        browseIntent.addFlags(
+                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                        | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
+                        | Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        );
+        startActivityForResult(browseIntent, requestCode);
+    }
+
+    private void openFileDialog_Android11(int requestCode){
+        Intent data = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        data.setType("*/*");
+        data.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        data = Intent.createChooser(data, "Choose a file");
+        startActivityForResult(data, requestCode);
+    }
+
+    /**
+     * This method gets called after finishing the file/folder dialog
+     * @param requestCode Type of request (Antenna, FFS, Meta)
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "Activity result");
+        if(resultCode == Activity.RESULT_OK){
+            Log.d(TAG, "Request Code: "+requestCode);
+            ExecutorService executorService  = Executors.newSingleThreadExecutor();
+
+            Future future = executorService.submit( getHandelResultRunnable( data, requestCode) );
+
+            try {
+                future.get();
+
+                initImportView();
+
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Exception " + e.getMessage());
+            }
+        }
     }
 
 

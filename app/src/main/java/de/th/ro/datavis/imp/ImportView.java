@@ -1,6 +1,7 @@
 package de.th.ro.datavis.imp;
 
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -20,12 +21,15 @@ public abstract class ImportView implements IImportOptions {
 
     private ListView listViewAntennaFields;
 
-    private Button btnChooseAntena;
-    private Button btnAddNewAntenna;
+    private Button btnAddNewConfig;
+    private Button btnChooseConfig;
+    private Button btnAddImportAntenna;
     private Button btnAddDefaultAntenna;
     private Button btnAddMetaData;
     private Button btnAddFFS;
     private Button btnAddMetaDataFolder;
+
+    private EditText configName;
 
 
     TextView tvHeadLine;
@@ -38,6 +42,7 @@ public abstract class ImportView implements IImportOptions {
 
         fragmentActivity = fa;
         initButtons(fa);
+        initConfigName(fa, antenna);
         initAntennaHeadLine(fa, antenna);
         initListView(fa, fieldList);
         initMetaDataIndicator(fa, metaData);
@@ -59,20 +64,33 @@ public abstract class ImportView implements IImportOptions {
     }
     private void initButtons(FragmentActivity fa){
 
-        btnChooseAntena = fa.findViewById(R.id.btn_import_choose_antenna);
-        btnAddNewAntenna = fa.findViewById(R.id.btn_import_add_antenna);
+        btnAddNewConfig = fa.findViewById(R.id.btn_add_config);
+        btnChooseConfig = fa.findViewById(R.id.btn_choose_config);
+        btnAddImportAntenna = fa.findViewById(R.id.btn_import_antenna);
         btnAddDefaultAntenna = fa.findViewById(R.id.btn_add_default);
         btnAddMetaData = fa.findViewById(R.id.btn_import_add_metadata);
         btnAddMetaDataFolder = fa.findViewById(R.id.btn_import_add_metadataFolder);
         btnAddFFS = fa.findViewById(R.id.btn_import_add_ffs);
 
-
-        btnChooseAntena.setOnClickListener( v -> { chooseExistingAntenna(); });
-        btnAddNewAntenna.setOnClickListener( v -> { addNewAntenna(); });
+        btnAddNewConfig.setOnClickListener(v -> {insertNewConfig(); });
+        btnChooseConfig.setOnClickListener(v -> { chooseExistingConfig(); });
+        btnAddImportAntenna.setOnClickListener(v -> { addImportAntenna(); });
         btnAddDefaultAntenna.setOnClickListener(v -> {addDefaultAntenna();});
         btnAddMetaData.setOnClickListener( v -> { addMetaData(); });
         btnAddMetaDataFolder.setOnClickListener( v -> { addMetaDataFolder(); });
         btnAddFFS.setOnClickListener( v -> { addFFS(); });
+    }
+
+    private void initConfigName(FragmentActivity fragmentActivity, Antenna antenna){
+        configName = fragmentActivity.findViewById(R.id.configName);
+        if (antenna == null){
+            return;
+        }
+        if(antenna.name == null) {
+            configName.setText("Antenna #" + antenna.id);
+        }else{
+            configName.setText(antenna.name);
+        }
     }
 
     private void initAntennaHeadLine(FragmentActivity fragmentActivity, Antenna antenna){
