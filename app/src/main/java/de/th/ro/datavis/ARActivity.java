@@ -75,6 +75,7 @@ public class ARActivity extends BaseActivity implements
     private AnchorNode anchorNode;
     private TransformableNode middleNode;
     private int antennaId;
+    private String antennaURI;
     private InterpretationMode interpretationMode;
     private String TAG = "myTag";
     private final AppDatabase db = AppDatabase.getInstance(this);
@@ -105,6 +106,7 @@ public class ARActivity extends BaseActivity implements
 
         Bundle b = getIntent().getExtras();
         antennaId = b.getInt("antennaId");
+        antennaURI = b.getString("antennaURI");
         String modeString = b.getString("interpretationMode");
         if(modeString.equals("Linear")){
             interpretationMode = InterpretationMode.Linear;
@@ -154,8 +156,9 @@ public class ARActivity extends BaseActivity implements
     }
 
     private void buildAntennaModel(){
+        Log.d(TAG, "buildAntennaModel: "+ antennaURI);
         ModelRenderable.builder()
-                .setSource(this, Uri.parse("models/datavis_antenna_asm.glb"))
+                .setSource(this, Uri.parse(antennaURI))
                 .setIsFilamentGltf(true)
                 .setAsyncLoadEnabled(true)
                 .build()
@@ -164,6 +167,7 @@ public class ARActivity extends BaseActivity implements
                     Log.d(TAG, "Antenna model done");
                 })
                 .exceptionally(throwable -> {
+                    Log.d(TAG, "buildAntennaModel: Failed to build antenna model" + throwable.getMessage());
                     Toast.makeText(
                             this, "Unable to load model", Toast.LENGTH_LONG).show();
                     return null;
@@ -306,10 +310,9 @@ public class ARActivity extends BaseActivity implements
 
     //Metadata reading
     private void readMetaDataFromDB(){
-        //TODO: AntennaID hardcoded
-        HHPBW_deg = db.metadataDao().findByMetadata_Background(1, bottomSheet.getFrequency(), bottomSheet.getTilt(), "HHPBW_deg");
-        VHPBW_deg = db.metadataDao().findByMetadata_Background(1, bottomSheet.getFrequency(), bottomSheet.getTilt(), "VHPBW_deg");
-        Directivity_dBi = db.metadataDao().findByMetadata_Background(1, bottomSheet.getFrequency(), bottomSheet.getTilt(), "Directivity_dBi");
+        HHPBW_deg = db.metadataDao().findByMetadata_Background(antennaId, bottomSheet.getFrequency(), bottomSheet.getTilt(), "HHPBW_deg");
+        VHPBW_deg = db.metadataDao().findByMetadata_Background(antennaId, bottomSheet.getFrequency(), bottomSheet.getTilt(), "VHPBW_deg");
+        Directivity_dBi = db.metadataDao().findByMetadata_Background(antennaId, bottomSheet.getFrequency(), bottomSheet.getTilt(), "Directivity_dBi");
     }
 
     private void createMetaDataObserver(){

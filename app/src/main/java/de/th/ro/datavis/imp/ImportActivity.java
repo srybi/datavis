@@ -1,14 +1,22 @@
 package de.th.ro.datavis.imp;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
@@ -77,6 +85,7 @@ public class ImportActivity extends BaseActivity{
         firstRun=true;
     }
 
+    //Why is this a anonymous class?
     private void initImportView(){
 
         importView = new ImportView(this, currentAntenna, currentAntenaFields, currentMetaData) {
@@ -97,7 +106,7 @@ public class ImportActivity extends BaseActivity{
 
             @Override
             public void addNewAntenna() {
-                openFileDialog_Android9(FileRequests.REQUEST_CODE_ANTENNA);
+                openFileDialog(FileRequests.REQUEST_CODE_ANTENNA);
             }
 
             @Override
@@ -109,7 +118,7 @@ public class ImportActivity extends BaseActivity{
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFragmentActivity());
                 preferences.edit().putInt("ID", currentAntenna.id).apply();
 
-                openFileDialog_Android9(FileRequests.REQUEST_CODE_METADATA);
+                openFileDialog(FileRequests.REQUEST_CODE_METADATA);
             }
 
             @Override
@@ -134,9 +143,18 @@ public class ImportActivity extends BaseActivity{
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFragmentActivity());
                 preferences.edit().putInt("ID", currentAntenna.id).apply();
 
-                openFileDialog_Android9(FileRequests.REQUEST_CODE_FFS);
+                openFileDialog(FileRequests.REQUEST_CODE_FFS);
             }
         };
+    }
+
+
+    public void openFileDialog(int requestCode){
+        if (SDK_INT >= Build.VERSION_CODES.Q) {
+            openFileDialog_Android11(requestCode);
+        } else {
+            openFileDialog_Android9(requestCode);
+        }
     }
 
     private void openFileDialog_Android9(int requestCode){
@@ -161,6 +179,16 @@ public class ImportActivity extends BaseActivity{
         startActivityForResult(browseIntent, requestCode);
     }
 
+    private void openFileDialog_Android11(int requestCode){
+        Intent data = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        data.setType("*/*");
+        data.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        data = Intent.createChooser(data, "Choose a file");
+        startActivityForResult(data, requestCode);
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -181,11 +209,8 @@ public class ImportActivity extends BaseActivity{
                 e.printStackTrace();
                 Log.e(LOG_TAG, "Exception " + e.getMessage());
             }
-
             // dD
-
         }
-
     }
 
     public Runnable getHandelResultRunnable(Intent data, int requestCode){
@@ -382,7 +407,7 @@ public class ImportActivity extends BaseActivity{
             @Override
             public void handelAntennaItemClick(Antenna antenna) {
 
-                Toast.makeText(getApplicationContext(), "Antenna " + antenna.filename, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Antenna " + antenna.name, Toast.LENGTH_LONG).show();
                 currentAntenna = antenna;
                 loadAntennaFieldsByAntennaId(currentAntenna.id);
 

@@ -109,6 +109,7 @@ public class MainFragment extends BaseFragment {
                 Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
                 Antenna item = antennas.getValue().get(i);
                 intent.putExtra("antennaId", item.id);
+                intent.putExtra("antennaURI", item.uri);
                 intent.putExtra("interpretationMode", "Linear");
                 getActivity().startActivity(intent);
 
@@ -122,6 +123,7 @@ public class MainFragment extends BaseFragment {
                 Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
                 Antenna item = antennas.getValue().get(i);
                 intent.putExtra("antennaId", item.id);
+                intent.putExtra("antennaURI", item.uri);
                 intent.putExtra("interpretationMode", "Logarithmic");
                 getActivity().startActivity(intent);
             }
