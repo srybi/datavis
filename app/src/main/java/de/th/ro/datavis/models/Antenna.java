@@ -40,6 +40,10 @@ public class Antenna {
         this.filename = filename;
     }
 
+    public void setDescription(String description){
+        this.description = description;
+    }
+
     @NonNull
     @Override
     public String toString() {
