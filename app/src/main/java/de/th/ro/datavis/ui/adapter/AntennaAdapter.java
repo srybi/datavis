@@ -29,7 +29,7 @@ public class AntennaAdapter extends ArrayAdapter<Antenna> {
              convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_antenna, parent, false);
          }
          TextView tvName = (TextView) convertView.findViewById(R.id.field_name);
-         tvName.setText(antenna.filename);
+         tvName.setText(antenna.description);
 
          return convertView;
     }

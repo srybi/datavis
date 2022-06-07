@@ -4,22 +4,26 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/projects/datavis/app/app/src/main/res/layout/activity_ar.xml" value="0.16666666666666666" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/activity_ar.xml" value="0.23753399818676338" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/activity_import.xml" value="0.1796875" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/activity_main.xml" value="0.1796875" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/activity_main.xml" value="0.276268115942029" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/activity_settings.xml" value="0.21034630183839248" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/antenna_field_list_item.xml" value="0.31666666666666665" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/antenna_list_item.xml" value="0.1796875" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/appbar_main.xml" value="0.1796875" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/dialog_import_existing_antenna.xml" value="0.1796875" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_antenna.xml" value="0.21034630183839248" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_app_instructions.xml" value="0.1796875" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_ar.xml" value="0.22" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_import.xml" value="0.16666666666666666" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_main.xml" value="0.13949275362318841" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/modal_bottom_sheet.xml" value="0.22" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/view_model_title.xml" value="0.1796875" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/activity_main.xml" value="0.276268115942029" />
-        <entry key="..\:/projects/datavis/app/src/main/res/layout/antenna_field_list_item.xml" value="0.31666666666666665" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_ar.xml" value="0.31666666666666665" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_import.xml" value="0.25" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_main.xml" value="0.31666666666666665" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/fragment_metadata.xml" value="0.21034630183839248" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/list_item_antenna.xml" value="0.21034630183839248" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/list_item_antenna_field.xml" value="0.21034630183839248" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/list_item_antenna_settings.xml" value="0.21034630183839248" />
+        <entry key="..\:/projects/datavis/app/src/main/res/layout/modal_bottom_sheet.xml" value="0.22" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/view_model_title.xml" value="0.31666666666666665" />
+        <entry key="..\:/projects/datavis/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.123" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1695" />
         <entry key="app/src/main/res/layout/activity_ar.xml" value="0.23229166666666667" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
@@ -27,8 +31,6 @@
         <entry key="app/src/main/res/layout/antenna_list_item.xml" value="0.14447463768115942" />
         <entry key="app/src/main/res/layout/antenna_settings_list_item.xml" value="0.335" />
         <entry key="app/src/main/res/layout/appbar_main.xml" value="0.23229166666666667" />
-        <entry key="app/src/main/res/layout/fragment_ar.xml" value="0.10885416666666667" />
-        <entry key="app/src/main/res/layout/fragment_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/atomicfield_settings_list_item.xml" value="0.1484375" />
         <entry key="app/src/main/res/layout/fragment_antenna.xml" value="0.14447463768115942" />
         <entry key="app/src/main/res/layout/fragment_ar.xml" value="0.10885416666666667" />
