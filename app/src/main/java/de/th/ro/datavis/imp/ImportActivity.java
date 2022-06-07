@@ -420,13 +420,15 @@ public class ImportActivity extends BaseActivity{
         dialog.showDialog();
     }
 
+    //This needs to be changed. LiveData causes site effects
     public void loadAntennaFieldsByAntennaId(int antennaId){
-        LiveData<List<AntennaField>> antennaFields = new MutableLiveData<>(new ArrayList<>());
-        antennaFields = appDb.antennaFieldDao().findByAntennaId_Main(antennaId);
-        antennaFields.observe(this, fieldList -> {
-            currentAntenaFields = fieldList;
+        List<AntennaField> antennaFields = new ArrayList<>();
+        executeRunnable(new Runnable() {
+            @Override
+            public void run() {
+                currentAntenaFields = appDb.antennaFieldDao().findByAntennaId_BackGround(antennaId);
+            }
         });
-
     }
 
     /**
