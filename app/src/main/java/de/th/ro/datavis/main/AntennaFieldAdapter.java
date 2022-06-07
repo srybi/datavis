@@ -30,8 +30,6 @@ public class AntennaFieldAdapter extends ArrayAdapter<AntennaField> {
          }
          TextView tvName = (TextView) convertView.findViewById(R.id.field_name);
          tvName.setText(field.filename);
-         TextView tvUri = (TextView) convertView.findViewById(R.id.field_uri);
-         tvUri.setText(field.uri);
 
          return convertView;
     }
