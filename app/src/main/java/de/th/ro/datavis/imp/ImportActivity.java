@@ -50,6 +50,7 @@ public class ImportActivity extends BaseActivity{
     Antenna currentAntenna;
     MetaData currentMetaData;
     List<AntennaField> currentAntenaFields;
+    List<Antenna> allAntennas;
 
     ImportView importView;
 
@@ -82,42 +83,30 @@ public class ImportActivity extends BaseActivity{
     }
 
     private void initImportView(){
+        Log.d(TAG, "initImportView: Initializing ... " + currentAntenna +", "+ currentAntenaFields +", "+ currentMetaData);
 
         importView = new ImportView(this, currentAntenna, currentAntenaFields, currentMetaData) {
             @Override
             public void insertNewConfig(){
+                Log.d(TAG, "insertNewConfig: new Config");
                 handleNewConfigInsert();
             }
 
             @Override
             public void chooseExistingConfig() {
                 // Antennen zeigen
-                AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
-
-                LiveData<List<Antenna>> antennaList = appDb.antennaDao().getAll();
-
-                antennaList.observe(getFragmentActivity(), list -> {
-
-                    displayChooseAntennaDialog(list);
-
-                });
+                executeRunnable(getAllAntennas());
+                displayChooseAntennaDialog(allAntennas);
             }
 
             @Override
             public void addImportAntenna() {
                 openFileDialog(FileRequests.REQUEST_CODE_ANTENNA);
-                //update antenna datenbank eintrag
             }
 
             public void addDefaultAntenna(){
                 ExecutorService executorService  = Executors.newSingleThreadExecutor();
-
-                Future future = executorService.submit(getSetDefaultAntennaRunnable());
-                try{
-                    future.get();
-                }catch (Exception e){
-                    Log.d(TAG, "addDefaultAntenna: " + e.getMessage());
-                }
+                executeRunnable(getSetDefaultAntennaRunnable());
             }
 
             @Override
@@ -126,8 +115,7 @@ public class ImportActivity extends BaseActivity{
                     Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();
                     return;
                 }
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFragmentActivity());
-                preferences.edit().putInt("ID", currentAntenna.id).apply();
+                setPreferenceID();
 
                 openFileDialog(FileRequests.REQUEST_CODE_METADATA);
             }
@@ -138,8 +126,7 @@ public class ImportActivity extends BaseActivity{
                     Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();
                     return;
                 }
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFragmentActivity());
-                preferences.edit().putInt("ID", currentAntenna.id).apply();
+                setPreferenceID();
 
                 openFolderDialog(FileRequests.REQUEST_CODE_METADATAFOLDER);
             }
@@ -151,10 +138,14 @@ public class ImportActivity extends BaseActivity{
                     return;
                 }
 
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFragmentActivity());
-                preferences.edit().putInt("ID", currentAntenna.id).apply();
+                setPreferenceID();
 
                 openFileDialog(FileRequests.REQUEST_CODE_FFS);
+            }
+
+            private void setPreferenceID(){
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFragmentActivity());
+                preferences.edit().putInt("ID", currentAntenna.id).apply();
             }
         };
     }
@@ -208,15 +199,39 @@ public class ImportActivity extends BaseActivity{
     }
 
     public Runnable addNewAntennaConfig(Antenna antenna){
+        Log.d(TAG, "addNewAntennaConfig: executing background thread");
         return new Runnable() {
             @Override
             public void run() {
                 AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
+                //changing default antenna name
                 int currentSize = appDb.antennaDao().getAll_Background().size();
                 antenna.name = antenna.name + (currentSize+1);
                 appDb.antennaDao().insert(antenna);
+                handleNewlyInsertedAntenna(appDb);
             }
         };
+    }
+
+    public Runnable getAllAntennas(){
+        return new Runnable() {
+            @Override
+            public void run() {
+                AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
+                List<Antenna> antennaList = appDb.antennaDao().getAll_Background();
+                allAntennas = antennaList;
+            }
+        };
+    }
+
+    public void executeRunnable(Runnable runnable){
+        ExecutorService executorService  = Executors.newSingleThreadExecutor();
+        Future future = executorService.submit(runnable);
+        try{
+            future.get();
+        }catch (Exception e){
+            Log.d(TAG, "executeRunnable: " + e.getMessage());
+        }
     }
 
 
@@ -248,7 +263,7 @@ public class ImportActivity extends BaseActivity{
         }
 
         handelGetAntennaInBackground(appDb, antennaId);
-        handelNewlyInsertedAntennaField(appDb, antennaId);
+        handleNewlyInsertedAntennaField(appDb, antennaId);
 
     }
     /**
@@ -266,7 +281,7 @@ public class ImportActivity extends BaseActivity{
             e.setAntennaID(antennaId);
             appDb.metadataDao().insert(e);
         }
-        handelNewlyInsertedMetadata(appDb);
+        handleNewlyInsertedMetadata(appDb);
     }
 
     /*
@@ -293,23 +308,24 @@ public class ImportActivity extends BaseActivity{
 
     /**
      * Gets new Antenna from database and sets it as the current antenna
-     * @param appDb - database
      */
-    private void handelNewlyInsertedAntenna(AppDatabase appDb){
+    private void handleNewlyInsertedAntenna(AppDatabase appDb){
+        Log.d(TAG, "handleNewlyInsertedAntenna: Setting newly insert antenna as current");
         // Background
-        List<Antenna> data = appDb.antennaDao().getAll_Background();
+        List<Antenna> data = new ArrayList<>();
+        data = appDb.antennaDao().getAll_Background();
         // Last Antenna
-        currentAntenna = data.get(data.size() - 1);
+        this.currentAntenna = data.get(data.size() - 1);
     }
 
-    private void handelNewlyInsertedAntennaField(AppDatabase appDb, int antennaId){
+    private void handleNewlyInsertedAntennaField(AppDatabase appDb, int antennaId){
         // Background
         List<AntennaField> data =new ArrayList<>();
         data = appDb.antennaFieldDao().findByAntennaId_BackGround(antennaId);
         this.currentAntenaFields = data;
     }
 
-    private void handelNewlyInsertedMetadata(AppDatabase appDb){
+    private void handleNewlyInsertedMetadata(AppDatabase appDb){
         // Background
         List<MetaData> data =new ArrayList<>();
         data = appDb.metadataDao().getAll_Background();
@@ -327,15 +343,10 @@ public class ImportActivity extends BaseActivity{
     }
 
     private void handleNewConfigInsert(){
+        Log.d(TAG, "handleNewConfigInsert: creating background thread");
         Antenna insert = new Antenna("Antenna #");
         //Background
-        ExecutorService executorService  = Executors.newSingleThreadExecutor();
-        Future future = executorService.submit(addNewAntennaConfig(insert));
-        try{
-            future.get();
-        }catch (Exception e){
-            Log.d(TAG, "handleNewConfigInsert: " + e.getMessage());
-        }
+        executeRunnable(addNewAntennaConfig(insert));
         initImportView();
     }
 
@@ -358,8 +369,8 @@ public class ImportActivity extends BaseActivity{
                 return;
             }
             currentAntenna = list.get(0);
-            // Get Antennafield
             loadAntennaFieldsByAntennaId(currentAntenna.id);
+            initImportView();
         });
 
     }
@@ -370,7 +381,7 @@ public class ImportActivity extends BaseActivity{
      * @param antennaList - all available antennas from the database
      */
     private void displayChooseAntennaDialog( List<Antenna> antennaList){
-
+        Log.d(TAG, "displayChooseAntennaDialog: Opening...");
         DialogExistingAntenna dialog = new DialogExistingAntenna(this, "Antenna", R.layout.dialog_import_existing_antenna, antennaList) {
             @Override
             public void handelAntennaItemClick(Antenna antenna) {
@@ -392,8 +403,6 @@ public class ImportActivity extends BaseActivity{
         antennaFields = appDb.antennaFieldDao().findByAntennaId_Main(antennaId);
         antennaFields.observe(this, fieldList -> {
             currentAntenaFields = fieldList;
-            // Update UI
-            initImportView();
         });
 
     }
@@ -456,19 +465,8 @@ public class ImportActivity extends BaseActivity{
         Log.d(TAG, "Activity result");
         if(resultCode == Activity.RESULT_OK){
             Log.d(TAG, "Request Code: "+requestCode);
-            ExecutorService executorService  = Executors.newSingleThreadExecutor();
-
-            Future future = executorService.submit( getHandelResultRunnable( data, requestCode) );
-
-            try {
-                future.get();
-
-                initImportView();
-
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-                Log.e(TAG, "Exception " + e.getMessage());
-            }
+            executeRunnable(getHandelResultRunnable( data, requestCode));
+            initImportView();
         }
     }
 
