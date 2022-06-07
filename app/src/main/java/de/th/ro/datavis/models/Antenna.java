@@ -43,7 +43,6 @@ public class Antenna {
     @NonNull
     @Override
     public String toString() {
-        return "[" + id + "] "
-                + "[" + filename + "] ";
+        return String.format("id: %2d; name: %s; uri: %s; filename: %s", id, name, uri, filename);
     }
 }
