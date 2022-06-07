@@ -8,6 +8,30 @@
     android:orientation="vertical"
     >
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/importName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            style="@style/HeadLine"
+            android:text="Name" />
+
+        <Button
+            android:id="@+id/showExisting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:text="" />
+
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/tv_import_headLine_antenna"
@@ -112,7 +136,6 @@
         android:layout_marginBottom="20dp">
 
     </ListView>
-
 
 
 </LinearLayout>
