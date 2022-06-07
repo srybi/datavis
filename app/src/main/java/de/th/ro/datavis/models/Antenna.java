@@ -17,18 +17,27 @@ public class Antenna {
     public String name;
 
 
-    public Antenna(int id, String uri, String filename) {
+    public Antenna(int id, String uri, String filename, String name) {
         this.id = id;
         this.uri = uri;
         this.filename = filename;
-        this.name = "DEFAULT";
+        this.name = name;
     }
 
     @Ignore
     public Antenna(Uri uri, String filename) {
         this.uri = uri.toString();
         this.filename = filename;
-        this.name = "DEFAULT";
+    }
+
+    @Ignore
+    public Antenna(String name){
+        this.name = name;
+    }
+
+    public void setAntennaFile(String uri, String filename){
+        this.uri = uri;
+        this.filename = filename;
     }
 
     @NonNull
