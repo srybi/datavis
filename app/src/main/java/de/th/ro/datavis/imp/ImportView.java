@@ -64,6 +64,7 @@ public abstract class ImportView implements IImportOptions {
     }
     private void initButtons(FragmentActivity fa){
 
+        configName = fa.findViewById(R.id.configName);
         btnAddNewConfig = fa.findViewById(R.id.btn_add_config);
         btnChooseConfig = fa.findViewById(R.id.btn_choose_config);
         btnAddImportAntenna = fa.findViewById(R.id.btn_import_antenna);
@@ -72,6 +73,7 @@ public abstract class ImportView implements IImportOptions {
         btnAddMetaDataFolder = fa.findViewById(R.id.btn_import_add_metadataFolder);
         btnAddFFS = fa.findViewById(R.id.btn_import_add_ffs);
 
+        configName.addTextChangedListener(descriptionChanged());
         btnAddNewConfig.setOnClickListener(v -> {insertNewConfig(); });
         btnChooseConfig.setOnClickListener(v -> { chooseExistingConfig(); });
         btnAddImportAntenna.setOnClickListener(v -> { addImportAntenna(); });
@@ -86,11 +88,7 @@ public abstract class ImportView implements IImportOptions {
         if (antenna == null){
             return;
         }
-        if(antenna.name == null) {
-            configName.setText("Antenna #" + antenna.id);
-        }else{
-            configName.setText(antenna.name);
-        }
+        configName.setText(antenna.description);
     }
 
     private void initAntennaHeadLine(FragmentActivity fragmentActivity, Antenna antenna){

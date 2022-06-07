@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
+import org.w3c.dom.Text;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -85,6 +89,29 @@ public class ImportActivity extends BaseActivity{
         Log.d(TAG, "initImportView: Initializing ... " + currentAntenna +", "+ currentAntenaFields +", "+ currentMetaData);
 
         importView = new ImportView(this, currentAntenna, currentAntenaFields, currentMetaData) {
+
+            public TextWatcher descriptionChanged(){
+                return new TextWatcher() {
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        executeRunnable(new Runnable() {
+                            @Override
+                            public void run() {
+                                currentAntenna.setDescription(editable.toString());
+                                appDb.antennaDao().update(currentAntenna);
+                            }
+                        });
+                    }
+                    // ============== NOT USED ==================
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+                    // ===========================================
+                };
+            }
+
             @Override
             public void insertNewConfig(){
                 Log.d(TAG, "insertNewConfig: new Config");
