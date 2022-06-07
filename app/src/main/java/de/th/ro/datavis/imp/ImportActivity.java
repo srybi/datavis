@@ -131,8 +131,8 @@ public class ImportActivity extends BaseActivity{
             }
 
             public void addDefaultAntenna(){
-                ExecutorService executorService  = Executors.newSingleThreadExecutor();
                 executeRunnable(getSetDefaultAntennaRunnable());
+                initImportView();
             }
 
             @Override
