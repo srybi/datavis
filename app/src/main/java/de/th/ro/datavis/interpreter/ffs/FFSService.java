@@ -21,6 +21,7 @@ import java.util.concurrent.Future;
 import de.th.ro.datavis.db.daos.AtomicFieldDao;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IInterpreter;
+import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.Result;
 import de.th.ro.datavis.models.Sphere;
@@ -35,6 +36,8 @@ public class FFSService {
     private AtomicField atomicField;
     private List<Double> frequencies;
     private List<Integer> tilts;
+
+    private int tilt;
 
     public FFSService(IInterpreter interpreter, Context context) {
         executor = Executors.newSingleThreadExecutor();
@@ -136,6 +139,25 @@ public class FFSService {
             e.printStackTrace();
         }
         return new ArrayList<>();
+    }
+
+    public int TiltForAntenna(int antennaID) {
+        Future future = executor.submit(new Runnable(){
+            @Override
+            public void run() {
+                String filename = db.antennaFieldDao().findByAntennaId_BackGround(antennaID).get(0).filename;
+                int start = filename.indexOf("_T") + 2, end = start + 2;
+                tilt = Integer.parseInt(filename.substring(start, end));
+            }
+        });
+
+        try {
+            future.get();
+            return tilt;
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return tilt;
     }
 
     public FFSIntensityColor mapToColor(double intensity, double maxItensity) {
