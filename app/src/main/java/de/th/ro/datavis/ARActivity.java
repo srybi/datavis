@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,6 +72,7 @@ public class ARActivity extends BaseActivity implements
     private FFSService ffsService;
 
     private BottomSheet bottomSheet;
+    private BottomSheetHandler bottomSheetHandler;
     private GestureDetector gestureDetector;
     private AnchorNode anchorNode;
     private TransformableNode middleNode;
@@ -115,7 +117,8 @@ public class ARActivity extends BaseActivity implements
         }
         List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, 2, InterpretationMode.Logarithmic);
         bottomSheet = new BottomSheet(this, frequencies);
-        gestureDetector = new GestureDetector(this, new BottomSheetHandler(bottomSheet));
+        bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
+        gestureDetector = new GestureDetector(this, bottomSheetHandler);
 
         //TODO
         try {
@@ -225,6 +228,7 @@ public class ARActivity extends BaseActivity implements
         // AntennaId hardcoded, since its is currently not possible to choose an antenna
         List<Sphere> list = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
         processRenderList(anchorNode, renderableList, list);
+        bottomSheetHandler.makeCueVisible(true);
         bottomSheet.subscribe(this);
     }
 
