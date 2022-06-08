@@ -6,38 +6,57 @@
     tools:context=".ARActivity"
     android:orientation="vertical">
 
-
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/arFragment"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
-    <TextView
-        android:id="@+id/meta_HHPBW_deg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:text="@string/meta_NF"
-        android:background="@color/black_20"
-        android:textColor="@color/white"/>
-    <TextView
-        android:id="@+id/meta_VHPBW_deg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/meta_HHPBW_deg"
-        android:text="@string/meta_NF"
-        android:background="@color/black_20"
-        android:textColor="@color/white"/>
-    <TextView
-        android:id="@+id/meta_Directivity_dBi"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/meta_VHPBW_deg"
-        android:text="@string/meta_NF"
-        android:background="@color/black_20"
-        android:textColor="@color/white"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/meta_HHPBW_deg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/meta_NF"
+            android:background="@color/black_20"
+            android:textColor="@color/white"/>
+        <TextView
+            android:id="@+id/meta_VHPBW_deg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/meta_HHPBW_deg"
+            android:text="@string/meta_NF"
+            android:background="@color/black_20"
+            android:textColor="@color/white"/>
+
+        <TextView
+            android:id="@+id/meta_Directivity_dBi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/meta_VHPBW_deg"
+            android:layout_alignParentLeft="true"
+            android:background="@color/black_20"
+            android:text="@string/meta_NF"
+            android:textColor="@color/white" />
+
+        <pl.droidsonroids.gif.GifImageView
+            android:id="@+id/visualCueBottomSheet"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginRight="1000dp"
+            android:layout_marginBottom="59dp"
+            android:src="@drawable/arrow_up"
+            android:visibility="gone"
+            tools:src="@drawable/arrow_up">
+
+        </pl.droidsonroids.gif.GifImageView>
+    </RelativeLayout>
 
 
 </RelativeLayout>
