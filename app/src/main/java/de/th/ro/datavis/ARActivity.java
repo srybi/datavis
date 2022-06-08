@@ -101,8 +101,8 @@ public class ARActivity extends BaseActivity implements
         }else{
             interpretationMode = InterpretationMode.Logarithmic;
         }
-        List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, 2, InterpretationMode.Logarithmic);
-        List<Integer> tilts = ffsService.TiltsForAntenna(antennaId, 2.0/*frequencies.get(0)*/, InterpretationMode.Logarithmic);
+        List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, ffsService.TiltForAntenna(antennaId), InterpretationMode.Logarithmic);
+        List<Integer> tilts = ffsService.TiltsForAntenna(antennaId, frequencies.get(0), InterpretationMode.Logarithmic);
         bottomSheet = new BottomSheet(this, frequencies, tilts);
         gestureDetector = new GestureDetector(this, new BottomSheetHandler(bottomSheet));
 
