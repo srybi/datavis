@@ -28,6 +28,9 @@ public interface MetadataDao {
     @Query("SELECT * FROM MetaData WHERE antennaID = :antennaID AND freq = :freq AND tilt = :tilt AND type LIKE :type")
     LiveData<MetaData> findByMetadata_Background(int antennaID, double freq, double tilt, String type);
 
+    @Query("SELECT * FROM MetaData WHERE antennaID = :antennaID AND freq = :freq AND tilt = :tilt")
+    LiveData<List<MetaData>> findAll_Background(int antennaID, double freq, double tilt);
+
     @Insert
     void insert(MetaData metaData);
 
