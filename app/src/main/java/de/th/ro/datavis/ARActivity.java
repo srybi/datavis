@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,10 +15,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Config;
 import com.google.ar.core.HitResult;
@@ -79,10 +76,12 @@ public class ARActivity extends BaseActivity implements
     private int antennaId;
     private String antennaURI;
     private InterpretationMode interpretationMode;
-    private String TAG = "myTag";
+    private String TAG = "ARActivity";
     private final AppDatabase db = AppDatabase.getInstance(this);
 
-    private LiveData<MetaData> HHPBW_deg, VHPBW_deg, Directivity_dBi = new MutableLiveData<>();
+    private LiveData<List<MetaData>> sqlQueryMetadata;
+    private Observer<List<MetaData>> sqlMetadataObs;
+    //private LiveData<MetaData> HHPBW_deg, VHPBW_deg, Directivity_dBi = new MutableLiveData<>();
 
     private double maxIntensity = -1;
     private float scalingFactor = 1;
@@ -120,16 +119,9 @@ public class ARActivity extends BaseActivity implements
         bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
         gestureDetector = new GestureDetector(this, bottomSheetHandler);
 
-        //TODO
-        try {
-            readMetaDataFromDB();
-        } catch (Exception e) { e.printStackTrace();}
-        //Create Observer for Metadata
-
-        createMetaDataObserver();
-
         buildAntennaModel();
         buildSpheres();
+
     }
 
     @Override
@@ -229,7 +221,13 @@ public class ARActivity extends BaseActivity implements
         List<Sphere> list = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
         processRenderList(anchorNode, renderableList, list);
         bottomSheetHandler.makeCueVisible(true);
+
+        //Initializes Metadata
+        try { readMetaDataFromDB(); } catch (Exception e) { e.printStackTrace();}
+        createMetaDataObserver();
+
         bottomSheet.subscribe(this);
+
     }
 
 
@@ -290,12 +288,17 @@ public class ARActivity extends BaseActivity implements
     @Override
     public void update() {
         Log.d(TAG, "update: the bottomsheet called an update");
+        deleteAllSpheres();
 
-        deleteAllSheres();
+        //Metadaten werden neu geladen
+        sqlQueryMetadata = db.metadataDao().findAll_Background(20,bottomSheet.getFrequency(),bottomSheet.getTilt());
+        sqlQueryMetadata.removeObservers(this);
+        createMetaDataObserver();
+
         processRenderList(anchorNode, renderableList, loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt()));
     }
 
-    private void deleteAllSheres(){
+    private void deleteAllSpheres(){
         anchorNode.removeChild(middleNode);
     }
 
@@ -312,6 +315,38 @@ public class ARActivity extends BaseActivity implements
         return super.dispatchTouchEvent(event);
     }
 
+    /**
+     * Methods to display and update Metadata:
+     * readMetaDataFromDB() fetches a List of all available Metadata for a certain AntennaID, frequency and tilt
+     * createMetaDataObserver() assigns an Observer to check for updates in the LiveData
+     * updateMetaData() on a change goes through the List of available Metadata and for each tries to find a TextView to update
+     *      this is done by String matching the [Metadata type] to the [TextView ID]
+     */
+    private void readMetaDataFromDB(){
+        //TODO: Antenna Hardcoded
+        sqlQueryMetadata = db.metadataDao().findAll_Background(20,bottomSheet.getFrequency(),bottomSheet.getTilt());
+        Log.d(TAG, "sqlQueryMetadata built "+sqlQueryMetadata.toString());
+    }
+
+    private void createMetaDataObserver(){
+        sqlMetadataObs  = changeMetaData -> { updateMetadata(changeMetaData);};
+        try {
+            sqlQueryMetadata.observe(this, sqlMetadataObs);
+        } catch (NullPointerException e) {}
+    }
+
+    private void updateMetadata(List<MetaData> changeMetaData){
+        for(MetaData m: changeMetaData) {
+            int resID = this.getResources().getIdentifier(("meta_" + m.getType()), "id", this.getPackageName());
+            try {
+                TextView textView = findViewById(resID);
+                textView.setText(m.getValue());
+                Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
+            } catch (Exception e) {
+            }
+        }
+    }
+    /*
     //Metadata reading
     private void readMetaDataFromDB(){
         HHPBW_deg = db.metadataDao().findByMetadata_Background(antennaId, bottomSheet.getFrequency(), bottomSheet.getTilt(), "HHPBW_deg");
@@ -345,5 +380,6 @@ public class ARActivity extends BaseActivity implements
             Directivity_dBi.setText("Directivity_dBi: " + changeMetaData.getValue());
         } catch (Exception e){ Log.d(TAG, "couldn't find directivity"); }
     }
+     */
 
 }

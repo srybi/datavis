@@ -264,11 +264,12 @@ public class BottomSheet implements ISubject{
 
     private void updateMetadata(BottomSheetDialog bsd, List<MetaData> changeMetaData){
         for(MetaData m: changeMetaData) {
-            Log.d(TAG, "Type: " + m.getType());
+
             int resID = context.getResources().getIdentifier(("meta_" + m.getType()), "id", context.getPackageName());
             try {
                 TextView textView = bsd.findViewById(resID);
                 textView.setText(m.getValue());
+                Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
             } catch (Exception e) {
             }
         }
@@ -345,5 +346,8 @@ public class BottomSheet implements ISubject{
     }
     public int getTilt() {
         return this.tilt;
+    }
+    public Context getContext() {
+        return this.context;
     }
 }
