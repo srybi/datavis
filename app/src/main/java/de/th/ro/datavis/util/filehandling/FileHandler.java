@@ -53,6 +53,7 @@ public class FileHandler {
         for(String m :mimesAccepted){
             if(mimeActual.equals(m)) return true;
         }
+        Log.d(TAG, "RETURN FALSE");
         return false;
     }
 
@@ -61,7 +62,7 @@ public class FileHandler {
         String extActual = queryFileExtension(resolver, uri);
         Log.d(TAG, "Extension found: "+extActual+" | Extension accepted: " + TextUtils.join(", ", extAccepted));
         for(String m :extAccepted){
-            if(extAccepted.equals(m)) return true;
+            if(extActual.equals(m)) return true;
         }
         return false;
     }

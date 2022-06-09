@@ -178,8 +178,8 @@ public class ImportActivity extends BaseActivity{
 
     /**
      * Handles a chosen file and stores it (using a background thread)
-     * @param data
-     * @param requestCode
+     * Uses the requestCode to find the correct Method to parse the data
+     * FileHandler checks the file for validity
      * @return
      */
     public Runnable getHandelResultRunnable(Intent data, int requestCode){
@@ -218,7 +218,7 @@ public class ImportActivity extends BaseActivity{
                             break;
                         default: throw new RuntimeException();
                     }
-                }catch(Exception e){
+                } catch(Exception e){
                     e.printStackTrace();
                     Log.e(TAG, "Exception " + e.getMessage());
                 }
