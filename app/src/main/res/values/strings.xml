@@ -57,6 +57,12 @@
     <string name="import_instructions_text">1) Press the menu icon in the top right corner\n\n2) Press \'Import\'\n\n3) Select an existing antenna or add a new one\n\n4) Add Metadata and .ffs files</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
+    <!-- about -->
+    <string name="about">About</string>
+    <string name="datavis">datavis</string>
+    <string name="about_text">AR-App for\ndata visualisation\nof antenna signals\n\nProject within the scope\nof the module\nSoftware Engineering Practice\nin collaboration with Ericsson\n\nBy\nTassilo Heinemann\nDominik Kauth\nSamuel Kern\nStefan Rybinski\nLeopold Straub</string>
+
+
     <!-- Settings -->
     <string name="tab_antenna">Antenna</string>
     <string name="tab_ffs">Fields</string>

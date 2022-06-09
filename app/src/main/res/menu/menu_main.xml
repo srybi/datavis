@@ -4,6 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="de.th.ro.datavis.MainActivity">
     <item
+        android:id="@+id/about"
+        android:icon="@drawable/ic_about"
+        android:title="@string/about"
+        app:showAsAction="ifRoom">
+
+    </item>
+    <item
         android:id="@+id/instructions"
         android:icon="@drawable/ic_instructions"
         android:title="@string/instructions"
