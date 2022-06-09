@@ -1,5 +1,6 @@
 package de.th.ro.datavis.interpreter.ffs;
 
+import android.content.Context;
 import android.util.Log;
 import android.util.Pair;
 
@@ -37,20 +38,20 @@ public class FFSInterpreter implements IInterpreter {
 
 
     @Override
-    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(InputStream stream, double scalingFactor, int antennaId) throws FFSInterpretException {
+    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(InputStream stream, double scalingFactor, ArrayList<Integer>tiltValues, int antennaId) throws FFSInterpretException {
             InputStreamReader reader = new InputStreamReader(stream);
             BufferedReader bufferedReader = new BufferedReader(reader);
 
-            return interpretData(bufferedReader, scalingFactor, antennaId);
+            return interpretData(bufferedReader, scalingFactor,tiltValues, antennaId);
     }
 
     @Override
-    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(File file, double scalingFactor, int antennaId) throws FFSInterpretException {
+    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(File file, double scalingFactor, ArrayList<Integer> tiltValues, int antennaId) throws FFSInterpretException {
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-            return interpretData(bufferedReader, scalingFactor, antennaId);
+            return interpretData(bufferedReader, scalingFactor, tiltValues, antennaId);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return Result.error("File Not Found.");
@@ -58,7 +59,7 @@ public class FFSInterpreter implements IInterpreter {
     }
 
 
-    private Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(BufferedReader reader, double scalingFactor, int antennaId) throws FFSInterpretException {
+    private Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(BufferedReader reader, double scalingFactor, ArrayList<Integer> tiltValues, int antennaId) throws FFSInterpretException {
         AtomicField atomicField;
         maxItensity = -1;
         Log.d(LOG_TAG, "Start Interpretation...");
@@ -101,8 +102,8 @@ public class FFSInterpreter implements IInterpreter {
                     findNextAtomicField(reader);
             }
 
-            ArrayList<AtomicField> atomicFieldsLog = interpretValues(values,frequencyValues, scalingFactor, InterpretationMode.Logarithmic, antennaId);
-            ArrayList<AtomicField> atomicFieldsLin = interpretValues(values,frequencyValues, scalingFactor, InterpretationMode.Linear, antennaId);
+            ArrayList<AtomicField> atomicFieldsLog = interpretValues(values,frequencyValues, tiltValues, scalingFactor, InterpretationMode.Logarithmic, antennaId);
+            ArrayList<AtomicField> atomicFieldsLin = interpretValues(values,frequencyValues, tiltValues, scalingFactor, InterpretationMode.Linear, antennaId);
             Log.d(LOG_TAG, "Interpretation finished");
             return Result.success(Pair.create(atomicFieldsLog, atomicFieldsLin));
 
@@ -131,16 +132,19 @@ public class FFSInterpreter implements IInterpreter {
         return frequencyValues;
     }
 
-    private ArrayList<AtomicField> interpretValues(ArrayList<ArrayList<String>> values, ArrayList<Double> frequencies, double scalingFactor, InterpretationMode mode, int antennaId) throws FFSInterpretException {
+    private ArrayList<AtomicField> interpretValues(ArrayList<ArrayList<String>> values, ArrayList<Double> frequencies, ArrayList<Integer> tilts, double scalingFactor, InterpretationMode mode, int antennaId) throws FFSInterpretException {
         ArrayList<AtomicField> atomicFields = new ArrayList<>();
-        for(Pair<ArrayList<String>, Double> pair : Helper.zip(values, frequencies)){
-            Result<AtomicField> atomicField = interpretValue(pair.first, scalingFactor, mode);
-            AtomicField field = atomicField.getData();
-            //convert to gHz
-            double frequency = pair.second/1000000000;
-            field.setFrequency(frequency);
-            field.setAntennaId(antennaId);
-            atomicFields.add(field);
+        for (int tilt : tilts) {
+            for (Pair<ArrayList<String>, Double> pair : Helper.zip(values, frequencies)) {
+                Result<AtomicField> atomicField = interpretValue(pair.first, scalingFactor, mode);
+                AtomicField field = atomicField.getData();
+                //convert to gHz
+                double frequency = pair.second / 1000000000;
+                field.setFrequency(frequency);
+                field.setTilt(tilt);
+                field.setAntennaId(antennaId);
+                atomicFields.add(field);
+            }
         }
         return atomicFields;
     }
