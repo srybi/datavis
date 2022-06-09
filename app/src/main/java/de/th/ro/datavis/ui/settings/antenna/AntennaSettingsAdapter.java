@@ -38,7 +38,7 @@ public class AntennaSettingsAdapter extends ArrayAdapter<Antenna> {
         TextView tvId = (TextView) convertView.findViewById(R.id.text_view_antenna_id);
         tvId.setText(String.valueOf("ID: "+antenna.id));
         TextView tvName = (TextView) convertView.findViewById(R.id.text_view_antenna_name);
-        tvName.setText(antenna.filename);
+        tvName.setText(antenna.description);
 
         ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.button_antenna_delete);
         View finalConvertView = convertView;
@@ -60,7 +60,7 @@ public class AntennaSettingsAdapter extends ArrayAdapter<Antenna> {
                     }
                 };
                 AlertDialog.Builder ab = new AlertDialog.Builder(finalConvertView.getContext());
-                ab.setMessage(getContext().getString(R.string.clear_one_confirm) + " " + antenna.filename + " ?").setPositiveButton(R.string.yes, dialogClickListener)
+                ab.setMessage(getContext().getString(R.string.clear_one_confirm) + " " + antenna.description + " ?").setPositiveButton(R.string.yes, dialogClickListener)
                         .setNegativeButton(R.string.no, dialogClickListener).show();
 
             }

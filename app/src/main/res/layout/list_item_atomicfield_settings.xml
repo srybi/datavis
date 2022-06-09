@@ -16,6 +16,12 @@
         android:layout_gravity="fill"
         android:textStyle="bold" />
 
+    <View
+        android:layout_width="1dp"
+        android:layout_height="fill_parent"
+        android:background="gra" />
+
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
