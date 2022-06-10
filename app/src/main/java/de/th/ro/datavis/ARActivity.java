@@ -346,40 +346,5 @@ public class ARActivity extends BaseActivity implements
             }
         }
     }
-    /*
-    //Metadata reading
-    private void readMetaDataFromDB(){
-        HHPBW_deg = db.metadataDao().findByMetadata_Background(antennaId, bottomSheet.getFrequency(), bottomSheet.getTilt(), "HHPBW_deg");
-        VHPBW_deg = db.metadataDao().findByMetadata_Background(antennaId, bottomSheet.getFrequency(), bottomSheet.getTilt(), "VHPBW_deg");
-        Directivity_dBi = db.metadataDao().findByMetadata_Background(antennaId, bottomSheet.getFrequency(), bottomSheet.getTilt(), "Directivity_dBi");
-    }
-
-    private void createMetaDataObserver(){
-        Observer<MetaData> nullFillObs = changeMetaData -> { updateHHPBW_degView(changeMetaData);};
-        HHPBW_deg.observe(this, nullFillObs);
-        Observer<MetaData> squintObs = changeMetaData -> { updateVHPBW_degView(changeMetaData);};
-        VHPBW_deg.observe(this, squintObs);
-        Observer<MetaData> tiltObs = changeMetaData -> { updateDirectivity_dBiView(changeMetaData);};
-        Directivity_dBi.observe(this, tiltObs);
-    }
-    private void updateHHPBW_degView(MetaData changeMetaData){
-        TextView HHPBW_deg = findViewById(R.id.meta_HHPBW_deg);
-        try {
-            HHPBW_deg.setText("HHPBW: " + changeMetaData.getValue());
-        } catch (Exception e){ Log.d(TAG, "couldn't find hhpbw"); }
-    }
-    private void updateVHPBW_degView(MetaData changeMetaData){
-        TextView VHPBW_deg = findViewById(R.id.meta_VHPBW_deg);
-        try {
-            VHPBW_deg.setText("VHPBW: " + changeMetaData.getValue());
-        } catch (Exception e){ Log.d(TAG, "couldn't find vhpbw"); }
-    }
-    private void updateDirectivity_dBiView(MetaData changeMetaData){
-        TextView Directivity_dBi = findViewById(R.id.meta_Directivity_dBi);
-        try {
-            Directivity_dBi.setText("Directivity_dBi: " + changeMetaData.getValue());
-        } catch (Exception e){ Log.d(TAG, "couldn't find directivity"); }
-    }
-     */
 
 }
