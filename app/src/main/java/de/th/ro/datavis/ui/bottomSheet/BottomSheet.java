@@ -80,9 +80,6 @@ public class BottomSheet implements ISubject{
 
 
     private LiveData<List<MetaData>> sqlQueryMetadata;
-    //private LiveData<MetaData> Nullfill_dB, Squint_deg, Tilt_deg, TiltDeviation_deg = new MutableLiveData<>();
-
-
     public InterpretationMode getMode(){
         return this.mode;
     }
@@ -98,8 +95,8 @@ public class BottomSheet implements ISubject{
         this.changedFrequency = frequencies.get(0);
 
         db = AppDatabase.getInstance(ctx);
-        tilt = 2;
-        changedTilt  = 2;
+        tilt = 3;
+        changedTilt  = 3;
     }
 
     /**
@@ -253,7 +250,7 @@ public class BottomSheet implements ISubject{
      */
     private void readMetaDataFromDB(){
         //TODO: Antenna Hardcoded
-        sqlQueryMetadata = db.metadataDao().findAll_Background(20,frequency,tilt);
+        sqlQueryMetadata = db.metadataDao().findAll_Background(5,frequency,tilt);
         Log.d(TAG, "sqlQueryMetadata built "+sqlQueryMetadata.toString());
     }
 
@@ -274,58 +271,6 @@ public class BottomSheet implements ISubject{
             }
         }
     }
-
-
-   //Obsolete and ugly
-
-    /*
-    private void readMetaDataFromDB(){
-        //TODO: AntennaID hardcoded
-        Nullfill_dB = db.metadataDao().findByMetadata_Background(1, frequency, tilt, "Nullfill_dB");
-        Squint_deg = db.metadataDao().findByMetadata_Background(1, frequency, tilt, "Squint_deg");
-        Tilt_deg = db.metadataDao().findByMetadata_Background(1, frequency, tilt, "Tilt_deg");
-        TiltDeviation_deg = db.metadataDao().findByMetadata_Background(1, frequency, tilt, "TiltDeviation_deg");
-    }
-
-    private void createMetaDataObserver(BottomSheetDialog bsd){
-        //a single observer for every field
-        Observer<MetaData> nullFillObs = changeMetaData -> { updateNullfill_dBView(bsd, changeMetaData);};
-        Nullfill_dB.observe((AppCompatActivity)context, nullFillObs);
-        Observer<MetaData> squintObs = changeMetaData -> { updateSquint_degView(bsd, changeMetaData);};
-        Squint_deg.observe((AppCompatActivity)context, squintObs);
-        Observer<MetaData> tiltObs = changeMetaData -> { updateTilt_degView(bsd, changeMetaData);};
-        Tilt_deg.observe((AppCompatActivity)context, tiltObs);
-        Observer<MetaData> tiltDevOps = changeMetaData -> { updateTiltDeviation_degView(bsd, changeMetaData);};
-        TiltDeviation_deg.observe((AppCompatActivity)context, tiltDevOps);
-    }
-    //An update method per field
-    private void updateNullfill_dBView(BottomSheetDialog b, MetaData changeMetaData){
-        TextView nullfill_dB = b.findViewById(R.id.meta_Nullfill_dB);
-        try {
-            nullfill_dB.setText(changeMetaData.getValue());
-        } catch (Exception e){ Log.d(TAG, "couldn't find nullfill"); }
-    }
-    private void updateSquint_degView(BottomSheetDialog b, MetaData changeMetaData){
-        TextView squint_deg = b.findViewById(R.id.meta_Squint_deg);
-        try {
-            squint_deg.setText(changeMetaData.getValue());
-        } catch (Exception e){ Log.d(TAG, "couldn't find squint"); }
-    }
-    private void updateTilt_degView(BottomSheetDialog b, MetaData changeMetaData){
-        TextView tilt_deg = b.findViewById(R.id.meta_Tilt_deg);
-        try {
-            tilt_deg.setText(changeMetaData.getValue());
-        } catch (Exception e){ Log.d(TAG, "couldn't find Tilt"); }
-    }
-    private void updateTiltDeviation_degView(BottomSheetDialog b, MetaData changeMetaData){
-        TextView tiltDeviation_deg = b.findViewById(R.id.meta_TiltDeviation_deg);
-        try {
-            tiltDeviation_deg.setText(changeMetaData.getValue());
-        } catch (Exception e){ Log.d(TAG, "couldn't find tiltdev"); }
-    }
- */
-
-
 
     private void handleFrequencySlider(float value) {
         changedFrequency = value;
