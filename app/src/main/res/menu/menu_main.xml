@@ -11,21 +11,10 @@
 
     </item>
     <item
-        android:id="@+id/instructions"
+        android:id="@+id/app_instructions"
         android:icon="@drawable/ic_instructions"
-        android:title="@string/instructions"
+        android:title="@string/app_instructions"
         app:showAsAction="ifRoom">
-        <menu>
-            <item
-                android:id="@+id/import_instructions"
-                android:title="@string/import_instructions"
-                app:showAsAction="never" />
-
-            <item
-                android:id="@+id/app_instructions"
-                android:title="@string/app_instructions"
-                app:showAsAction="never" />
-        </menu>
     </item>
 
 </menu>

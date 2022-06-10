@@ -13,6 +13,8 @@ import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -28,6 +30,7 @@ import java.util.concurrent.Future;
 
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
+import de.th.ro.datavis.instructions.ImportInstructionsActivity;
 import de.th.ro.datavis.interpreter.csv.MetadataInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
@@ -74,6 +77,24 @@ public class ImportActivity extends BaseActivity{
         ffsService = new FFSService(new FFSInterpreter(), this);
 
         setDefaultAntennaData();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)  {
+        getMenuInflater().inflate(R.menu.menu_import, menu);
+
+        MenuItem itemImportInstructions = menu.findItem(R.id.import_instructions);
+
+        itemImportInstructions.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                // switch to import instructions
+                Intent intent = new Intent(getApplicationContext(), ImportInstructionsActivity.class);
+                startActivity(intent);
+                return false;
+            }
+        });
+        return true;
     }
 
     @Override

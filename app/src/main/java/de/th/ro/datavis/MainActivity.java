@@ -55,7 +55,6 @@ public class MainActivity extends BaseActivity{
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         MenuItem itemAbout = menu.findItem(R.id.about);
-        MenuItem itemImportInstructions = menu.findItem(R.id.import_instructions);
         MenuItem itemAppInstructions = menu.findItem(R.id.app_instructions);
         //replace these two with actuall buttons
 
@@ -64,18 +63,6 @@ public class MainActivity extends BaseActivity{
             public boolean onMenuItemClick(MenuItem menuItem) {
                 // switch to about
                 Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
-                startActivity(intent);
-
-                return false;
-            }
-        });
-
-        itemImportInstructions.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                // switch to import instructions
-
-                Intent intent = new Intent(getApplicationContext(), ImportInstructionsActivity.class);
                 startActivity(intent);
 
                 return false;

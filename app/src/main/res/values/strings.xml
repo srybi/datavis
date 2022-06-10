@@ -62,8 +62,7 @@
 
     <!-- Instructions -->
     <string name="app_instructions_text">1) Press the Checkboxes of the antennas you want to display\n\n2) Press the button \'Open In AR\'\n\n3) Use the Bottom Sheet to get more information about the field strength of the antenna and to change frequency and tilt</string>
-    <string name="import_instructions_text">1) Press the menu icon in the top right corner\n\n2) Press \'Import\'\n\n3) Select an existing antenna or add a new one\n\n4) Add Metadata and .ffs files</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="import_instructions_text">1) Press \'⌄\' to select an existing configuration\nor \'+\' to add a new one\n\n2) *OPTOINAL*\nChange the name by clicking on it\n\n3) If you want to use a custom antenna,\nadd one by clicking on \'ADD ANTENNA\',\notherwise click on \'ADD DEFAULT\'\n\n4) Add Metadata and .ffs files</string>
 
     <!-- about -->
     <string name="about">About</string>
@@ -79,5 +78,7 @@
     <string name="clear_one_confirm">Delete</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
 
 </resources>
