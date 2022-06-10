@@ -75,7 +75,6 @@ public class ARActivity extends BaseActivity implements
     private TransformableNode middleNode;
     private int antennaId;
     private String antennaURI;
-    private InterpretationMode interpretationMode;
     private String TAG = "ARActivity";
     private final AppDatabase db = AppDatabase.getInstance(this);
 
@@ -108,12 +107,6 @@ public class ARActivity extends BaseActivity implements
         Bundle b = getIntent().getExtras();
         antennaId = b.getInt("antennaId");
         antennaURI = b.getString("antennaURI");
-        String modeString = b.getString("interpretationMode");
-        if(modeString.equals("Linear")){
-            interpretationMode = InterpretationMode.Linear;
-        }else{
-            interpretationMode = InterpretationMode.Logarithmic;
-        }
         List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, 2, InterpretationMode.Logarithmic);
         bottomSheet = new BottomSheet(this, frequencies);
         bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
