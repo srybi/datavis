@@ -102,8 +102,13 @@ public class FFSInterpreter implements IInterpreter {
                     findNextAtomicField(reader);
             }
 
-            ArrayList<AtomicField> atomicFieldsLog = interpretValues(values,frequencyValues, tiltValues, scalingFactor, InterpretationMode.Logarithmic, antennaId);
-            ArrayList<AtomicField> atomicFieldsLin = interpretValues(values,frequencyValues, tiltValues, scalingFactor, InterpretationMode.Linear, antennaId);
+            ArrayList<AtomicField> atomicFieldsLog = new ArrayList<AtomicField>();
+            ArrayList<AtomicField> atomicFieldsLin = new ArrayList<AtomicField>();
+
+            for (int tiltValue : tiltValues) {
+                atomicFieldsLog.addAll(interpretValues(values, frequencyValues, tiltValue, scalingFactor, InterpretationMode.Logarithmic, antennaId));
+                atomicFieldsLin.addAll(interpretValues(values, frequencyValues, tiltValue, scalingFactor, InterpretationMode.Linear, antennaId));
+            }
             Log.d(LOG_TAG, "Interpretation finished");
             return Result.success(Pair.create(atomicFieldsLog, atomicFieldsLin));
 
@@ -132,9 +137,8 @@ public class FFSInterpreter implements IInterpreter {
         return frequencyValues;
     }
 
-    private ArrayList<AtomicField> interpretValues(ArrayList<ArrayList<String>> values, ArrayList<Double> frequencies, ArrayList<Integer> tilts, double scalingFactor, InterpretationMode mode, int antennaId) throws FFSInterpretException {
+    private ArrayList<AtomicField> interpretValues(ArrayList<ArrayList<String>> values, ArrayList<Double> frequencies, int tilt, double scalingFactor, InterpretationMode mode, int antennaId) throws FFSInterpretException {
         ArrayList<AtomicField> atomicFields = new ArrayList<>();
-        for (int tilt : tilts) {
             for (Pair<ArrayList<String>, Double> pair : Helper.zip(values, frequencies)) {
                 Result<AtomicField> atomicField = interpretValue(pair.first, scalingFactor, mode);
                 AtomicField field = atomicField.getData();
@@ -145,7 +149,6 @@ public class FFSInterpreter implements IInterpreter {
                 field.setAntennaId(antennaId);
                 atomicFields.add(field);
             }
-        }
         return atomicFields;
     }
 
