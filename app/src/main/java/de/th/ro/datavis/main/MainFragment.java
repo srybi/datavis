@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -112,7 +113,7 @@ public class MainFragment extends BaseFragment {
                 Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
                 Antenna item = antennas.getValue().get(i);
                 intent.putExtra("antennaId", item.id);
-                intent.putExtra("antennaURI", item.uri);
+                intent.putExtra("antennaURI", checkAntenna(item));
                 getActivity().startActivity(intent);
             }
         });
@@ -151,6 +152,16 @@ public class MainFragment extends BaseFragment {
             }
         });
 
+    }
+
+    private String checkAntenna(Antenna item){
+        if(item.uri == null){
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "No antenna model to display. Showing default", Toast.LENGTH_LONG).show();
+            return "models/datavis_antenna_asm.glb";
+        }else{
+            return item.uri;
+        }
     }
 
 
