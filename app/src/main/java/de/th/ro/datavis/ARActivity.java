@@ -35,6 +35,7 @@ import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -110,7 +111,6 @@ public class ARActivity extends BaseActivity implements
         antennaURI = b.getString("antennaURI");
         List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, 2, InterpretationMode.Logarithmic);
         ffsAvailable = frequencies.size() != 0;
-        Log.d(TAG, "onCreate: " + ffsAvailable);
         //only initialize bottom sheet, if there is a ffs data to manipulate
         if(ffsAvailable){
             bottomSheet = new BottomSheet(this, frequencies);
@@ -124,6 +124,7 @@ public class ARActivity extends BaseActivity implements
 
         buildAntennaModel();
         buildSpheres();
+        Log.d(TAG, "onCreate: " + renderableList.size());
 
     }
 
@@ -154,22 +155,39 @@ public class ARActivity extends BaseActivity implements
     }
 
     private void buildAntennaModel(){
-        Log.d(TAG, "buildAntennaModel: "+ antennaURI);
-        ModelRenderable.builder()
-                .setSource(this, Uri.parse(antennaURI))
-                .setIsFilamentGltf(true)
-                .setAsyncLoadEnabled(true)
-                .build()
-                .thenAccept(model -> {
-                    renderableList.put("antenne", model);
-                    Log.d(TAG, "Antenna model done");
-                })
-                .exceptionally(throwable -> {
-                    Log.d(TAG, "buildAntennaModel: Failed to build antenna model" + throwable.getMessage());
-                    Toast.makeText(
-                            this, "Unable to load model", Toast.LENGTH_LONG).show();
-                    return null;
-                });
+            Log.d(TAG, "buildAntennaModel: "+ antennaURI);
+            ModelRenderable.builder()
+                    .setSource(this, Uri.parse(antennaURI))
+                    .setIsFilamentGltf(true)
+                    .setAsyncLoadEnabled(true)
+                    .build()
+                    .thenAccept(model -> {
+                        renderableList.put("antenne", model);
+                        Log.d(TAG, "Antenna model done");
+                    })
+                    .exceptionally(throwable -> {
+                        throwable.printStackTrace();
+                        Log.d(TAG, "buildAntennaModel: Failed to build antenna model" + throwable.getMessage());
+                        buildDefaultModel();
+                        return null;
+                    });
+    }
+
+    private void buildDefaultModel(){
+            Log.d(TAG, "building default model");
+            ModelRenderable.builder()
+                    .setSource(this, Uri.parse("models/datavis_antenna_asm.glb"))
+                    .setIsFilamentGltf(true)
+                    .setAsyncLoadEnabled(true)
+                    .build()
+                    .thenAccept(model -> {
+                        handleCorruptGLB(model);
+                        Log.d(TAG, "Antenna model done");
+                    }).exceptionally(throwable -> {
+                         throwable.printStackTrace();
+                         Log.d(TAG, "buildAntennaModel: Failed to build default model" + throwable.getMessage());
+                        return null;
+            });
     }
 
     private void buildSpheres(){
@@ -270,9 +288,28 @@ public class ARActivity extends BaseActivity implements
         model.getScaleController().setMaxScale(0.20f);
         model.getScaleController().setMinScale(0.15f);
         model.setParent(anchorNode);
+
+        try{
+            model.setRenderable(renderable)
+                    .animate(true).start();
+        }catch(IllegalStateException e){
+            Log.e(TAG, "attachAntennaToAnchorNode: failed because of corrupt glb file");
+            Toast.makeText(this, "Found corrupt .glb file! Displaying default antenna", Toast.LENGTH_LONG).show();
+            anchorNode.removeChild(model);
+            buildDefaultModel();
+        }finally {
+            model.select();
+        }
+    }
+
+    private void handleCorruptGLB(Renderable renderable){
+        TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
+        model.getScaleController().setMaxScale(0.20f);
+        model.getScaleController().setMinScale(0.15f);
+        model.setParent(anchorNode);
         model.setRenderable(renderable)
                 .animate(true).start();
-        model.select();
+                model.select();
     }
 
 
