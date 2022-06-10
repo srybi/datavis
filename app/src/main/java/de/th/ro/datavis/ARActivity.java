@@ -76,6 +76,7 @@ public class ARActivity extends BaseActivity implements
     private int antennaId;
     private String antennaURI;
     private String TAG = "ARActivity";
+    private boolean ffsAvailable;
     private final AppDatabase db = AppDatabase.getInstance(this);
 
     private LiveData<List<MetaData>> sqlQueryMetadata;
@@ -108,9 +109,18 @@ public class ARActivity extends BaseActivity implements
         antennaId = b.getInt("antennaId");
         antennaURI = b.getString("antennaURI");
         List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, 2, InterpretationMode.Logarithmic);
-        bottomSheet = new BottomSheet(this, frequencies);
-        bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
-        gestureDetector = new GestureDetector(this, bottomSheetHandler);
+        ffsAvailable = frequencies.size() != 0;
+        Log.d(TAG, "onCreate: " + ffsAvailable);
+        //only initialize bottom sheet, if there is a ffs data to manipulate
+        if(ffsAvailable){
+            bottomSheet = new BottomSheet(this, frequencies);
+            bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
+            gestureDetector = new GestureDetector(this, bottomSheetHandler);
+        }else{
+            Toast.makeText(
+                    this, "No ffs data to display!", Toast.LENGTH_LONG).show();
+        }
+
 
         buildAntennaModel();
         buildSpheres();
@@ -171,6 +181,7 @@ public class ARActivity extends BaseActivity implements
                                 renderableList.put(intensityColor.getName() + "Sphere", sphere);
                             });
         }
+        Log.d(TAG, "buildSpheres: done");
     }
 
     private List<Sphere> loadCoordinates(InterpretationMode mode, double frequency, int tilt){
@@ -183,6 +194,7 @@ public class ARActivity extends BaseActivity implements
             coordinates = field.spheres;
 
         } catch(Exception e){
+            Log.e(TAG, "loadCoordinates: " + e.getMessage() );
             Toast.makeText(this, "Unable to load the coordinates from the database.", Toast.LENGTH_SHORT).show();
             return new ArrayList<Sphere>();
         }
@@ -202,24 +214,29 @@ public class ARActivity extends BaseActivity implements
     @Override
     public void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
         Log.d(TAG, "Plane Tab");
-
         // Create the Anchor.
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
         //saving the anchorNode for removing later
         this.anchorNode = anchorNode;
         anchorNode.setParent(arFragment.getArSceneView().getScene());
+        List<Sphere> list = new ArrayList<>();
 
-        // AntennaId hardcoded, since its is currently not possible to choose an antenna
-        List<Sphere> list = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
+        if(ffsAvailable){
+            list = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
+        }
+
         processRenderList(anchorNode, renderableList, list);
-        bottomSheetHandler.makeCueVisible(true);
 
-        //Initializes Metadata
-        try { readMetaDataFromDB(); } catch (Exception e) { e.printStackTrace();}
-        createMetaDataObserver();
 
-        bottomSheet.subscribe(this);
+        if(ffsAvailable){
+            //Initializes Metadata
+            Log.d(TAG, "onTapPlane: Initilizing metadata");
+            try { readMetaDataFromDB(); } catch (Exception e) { e.printStackTrace();}
+            createMetaDataObserver();
+            bottomSheetHandler.makeCueVisible(true);
+            bottomSheet.subscribe(this);
+        }
 
     }
 
@@ -231,16 +248,21 @@ public class ARActivity extends BaseActivity implements
         middleNode = new TransformableNode(arFragment.getTransformationSystem());
         middleNode.setParent(anchorNode);
 
+        if(ffsAvailable){
+            proccessCoordList(middleNode, list, coords);
+        }
+        Log.d(TAG, "Processing RenderList Done");
+    }
+
+    private void proccessCoordList(TransformableNode middle,  Map<String, Renderable> list, List<Sphere> coords){
         scalingFactor = calcScalingFactor(maxIntensity);
         Log.d(TAG, "ScalingFactor " + scalingFactor);
         int i = 0;
         for(Sphere s : coords){
             FFSIntensityColor intensityColor = ffsService.mapToColor(s.getIntensity(), maxIntensity);
-            attachSphereToAnchorNode(middleNode, list.get(intensityColor.getName()+"Sphere"), s, scalingFactor);
+            attachSphereToAnchorNode(middle, list.get(intensityColor.getName()+"Sphere"), s, scalingFactor);
             i++;
-            //Log.d(TAG, "processRenderList: proccessing #" + i);
         }
-        Log.d(TAG, "Processing RenderList Done");
     }
 
     private void attachAntennaToAnchorNode(AnchorNode anchorNode, Renderable renderable) {
@@ -270,6 +292,10 @@ public class ARActivity extends BaseActivity implements
      * @return a ScalingFactor based on the maxIntensity
      */
     private float calcScalingFactor(double maxIntensity){
+        if(maxIntensity == -1){
+            Log.d(TAG, "calcScalingFactor: There is no ffs data");
+            return -1 ;
+        }
 
         float target = 0.5f;
         float factor = (float) (target / maxIntensity);
@@ -298,13 +324,17 @@ public class ARActivity extends BaseActivity implements
     //Used for gestureDetection
     @Override
     public boolean onTouchEvent(MotionEvent event){
-        gestureDetector.onTouchEvent(event);
+        if(ffsAvailable){
+            this.gestureDetector.onTouchEvent(event);
+        }
         return super.onTouchEvent(event);
     }
     //Used for gestureDetection
     @Override
     public boolean dispatchTouchEvent(MotionEvent event){
-        this.gestureDetector.onTouchEvent(event);
+        if(ffsAvailable){
+            this.gestureDetector.onTouchEvent(event);
+        }
         return super.dispatchTouchEvent(event);
     }
 
@@ -316,7 +346,6 @@ public class ARActivity extends BaseActivity implements
      *      this is done by String matching the [Metadata type] to the [TextView ID]
      */
     private void readMetaDataFromDB(){
-        //TODO: Antenna Hardcoded
         sqlQueryMetadata = db.metadataDao().findAll_Background(antennaId,bottomSheet.getFrequency(),bottomSheet.getTilt());
         Log.d(TAG, "sqlQueryMetadata built "+sqlQueryMetadata.toString());
     }
