@@ -16,10 +16,7 @@
         android:layout_gravity="fill"
         android:textStyle="bold" />
 
-    <View
-        android:layout_width="1dp"
-        android:layout_height="fill_parent"
-        android:background="gra" />
+    <View style="@style/VerticalDivider" />
 
 
     <TextView
@@ -29,6 +26,9 @@
         android:layout_weight="1"
         android:gravity="start"
         android:layout_gravity="fill" />
+
+    <View style="@style/VerticalDivider" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,6 +36,9 @@
         android:layout_weight="1"
         android:gravity="start"
         android:layout_gravity="fill" />
+
+    <View style="@style/VerticalDivider" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

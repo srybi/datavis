@@ -39,7 +39,7 @@ public class FileHandler {
             case FileRequests.REQUEST_CODE_FFS:
                 return checkExtension(resolver, uri, new String[]{".ffs"});
             case FileRequests.REQUEST_CODE_METADATA:
-                return checkMime(resolver, uri, new String[]{"text/comma-separated-values"});
+                return checkMime(resolver, uri, new String[]{"text/comma-separated-values", "text/csv"});
             case FileRequests.REQUEST_CODE_METADATAFOLDER:
                 return true;
             default: throw new RuntimeException();

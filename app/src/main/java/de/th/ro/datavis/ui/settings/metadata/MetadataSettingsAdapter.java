@@ -43,9 +43,9 @@ public class MetadataSettingsAdapter extends ArrayAdapter<MetaData> {
         TextView tvTilt = (TextView) convertView.findViewById(R.id.text_view_metadata_tilt);
         tvTilt.setText("Tilt: "+data.tilt);
         TextView tvType = (TextView) convertView.findViewById(R.id.text_view_metadata_type);
-        tvType.setText("Type: "+data.type);
+        tvType.setText(data.type);
         TextView tvValue = (TextView) convertView.findViewById(R.id.text_view_metadata_value);
-        tvValue.setText("Value: "+data.value);
+        tvValue.setText(data.value);
 
         ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.button_metadata_delete);
         View finalConvertView = convertView;
