@@ -13,7 +13,7 @@
     <!-- Misc -->
     <string name="antenna">Antenna</string>
     <string name="metaData">Metadata</string>
-    <string name="metaDataIndicator">No Metadata</string>
+    <string name="metaDataIndicator">Metadata Imported</string>
     <string name="farFieldSource">Farfield Source</string>
 
     <!-- Main -->
@@ -46,7 +46,7 @@
     <string name="btn_add_default">Add Default</string>
     <string name="btn_add_new_antenna">Add antenna</string>
     <string name="btn_add_metaData">Add Metadata</string>
-    <string name="btn_add_metaFolder">Add MetadataFolder</string>
+    <string name="btn_add_metaFolder">Add Metadata Folder</string>
     <string name="btn_add_ffs">Add FFS</string>
     <string name="apply_changes">Apply Changes</string>
     <string name="log">Log</string>
@@ -54,6 +54,10 @@
     <string name="toastInvalidAntenna">Not a valid Antenna!</string>
     <string name="toastInvalidFFS">Not a valid .ffs File!</string>
     <string name="toastInvalidMetadata">Not a valid .csv Metadata file!</string>
+    <string name="toastValidMetadata">Metadata File imported</string>
+    <string name="toastValidMetadataFolder">Metadata Folder imported</string>
+    <string name="toastRedundantMetadata">Metadata already read!</string>
+
 
     <!-- Instructions -->
     <string name="app_instructions_text">1) Press the Checkboxes of the antennas you want to display\n\n2) Press the button \'Open In AR\'\n\n3) Use the Bottom Sheet to get more information about the field strength of the antenna and to change frequency and tilt</string>

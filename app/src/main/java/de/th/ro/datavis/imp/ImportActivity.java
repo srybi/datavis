@@ -208,13 +208,22 @@ public class ImportActivity extends BaseActivity{
                             break;
                         case FileRequests.REQUEST_CODE_METADATA:
                             if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
-                                persistMetadata(appDb, uri);
+                                //If Metadata with the same Primary Key are read, it runs into a System.err and is caught here
+                                try{
+                                    persistMetadata(appDb, uri);
+                                    showToast(getString(R.string.toastValidMetadata));
+                                } catch (Exception e) {
+                                    Log.e(TAG, "Metadata already inserted - PK Error: " + e.getMessage());
+                                    showToast(getString(R.string.toastRedundantMetadata));
+                                }
                             } else {
                                 showToast(getString(R.string.toastInvalidMetadata));
                             }
                             break;
                         case FileRequests.REQUEST_CODE_METADATAFOLDER:
+                            //Currently does not return whether any files from the Folder were imported
                             persistMetadataFolder(appDb, uri);
+                            showToast(getString(R.string.toastValidMetadataFolder));
                             break;
                         default: throw new RuntimeException();
                     }
