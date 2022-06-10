@@ -26,6 +26,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.navigation.fragment.DialogFragmentNavigatorDestinationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ import static android.os.Build.VERSION.SDK_INT;
 
 public class MainFragment extends BaseFragment {
 
+    private final String TAG = "MainFragment";
     private AppDatabase appDb;
 
     private ListView listView;
@@ -103,28 +105,14 @@ public class MainFragment extends BaseFragment {
 
     private void findListView() {
         listView = getActivity().findViewById(R.id.list_antenna_fields);
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
-                Antenna item = antennas.getValue().get(i);
-                intent.putExtra("antennaId", item.id);
-                intent.putExtra("antennaURI", item.uri);
-                intent.putExtra("interpretationMode", "Linear");
-                getActivity().startActivity(intent);
-
-                return true;
-            }
-        });
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.d(TAG, "onItemClick: Clicked on item");
                 Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
                 Antenna item = antennas.getValue().get(i);
                 intent.putExtra("antennaId", item.id);
                 intent.putExtra("antennaURI", item.uri);
-                intent.putExtra("interpretationMode", "Logarithmic");
                 getActivity().startActivity(intent);
             }
         });
