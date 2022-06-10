@@ -5,6 +5,7 @@ import static android.os.Build.VERSION.SDK_INT;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteConstraintException;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -343,9 +344,13 @@ public class ImportActivity extends BaseActivity{
         ArrayList<Uri> listUri = metaInt.traverseDirectoryEntries(rootUri, this.getContentResolver());
         Log.d(TAG, "directory list length: "+listUri.size());
         for(Uri u: listUri){
-            //String nameUri = FileHandler.queryName(getContentResolver(), u);
             Log.d(TAG, "persisting Uri: " +u.toString());
-            persistMetadata(appDb, u);
+            try{
+                persistMetadata(appDb, u);
+            } catch (SQLiteConstraintException sq){
+                //If single Metadata was added manually before, RoomDB won't let it added
+                Log.d(TAG, "Metadata already inserted - PK Error: " + sq.getMessage());
+            }
         }
     }
 
