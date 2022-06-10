@@ -178,8 +178,8 @@ public class ImportActivity extends BaseActivity{
 
     /**
      * Handles a chosen file and stores it (using a background thread)
-     * @param data
-     * @param requestCode
+     * Uses the requestCode to find the correct Method to parse the data
+     * FileHandler checks the file for validity
      * @return
      */
     public Runnable getHandelResultRunnable(Intent data, int requestCode){
@@ -188,29 +188,45 @@ public class ImportActivity extends BaseActivity{
             public void run() {
                 try {
                     Uri uri = data.getData();
-
                     AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
-
-                    if (requestCode == FileRequests.REQUEST_CODE_ANTENNA){
-                        String name = FileHandler.queryName( getContentResolver(), uri);
-                        updateAntenna(appDb, uri, name);
-                    } else if(requestCode == FileRequests.REQUEST_CODE_FFS) {
-                        String name = FileHandler.queryName( getContentResolver(), uri);
-                        persistFFS(appDb, uri, name, data);
-                    } else if(requestCode == FileRequests.REQUEST_CODE_METADATA) {
-                        persistMetadata(appDb, uri);
-                    } else {
-                        persistMetadataFolder(appDb, uri);
+                    switch (requestCode) {
+                        case FileRequests.REQUEST_CODE_ANTENNA:
+                            String antennaName = FileHandler.queryName(getContentResolver(), uri);
+                            if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
+                                updateAntenna(appDb, uri, antennaName);
+                            } else {
+                                showToast(getString(R.string.toastInvalidAntenna));
+                            }
+                            break;
+                        case FileRequests.REQUEST_CODE_FFS:
+                            String ffsName = FileHandler.queryName( getContentResolver(), uri);
+                            if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
+                                persistFFS(appDb, uri, ffsName, data);
+                            } else {
+                                showToast(getString(R.string.toastInvalidFFS));
+                            }
+                            break;
+                        case FileRequests.REQUEST_CODE_METADATA:
+                            if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
+                                persistMetadata(appDb, uri);
+                            } else {
+                                showToast(getString(R.string.toastInvalidMetadata));
+                            }
+                            break;
+                        case FileRequests.REQUEST_CODE_METADATAFOLDER:
+                            persistMetadataFolder(appDb, uri);
+                            break;
+                        default: throw new RuntimeException();
                     }
-
-                }catch(Exception e){
-                    //TODO: Improve exception handling
+                } catch(Exception e){
                     e.printStackTrace();
                     Log.e(TAG, "Exception " + e.getMessage());
                 }
             }
         };
     }
+
+
 
     public Runnable getSetDefaultAntennaRunnable(){
         return new Runnable() {
@@ -310,7 +326,7 @@ public class ImportActivity extends BaseActivity{
         handleNewlyInsertedMetadata(appDb);
     }
 
-    /*
+    /**
      * Calls MetadataInterpreter to iterate through files in a folder
      * Calls persistMetadata
      */
@@ -497,5 +513,13 @@ public class ImportActivity extends BaseActivity{
         }
     }
 
+    /**
+     * Utility method to call Toasts in UI Thread
+     * @param toast
+     */
+    public void showToast(final String toast)
+    {
+        runOnUiThread(() -> Toast.makeText(this, toast, Toast.LENGTH_SHORT).show());
+    }
 
 }

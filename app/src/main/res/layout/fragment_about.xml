@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".instructions.ImportInstructionsFragment"
+    tools:context=".about.AboutFragment"
     android:orientation="vertical"
 
     >
@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="@string/import_instructions"
+        android:text="@string/datavis"
         style="@style/HeadLine"
         />
     <TextView
@@ -21,6 +21,6 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:textSize="20sp"
-        android:text="@string/import_instructions_text"
+        android:text="@string/about_text"
         />
 </LinearLayout>

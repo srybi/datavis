@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,10 +15,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Config;
 import com.google.ar.core.HitResult;
@@ -37,6 +34,7 @@ import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,11 +76,13 @@ public class ARActivity extends BaseActivity implements
     private TransformableNode middleNode;
     private int antennaId;
     private String antennaURI;
-    private InterpretationMode interpretationMode;
-    private String TAG = "myTag";
+    private String TAG = "ARActivity";
+    private boolean ffsAvailable;
     private final AppDatabase db = AppDatabase.getInstance(this);
 
-    private LiveData<MetaData> HHPBW_deg, VHPBW_deg, Directivity_dBi = new MutableLiveData<>();
+    private LiveData<List<MetaData>> sqlQueryMetadata;
+    private Observer<List<MetaData>> sqlMetadataObs;
+    //private LiveData<MetaData> HHPBW_deg, VHPBW_deg, Directivity_dBi = new MutableLiveData<>();
 
     private double maxIntensity = -1;
     private float scalingFactor = 1;
@@ -109,27 +109,23 @@ public class ARActivity extends BaseActivity implements
         Bundle b = getIntent().getExtras();
         antennaId = b.getInt("antennaId");
         antennaURI = b.getString("antennaURI");
-        String modeString = b.getString("interpretationMode");
-        if(modeString.equals("Linear")){
-            interpretationMode = InterpretationMode.Linear;
-        }else{
-            interpretationMode = InterpretationMode.Logarithmic;
-        }
         List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, 2, InterpretationMode.Logarithmic);
-        bottomSheet = new BottomSheet(this, frequencies);
-        bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
-        gestureDetector = new GestureDetector(this, bottomSheetHandler);
+        ffsAvailable = frequencies.size() != 0;
+        //only initialize bottom sheet, if there is a ffs data to manipulate
+        if(ffsAvailable){
+            bottomSheet = new BottomSheet(this, frequencies);
+            bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
+            gestureDetector = new GestureDetector(this, bottomSheetHandler);
+        }else{
+            Toast.makeText(
+                    this, "No ffs data to display!", Toast.LENGTH_LONG).show();
+        }
 
-        //TODO
-        try {
-            readMetaDataFromDB();
-        } catch (Exception e) { e.printStackTrace();}
-        //Create Observer for Metadata
-
-        createMetaDataObserver();
 
         buildAntennaModel();
         buildSpheres();
+        Log.d(TAG, "onCreate: " + renderableList.size());
+
     }
 
     @Override
@@ -159,22 +155,39 @@ public class ARActivity extends BaseActivity implements
     }
 
     private void buildAntennaModel(){
-        Log.d(TAG, "buildAntennaModel: "+ antennaURI);
-        ModelRenderable.builder()
-                .setSource(this, Uri.parse(antennaURI))
-                .setIsFilamentGltf(true)
-                .setAsyncLoadEnabled(true)
-                .build()
-                .thenAccept(model -> {
-                    renderableList.put("antenne", model);
-                    Log.d(TAG, "Antenna model done");
-                })
-                .exceptionally(throwable -> {
-                    Log.d(TAG, "buildAntennaModel: Failed to build antenna model" + throwable.getMessage());
-                    Toast.makeText(
-                            this, "Unable to load model", Toast.LENGTH_LONG).show();
-                    return null;
-                });
+            Log.d(TAG, "buildAntennaModel: "+ antennaURI);
+            ModelRenderable.builder()
+                    .setSource(this, Uri.parse(antennaURI))
+                    .setIsFilamentGltf(true)
+                    .setAsyncLoadEnabled(true)
+                    .build()
+                    .thenAccept(model -> {
+                        renderableList.put("antenne", model);
+                        Log.d(TAG, "Antenna model done");
+                    })
+                    .exceptionally(throwable -> {
+                        throwable.printStackTrace();
+                        Log.d(TAG, "buildAntennaModel: Failed to build antenna model" + throwable.getMessage());
+                        buildDefaultModel();
+                        return null;
+                    });
+    }
+
+    private void buildDefaultModel(){
+            Log.d(TAG, "building default model");
+            ModelRenderable.builder()
+                    .setSource(this, Uri.parse("models/datavis_antenna_asm.glb"))
+                    .setIsFilamentGltf(true)
+                    .setAsyncLoadEnabled(true)
+                    .build()
+                    .thenAccept(model -> {
+                        handleCorruptGLB(model);
+                        Log.d(TAG, "Antenna model done");
+                    }).exceptionally(throwable -> {
+                         throwable.printStackTrace();
+                         Log.d(TAG, "buildAntennaModel: Failed to build default model" + throwable.getMessage());
+                        return null;
+            });
     }
 
     private void buildSpheres(){
@@ -186,6 +199,7 @@ public class ARActivity extends BaseActivity implements
                                 renderableList.put(intensityColor.getName() + "Sphere", sphere);
                             });
         }
+        Log.d(TAG, "buildSpheres: done");
     }
 
     private List<Sphere> loadCoordinates(InterpretationMode mode, double frequency, int tilt){
@@ -198,6 +212,7 @@ public class ARActivity extends BaseActivity implements
             coordinates = field.spheres;
 
         } catch(Exception e){
+            Log.e(TAG, "loadCoordinates: " + e.getMessage() );
             Toast.makeText(this, "Unable to load the coordinates from the database.", Toast.LENGTH_SHORT).show();
             return new ArrayList<Sphere>();
         }
@@ -217,19 +232,30 @@ public class ARActivity extends BaseActivity implements
     @Override
     public void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
         Log.d(TAG, "Plane Tab");
-
         // Create the Anchor.
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
         //saving the anchorNode for removing later
         this.anchorNode = anchorNode;
         anchorNode.setParent(arFragment.getArSceneView().getScene());
+        List<Sphere> list = new ArrayList<>();
 
-        // AntennaId hardcoded, since its is currently not possible to choose an antenna
-        List<Sphere> list = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
+        if(ffsAvailable){
+            list = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
+        }
+
         processRenderList(anchorNode, renderableList, list);
-        bottomSheetHandler.makeCueVisible(true);
-        bottomSheet.subscribe(this);
+
+
+        if(ffsAvailable){
+            //Initializes Metadata
+            Log.d(TAG, "onTapPlane: Initilizing metadata");
+            try { readMetaDataFromDB(); } catch (Exception e) { e.printStackTrace();}
+            createMetaDataObserver();
+            bottomSheetHandler.makeCueVisible(true);
+            bottomSheet.subscribe(this);
+        }
+
     }
 
 
@@ -240,16 +266,21 @@ public class ARActivity extends BaseActivity implements
         middleNode = new TransformableNode(arFragment.getTransformationSystem());
         middleNode.setParent(anchorNode);
 
+        if(ffsAvailable){
+            proccessCoordList(middleNode, list, coords);
+        }
+        Log.d(TAG, "Processing RenderList Done");
+    }
+
+    private void proccessCoordList(TransformableNode middle,  Map<String, Renderable> list, List<Sphere> coords){
         scalingFactor = calcScalingFactor(maxIntensity);
         Log.d(TAG, "ScalingFactor " + scalingFactor);
         int i = 0;
         for(Sphere s : coords){
             FFSIntensityColor intensityColor = ffsService.mapToColor(s.getIntensity(), maxIntensity);
-            attachSphereToAnchorNode(middleNode, list.get(intensityColor.getName()+"Sphere"), s, scalingFactor);
+            attachSphereToAnchorNode(middle, list.get(intensityColor.getName()+"Sphere"), s, scalingFactor);
             i++;
-            //Log.d(TAG, "processRenderList: proccessing #" + i);
         }
-        Log.d(TAG, "Processing RenderList Done");
     }
 
     private void attachAntennaToAnchorNode(AnchorNode anchorNode, Renderable renderable) {
@@ -257,9 +288,28 @@ public class ARActivity extends BaseActivity implements
         model.getScaleController().setMaxScale(0.20f);
         model.getScaleController().setMinScale(0.15f);
         model.setParent(anchorNode);
+
+        try{
+            model.setRenderable(renderable)
+                    .animate(true).start();
+        }catch(IllegalStateException e){
+            Log.e(TAG, "attachAntennaToAnchorNode: failed because of corrupt glb file");
+            Toast.makeText(this, "Found corrupt .glb file! Displaying default antenna", Toast.LENGTH_LONG).show();
+            anchorNode.removeChild(model);
+            buildDefaultModel();
+        }finally {
+            model.select();
+        }
+    }
+
+    private void handleCorruptGLB(Renderable renderable){
+        TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
+        model.getScaleController().setMaxScale(0.20f);
+        model.getScaleController().setMinScale(0.15f);
+        model.setParent(anchorNode);
         model.setRenderable(renderable)
                 .animate(true).start();
-        model.select();
+                model.select();
     }
 
 
@@ -279,6 +329,10 @@ public class ARActivity extends BaseActivity implements
      * @return a ScalingFactor based on the maxIntensity
      */
     private float calcScalingFactor(double maxIntensity){
+        if(maxIntensity == -1){
+            Log.d(TAG, "calcScalingFactor: There is no ffs data");
+            return -1 ;
+        }
 
         float target = 0.5f;
         float factor = (float) (target / maxIntensity);
@@ -290,28 +344,68 @@ public class ARActivity extends BaseActivity implements
     @Override
     public void update() {
         Log.d(TAG, "update: the bottomsheet called an update");
+        deleteAllSpheres();
 
-        deleteAllSheres();
+        //Metadaten werden neu geladen
+        sqlQueryMetadata = db.metadataDao().findAll_Background(antennaId,bottomSheet.getFrequency(),bottomSheet.getTilt());
+        sqlQueryMetadata.removeObservers(this);
+        createMetaDataObserver();
+
         processRenderList(anchorNode, renderableList, loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt()));
     }
 
-    private void deleteAllSheres(){
+    private void deleteAllSpheres(){
         anchorNode.removeChild(middleNode);
     }
 
     //Used for gestureDetection
     @Override
     public boolean onTouchEvent(MotionEvent event){
-        gestureDetector.onTouchEvent(event);
+        if(ffsAvailable){
+            this.gestureDetector.onTouchEvent(event);
+        }
         return super.onTouchEvent(event);
     }
     //Used for gestureDetection
     @Override
     public boolean dispatchTouchEvent(MotionEvent event){
-        this.gestureDetector.onTouchEvent(event);
+        if(ffsAvailable){
+            this.gestureDetector.onTouchEvent(event);
+        }
         return super.dispatchTouchEvent(event);
     }
 
+    /**
+     * Methods to display and update Metadata:
+     * readMetaDataFromDB() fetches a List of all available Metadata for a certain AntennaID, frequency and tilt
+     * createMetaDataObserver() assigns an Observer to check for updates in the LiveData
+     * updateMetaData() on a change goes through the List of available Metadata and for each tries to find a TextView to update
+     *      this is done by String matching the [Metadata type] to the [TextView ID]
+     */
+    private void readMetaDataFromDB(){
+        sqlQueryMetadata = db.metadataDao().findAll_Background(antennaId,bottomSheet.getFrequency(),bottomSheet.getTilt());
+        Log.d(TAG, "sqlQueryMetadata built "+sqlQueryMetadata.toString());
+    }
+
+    private void createMetaDataObserver(){
+        sqlMetadataObs  = changeMetaData -> { updateMetadata(changeMetaData);};
+        try {
+            sqlQueryMetadata.observe(this, sqlMetadataObs);
+        } catch (NullPointerException e) {}
+    }
+
+    private void updateMetadata(List<MetaData> changeMetaData){
+        for(MetaData m: changeMetaData) {
+            int resID = this.getResources().getIdentifier(("meta_" + m.getType()), "id", this.getPackageName());
+            try {
+                TextView textView = findViewById(resID);
+                textView.setText(m.getValue());
+                Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
+            } catch (Exception e) {
+            }
+        }
+    }
+    /*
     //Metadata reading
     private void readMetaDataFromDB(){
         HHPBW_deg = db.metadataDao().findByMetadata_Background(antennaId, bottomSheet.getFrequency(), bottomSheet.getTilt(), "HHPBW_deg");
@@ -345,5 +439,6 @@ public class ARActivity extends BaseActivity implements
             Directivity_dBi.setText("Directivity_dBi: " + changeMetaData.getValue());
         } catch (Exception e){ Log.d(TAG, "couldn't find directivity"); }
     }
+     */
 
 }

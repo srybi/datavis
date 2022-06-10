@@ -78,7 +78,9 @@ public class BottomSheet implements ISubject{
     private int tilt;
     private int changedTilt;
 
-    private LiveData<MetaData> Nullfill_dB, Squint_deg, Tilt_deg, TiltDeviation_deg = new MutableLiveData<>();
+
+    private LiveData<List<MetaData>> sqlQueryMetadata;
+    //private LiveData<MetaData> Nullfill_dB, Squint_deg, Tilt_deg, TiltDeviation_deg = new MutableLiveData<>();
 
 
     public InterpretationMode getMode(){
@@ -121,7 +123,6 @@ public class BottomSheet implements ISubject{
         } catch (Exception e) { e.printStackTrace();}
 
         //Create Observer for Metadata
-
         createMetaDataObserver(bottomSheetDialog);
 
         modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
@@ -243,6 +244,41 @@ public class BottomSheet implements ISubject{
         switchBtn.setChecked(isChecked);
     }
 
+    /**
+     * Methods to display and update Metadata:
+     * readMetaDataFromDB() fetches a List of all available Metadata for a certain AntennaID, frequency and tilt
+     * createMetaDataObserver() assigns an Observer to check for updates in the LiveData
+     * updateMetaData() on a change goes through the List of available Metadata and for each tries to find a TextView to update
+     *      this is done by String matching the [Metadata type] to the [TextView ID]
+     */
+    private void readMetaDataFromDB(){
+        //TODO: Antenna Hardcoded
+        sqlQueryMetadata = db.metadataDao().findAll_Background(20,frequency,tilt);
+        Log.d(TAG, "sqlQueryMetadata built "+sqlQueryMetadata.toString());
+    }
+
+    private void createMetaDataObserver(BottomSheetDialog bsd){
+        Observer<List<MetaData>> sqlMetadataObs = changeMetaData -> { updateMetadata(bsd, changeMetaData);};
+        sqlQueryMetadata.observe((AppCompatActivity)context, sqlMetadataObs);
+    }
+
+    private void updateMetadata(BottomSheetDialog bsd, List<MetaData> changeMetaData){
+        for(MetaData m: changeMetaData) {
+
+            int resID = context.getResources().getIdentifier(("meta_" + m.getType()), "id", context.getPackageName());
+            try {
+                TextView textView = bsd.findViewById(resID);
+                textView.setText(m.getValue());
+                Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
+            } catch (Exception e) {
+            }
+        }
+    }
+
+
+   //Obsolete and ugly
+
+    /*
     private void readMetaDataFromDB(){
         //TODO: AntennaID hardcoded
         Nullfill_dB = db.metadataDao().findByMetadata_Background(1, frequency, tilt, "Nullfill_dB");
@@ -287,6 +323,7 @@ public class BottomSheet implements ISubject{
             tiltDeviation_deg.setText(changeMetaData.getValue());
         } catch (Exception e){ Log.d(TAG, "couldn't find tiltdev"); }
     }
+ */
 
 
 
@@ -309,5 +346,8 @@ public class BottomSheet implements ISubject{
     }
     public int getTilt() {
         return this.tilt;
+    }
+    public Context getContext() {
+        return this.context;
     }
 }

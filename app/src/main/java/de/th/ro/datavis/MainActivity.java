@@ -16,6 +16,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import java.util.concurrent.Executors;
 
+import de.th.ro.datavis.about.AboutActivity;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.imp.ImportActivity;
 import de.th.ro.datavis.instructions.AppInstructionsActivity;
@@ -53,9 +54,21 @@ public class MainActivity extends BaseActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
+        MenuItem itemAbout = menu.findItem(R.id.about);
         MenuItem itemImportInstructions = menu.findItem(R.id.import_instructions);
         MenuItem itemAppInstructions = menu.findItem(R.id.app_instructions);
         //replace these two with actuall buttons
+
+        itemAbout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                // switch to about
+                Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
+                startActivity(intent);
+
+                return false;
+            }
+        });
 
         itemImportInstructions.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
