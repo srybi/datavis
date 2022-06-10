@@ -39,7 +39,6 @@ public class MetadataInterpreter {
                 m.add(new MetaData(0,0,"N/A"));
             }else{
                 InputStream in = c.openInputStream(uri);
-                Log.d(LOG_TAG, "Input Stream open");
                 m = getMetadataFromLines(interpretCSV(in));
                 //Set Type
                 String name = FileHandler.queryName(c, uri);
@@ -49,11 +48,9 @@ public class MetadataInterpreter {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            Log.d(LOG_TAG,"Input Stream read failed: " + e.getMessage());
         } catch(SecurityException se){
-            se.printStackTrace();
-            return null;
+            Log.d(LOG_TAG,"Permissions for Stream failed: " + se.getMessage());
         }
         return m;
     }
@@ -67,11 +64,11 @@ public class MetadataInterpreter {
         List<MetaData> mList = new ArrayList<>();
         for(int i=1; i<matrix.length; i++) {
             for(int j=1; j<matrix[i].length; j++) {
-                MetaData m = new MetaData(Double.parseDouble(matrix[i][0]),Integer.parseInt(matrix[0][j]),matrix[i][j]);
+                MetaData m = new MetaData(Double.parseDouble(matrix[i][0]),Double.parseDouble(matrix[0][j]),matrix[i][j]);
                 mList.add(m);
             }
         }
-        Log.d(LOG_TAG, "Finished making MetaData from matrix...");
+        Log.d(LOG_TAG, "Finished making MetaData from .csv matrix with "+ mList.size() + " entries");
         return mList;
     }
 
@@ -83,8 +80,6 @@ public class MetadataInterpreter {
     public String[][] interpretCSV(InputStream in) throws IOException {
         InputStreamReader reader = new InputStreamReader(in);
         BufferedReader br = new BufferedReader(reader);
-        Log.d(LOG_TAG, "Interpreting csv as matrix...");
-
         List<String[]> rowList = new ArrayList<>();
         try {
             String line;
@@ -100,7 +95,6 @@ public class MetadataInterpreter {
             String[] row = rowList.get(i);
             matrix[i] = row;
         }
-        Log.d(LOG_TAG, "Finished generating csv matrix...");
         return matrix;
     }
 

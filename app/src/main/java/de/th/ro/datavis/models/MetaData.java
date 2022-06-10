@@ -20,11 +20,11 @@ public class MetaData {
     public String type;
 
     public double freq;
-    public int tilt;
+    public double tilt;
     public String value;
 
     //ID, Tilt, Freq, Value
-    public MetaData(double freq, int tilt, String value) {
+    public MetaData(double freq, double tilt, String value) {
         this.freq = freq;
         this.tilt = tilt;
         this.value = value;
@@ -57,7 +57,7 @@ public class MetaData {
         this.freq = freq;
     }
 
-    public int getTilt() {
+    public double getTilt() {
         return tilt;
     }
 
