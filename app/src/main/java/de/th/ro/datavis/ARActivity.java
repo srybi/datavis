@@ -291,7 +291,7 @@ public class ARActivity extends BaseActivity implements
         deleteAllSpheres();
 
         //Metadaten werden neu geladen
-        sqlQueryMetadata = db.metadataDao().findAll_Background(20,bottomSheet.getFrequency(),bottomSheet.getTilt());
+        sqlQueryMetadata = db.metadataDao().findAll_Background(antennaId,bottomSheet.getFrequency(),bottomSheet.getTilt());
         sqlQueryMetadata.removeObservers(this);
         createMetaDataObserver();
 
@@ -324,7 +324,7 @@ public class ARActivity extends BaseActivity implements
      */
     private void readMetaDataFromDB(){
         //TODO: Antenna Hardcoded
-        sqlQueryMetadata = db.metadataDao().findAll_Background(20,bottomSheet.getFrequency(),bottomSheet.getTilt());
+        sqlQueryMetadata = db.metadataDao().findAll_Background(antennaId,bottomSheet.getFrequency(),bottomSheet.getTilt());
         Log.d(TAG, "sqlQueryMetadata built "+sqlQueryMetadata.toString());
     }
 
