@@ -45,8 +45,6 @@ public abstract class ImportView implements IImportOptions {
         initConfigName(fa, antenna);
         initAntennaHeadLine(fa, antenna);
         initListView(fa, fieldList);
-        initMetaDataIndicator(fa, metaData);
-
     }
 
     private void initListView(FragmentActivity fa, List<AntennaField> antennaFieldList){
@@ -100,24 +98,11 @@ public abstract class ImportView implements IImportOptions {
 
         String s = "Antenna " + antenna.filename;
         tvHeadLine.setText(s);
-
     }
-
-    private void initMetaDataIndicator(FragmentActivity fa, MetaData m){
-        tvMetaIndicator = fa.findViewById(R.id.tv_metadataHeadLine);
-        if (m == null){
-            tvMetaIndicator.setText(fa.getString(R.string.metaData));
-            return;
-        }
-        String s = fa.getString(R.string.metaDataIndicator);
-        tvMetaIndicator.setText(s);
-    }
-
 
     public void updateData(FragmentActivity fa, Antenna antenna, List<AntennaField> antennaFieldList, MetaData metaData){
         initAntennaHeadLine(fa, antenna);
         initListView(fa, antennaFieldList);
-        initMetaDataIndicator(fa, metaData);
     }
 
 
