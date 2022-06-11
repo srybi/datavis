@@ -33,16 +33,16 @@ public interface AtomicFieldDao {
     LiveData<List<AtomicField>> getAllAtomicFields();
 
     @Query("SELECT * from atomic_field WHERE interpretationMode = :interpretationMode AND antennaId = :antennaId AND tilt = :tilt AND frequency = :frequency")
-    LiveData<AtomicField> getAtomicFields(int antennaId, int tilt, double frequency, int interpretationMode);
+    LiveData<AtomicField> getAtomicFields(int antennaId, double tilt, double frequency, int interpretationMode);
 
     @Query("SELECT * from atomic_field WHERE interpretationMode = :interpretationMode AND antennaId = :antennaId AND tilt = :tilt AND frequency = :frequency")
-    AtomicField getAtomicFields_Background(int antennaId, int tilt, double frequency, int interpretationMode);
+    AtomicField getAtomicFields_Background(int antennaId, double tilt, double frequency, int interpretationMode);
 
     @Query("SELECT frequency from atomic_field WHERE interpretationMode = :interpretationMode AND antennaId = :antennaId AND tilt = :tilt ")
-    List<Double> getFrequencies_Background(int antennaId, int tilt, int interpretationMode);
+    List<Double> getFrequencies_Background(int antennaId, double tilt, int interpretationMode);
 
     @Query("SELECT tilt from atomic_field WHERE interpretationMode = :interpretationMode AND antennaId = :antennaId AND frequency = :frequency ")
-    List<Integer> getTilts_Background(int antennaId, double frequency, int interpretationMode);
+    List<Double> getTilts_Background(int antennaId, double frequency, int interpretationMode);
 
     @Query("SELECT * from atomic_field WHERE antennaId = :antennaId")
     LiveData<List<AtomicField>> getAtomicFieldsByAntennaFieldId(int antennaId);

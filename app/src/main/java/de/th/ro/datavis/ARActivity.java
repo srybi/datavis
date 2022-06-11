@@ -102,7 +102,7 @@ public class ARActivity extends BaseActivity implements
             interpretationMode = InterpretationMode.Logarithmic;
         }
         List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, ffsService.TiltsForAntenna(antennaId), InterpretationMode.Logarithmic);
-        List<Integer> tilts = ffsService.TiltsForAntenna(antennaId, frequencies.get(0), InterpretationMode.Logarithmic);
+        List<Double> tilts = ffsService.TiltsForAntenna(antennaId, frequencies.get(0), InterpretationMode.Logarithmic);
         bottomSheet = new BottomSheet(this, frequencies, tilts);
         gestureDetector = new GestureDetector(this, new BottomSheetHandler(bottomSheet));
 
@@ -166,7 +166,7 @@ public class ARActivity extends BaseActivity implements
         }
     }
 
-    private List<Sphere> loadCoordinates(InterpretationMode mode, double frequency, int tilt){
+    private List<Sphere> loadCoordinates(InterpretationMode mode, double frequency, double tilt){
         List<Sphere> coordinates = null;
         Log.d(TAG, "Start coordinate Loading...");
 

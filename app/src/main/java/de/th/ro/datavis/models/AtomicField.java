@@ -17,11 +17,11 @@ import de.th.ro.datavis.util.enums.InterpretationMode;
                 childColumns = "antennaId",
                 onDelete = CASCADE)})
 public class AtomicField {
-    public int getTilt() {
+    public double getTilt() {
         return tilt;
     }
 
-    public void setTilt(int tilt) {
+    public void setTilt(double tilt) {
         this.tilt = tilt;
     }
 
@@ -50,7 +50,7 @@ public class AtomicField {
         this.spheres = spheres;
     }
 
-    public int tilt;
+    public double tilt;
     public double frequency;
     @NonNull
     public InterpretationMode interpretationMode;
