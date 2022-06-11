@@ -294,8 +294,7 @@ public class ImportActivity extends BaseActivity{
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         int antennaId = preferences.getInt("ID", 1);
 
-        AntennaField antennaField = new AntennaField(uri, name, antennaId);
-        appDb.antennaFieldDao().insert(antennaField);
+
 
         InputStream in = null;
         try {
@@ -308,8 +307,17 @@ public class ImportActivity extends BaseActivity{
             ffsService.interpretData(in,0.4, antennaId);
         } catch (FFSInterpretException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Error interpreting .ffs File", Toast.LENGTH_SHORT).show();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            return;
         }
+        //Save Antenna and file to database
+        AntennaField antennaField = new AntennaField(uri, name, antennaId);
+        appDb.antennaFieldDao().insert(antennaField);
 
         handelGetAntennaInBackground(appDb, antennaId);
         handleNewlyInsertedAntennaField(appDb, antennaId);

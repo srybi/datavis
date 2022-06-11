@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,7 +71,7 @@ public class FFSInterpreter implements IInterpreter {
 
         try {
             String line;
-            while((line = reader.readLine()) != null && (frequencies == -1 || samples == -1 || !startFound)){
+            while((line = reader.readLine()) != null && (frequencies == -1 || samples == -1 || !startFound || frequencyValues.size() < frequencies)) {
                 if(Calc.calcLevenstheinDistance(line.trim(),(FFSConstants.FREQUENCIES_HEADER.trim())) < MAX_HAMMING_DISTANCE){
                     //go to next line to get the value
                     line = reader.readLine();
@@ -88,9 +89,19 @@ public class FFSInterpreter implements IInterpreter {
                     break;
                 }
                 if(Calc.calcLevenstheinDistance(line.trim(),(FFSConstants.RADACCSTMFREQ_HEADER.trim())) < MAX_HAMMING_DISTANCE){
-                    frequencyValues = extractFrequencyValues(reader, frequencies);
+                    try{
+                    frequencyValues = extractFrequencyValues(reader, frequencies);}
+                    catch(Exception e){
+                        e.printStackTrace();
+                        return Result.error("Could not extract frequency values.");
+                    }
                 }
             }
+
+            //Check if all headers were found and values could be extracted
+            if(frequencies == -1 || samples == -1 || !startFound || frequencyValues.size() < frequencies)
+                return Result.error("Could not find headers in FFS file.");
+
 
             ArrayList<ArrayList<String>> values = new ArrayList<ArrayList<String>>();
             for (int i = 0; i < frequencies; i++) {
@@ -107,12 +118,8 @@ public class FFSInterpreter implements IInterpreter {
             return Result.success(Pair.create(atomicFieldsLog, atomicFieldsLin));
 
         } catch (Exception e) {
-            //TODO: Specify exceptions, which can be thrown during the interpretation
             throw new FFSInterpretException(e.getMessage());
         }
-
-
-
     }
 
     private ArrayList<Double> extractFrequencyValues(BufferedReader reader, int frequencies) throws IOException {
@@ -135,6 +142,9 @@ public class FFSInterpreter implements IInterpreter {
         ArrayList<AtomicField> atomicFields = new ArrayList<>();
         for(Pair<ArrayList<String>, Double> pair : Helper.zip(values, frequencies)){
             Result<AtomicField> atomicField = interpretValue(pair.first, scalingFactor, mode);
+            if (!atomicField.isSuccess()) {
+                throw new FFSInterpretException(atomicField.getMessage());
+            }
             AtomicField field = atomicField.getData();
             //convert to gHz
             double frequency = pair.second/1000000000;
@@ -181,15 +191,26 @@ public class FFSInterpreter implements IInterpreter {
         maxItensity = -1;
         AtomicField atomicField = new AtomicField(2,1,mode, new ArrayList<>(),maxItensity , 1, 1);
         List<Sphere> coordinates;
-
-        //TODO: Currently the first frequency is chosen. This should be specified in the parameter list
+        AtomicBoolean error = new AtomicBoolean(false);
         List<FFSLine> ffsLines = stream
                 .map(x -> {
-                    String[] vals = x.trim().split("\\s+");
-                    double[] dVals = Arrays.stream(vals).mapToDouble(Double::parseDouble).toArray();
+                    FFSLine line = null;
+                    try{
+                        String[] vals = x.trim().split("\\s+");
+                        double[] dVals = Arrays.stream(vals).mapToDouble(Double::parseDouble).toArray();
 
-                    return new FFSLine(dVals[0], dVals[1], dVals[2], dVals[3], dVals[4], dVals[5]);
+                        line = new FFSLine(dVals[0], dVals[1], dVals[2], dVals[3], dVals[4], dVals[5]);
+                       }
+                    catch (Exception e){
+                        e.printStackTrace();
+                        error.set(true);
+                    }
+                    return line;
                 }).collect(Collectors.toList());
+
+        if(error.get()){
+            return Result.error(".ffs File contains corrupt values.");
+        }
 
         //Bugfix: If stepsize of file is greater than smaller than 3, the interpreter will use a stepsize of 3
         final int stepSize = (ffsLines.get(1).getTheta() - ffsLines.get(0).getTheta()) < 3 ? 3 : 1;
