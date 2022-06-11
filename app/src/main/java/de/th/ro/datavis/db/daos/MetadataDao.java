@@ -32,7 +32,7 @@ public interface MetadataDao {
     MetaData findByMetadata_Main(int antennaID, double freq, int tilt, String type);
 
     @Query("SELECT * FROM MetaData where antennaID = :antennaID AND freq = :freq AND tilt = :tilt AND type = :type LIMIT 1")
-    LiveData<MetaData> findByMetadata_Background(int antennaID, double freq, int tilt, String type);
+    LiveData<MetaData> findByMetadata_Background(int antennaID, double freq, double tilt, String type);
 
     @Insert
     void insert(MetaData metaData);

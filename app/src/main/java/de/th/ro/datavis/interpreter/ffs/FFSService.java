@@ -29,8 +29,8 @@ public class FFSService {
 
     private AtomicField atomicField;
     private List<Double> frequencies;
-    private List<Integer> tilts;
-    private int tilt;
+    private List<Double> tilts;
+    private double tilt;
 
     public FFSService(IInterpreter interpreter, Context context) {
         executor = Executors.newSingleThreadExecutor();
@@ -39,11 +39,13 @@ public class FFSService {
     }
 
     public void interpretData(InputStream stream, double scalingFactor, int antennaId, String filename) throws FFSInterpretException{
-        //int floatingPoint = Math;
+        double floatingPoint = 1;
         int start = filename.indexOf("_T") + 2, end = start + 2;
-        if (filename.charAt(start+1)=='.' || (filename.charAt(start+3)!='f')&&filename.charAt(start+2)=='.')
-            end = filename.indexOf("e+0");
-        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, Integer.parseInt(filename.substring(start, end)), antennaId);
+        if (filename.charAt(start+1)=='.') {
+            end = filename.indexOf("e+");
+            floatingPoint = Math.pow(10, Double.parseDouble(filename.substring(end+2, end+4)));
+        }
+        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPoint, antennaId);
         if(fields.isSuccess()){
             Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> pair = fields.getData();
             saveSpheresIfNotExist(pair.first, pair.second);
@@ -52,9 +54,14 @@ public class FFSService {
     }
 
     public void interpretData(File file, double scalingFactor, int antennaId) throws FFSInterpretException{
+        double floatingPiont = 1;
         String filename = file.getName();
         int start = filename.indexOf("_T") + 2, end = start + 2;
-        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(file, scalingFactor, Integer.parseInt(filename.substring(start, end)), antennaId);
+        if (filename.charAt(start+1)=='.') {
+            end = filename.indexOf("e+");
+            floatingPiont = Math.pow(10, Double.parseDouble(filename.substring(end+2, end+4)));
+        }
+        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(file, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPiont, antennaId);
         if(fields.isSuccess()){
             Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> pair = fields.getData();
             saveSpheresIfNotExist(pair.first, pair.second);
@@ -82,7 +89,7 @@ public class FFSService {
             }
 
 
-    public AtomicField getSpheresByPrimaryKey(int antennaId, double frequency, int tilt, InterpretationMode mode) {
+    public AtomicField getSpheresByPrimaryKey(int antennaId, double frequency, double tilt, InterpretationMode mode) {
 
         Future future = executor.submit(new Runnable(){
             @Override
@@ -101,7 +108,7 @@ public class FFSService {
         return null;
     }
 
-    public List<Double> FrequenciesForAntenna(int antennaId, int tilt, InterpretationMode mode) {
+    public List<Double> FrequenciesForAntenna(int antennaId, double tilt, InterpretationMode mode) {
 
         Future future = executor.submit(new Runnable(){
             @Override
@@ -120,7 +127,7 @@ public class FFSService {
         return new ArrayList<>();
     }
 
-    public List<Integer> TiltsForAntenna(int antennaId, double frequency, InterpretationMode mode) {
+    public List<Double> TiltsForAntenna(int antennaId, double frequency, InterpretationMode mode) {
 
         Future future = executor.submit(new Runnable(){
             @Override
@@ -139,7 +146,7 @@ public class FFSService {
         return new ArrayList<>();
     }
 
-    public int TiltsForAntenna(int antennaID) {
+    public double TiltsForAntenna(int antennaID) {
         Future future = executor.submit(new Runnable(){
             @Override
             public void run() {

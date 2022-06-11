@@ -60,7 +60,7 @@ public class BottomSheet implements ISubject{
     private Button applyButton;
 
     private List<Double> frequencies;
-    private List<Integer> tilts;
+    private List<Double> tilts;
 
     /**
      * List of all settings. All setting have their actual State and a changing state.
@@ -76,15 +76,15 @@ public class BottomSheet implements ISubject{
     private double frequency;
     private double changedFrequency;
 
-    private int tilt;
-    private int changedTilt;
+    private double tilt;
+    private double changedTilt;
 
 
     public InterpretationMode getMode(){
         return this.mode;
     }
 
-    public BottomSheet(Context ctx, List<Double> frequencies, List<Integer> tilts){
+    public BottomSheet(Context ctx, List<Double> frequencies, List<Double> tilts){
         this.context = ctx;
         observers = new LinkedList<>();
         //default values
@@ -114,7 +114,7 @@ public class BottomSheet implements ISubject{
         Button applyButton = bottomSheetDialog.findViewById(R.id.apply);
 
         Log.d(TAG, Double.toString(frequency));
-        Log.d(TAG, Integer.toString(tilt));
+        Log.d(TAG, Double.toString(tilt));
 
         try {
             Log.d(TAG, "Meta ID: " + db.metadataDao().findByMetadata_Background(1, frequency, tilt , "HHPBW_deg"));
@@ -156,16 +156,18 @@ public class BottomSheet implements ISubject{
             frequencySlider.setEnabled(false);
         }
         if(tilts.size() > 1) {
-            int from = tilts.get(0);
-            int to = tilts.get(tilts.size() - 1);
+            float from = tilts.get(0).floatValue();
+            float to = tilts.get(tilts.size() - 1).floatValue();
 
             tiltSlider.setValueFrom(from);
             tiltSlider.setValueTo(to);
 
             //dynamically calculate step size for slider
-            int stepSize = (tilts.get(1) - tilts.get(0));
+            double stepSize = (float)(tilts.get(1) - tilts.get(0));
 
-            tiltSlider.setStepSize(stepSize);
+            double truncatedDouble = Helper.scaleDouble(3, stepSize);
+
+            tiltSlider.setStepSize((float)truncatedDouble);
 
         }else{
             tiltSlider.setEnabled(false);
@@ -244,7 +246,7 @@ public class BottomSheet implements ISubject{
 
         //tilt slider
         if (tilts.size() > 1) {
-            tiltSlider.setValue(tilt);
+            tiltSlider.setValue((float)tilt);
         }
     }
     private void updateMetadataViews(BottomSheetDialog b, MetaData changeMetaData){
@@ -307,7 +309,7 @@ public class BottomSheet implements ISubject{
     public double getFrequency() {
         return this.frequency;
     }
-    public int getTilt() {
+    public double getTilt() {
         return this.tilt;
     }
 }
