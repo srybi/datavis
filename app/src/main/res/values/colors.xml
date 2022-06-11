@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Default colors. -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -8,4 +9,20 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="black_20">#33000000</color>
+
+    <!-- Ericsson brand colors. -->
+    <color name="colorEricsson_Black">#000000</color>
+    <color name="colorEricsson_Gray1">#242424</color>
+    <color name="colorEricsson_Gray2">#767676</color>
+    <color name="colorEricsson_Gray3">#a0a0a0</color>
+    <color name="colorEricsson_Gray4">#e0e0e0</color>
+    <color name="colorEricsson_Gray5">#f2f2f2</color>
+    <color name="colorEricsson_White">#fafafa</color>
+
+    <color name="colorEricsson_Blue1">#000082</color>
+    <color name="colorEricsson_Blue2">#0050ca</color>
+    <color name="colorEricsson_Blue">#0082f0</color>
+    <color name="colorEricsson_Blue3">#48a8fa</color>
+    <color name="colorEricsson_Blue4">#85ccff</color>
+
 </resources>
