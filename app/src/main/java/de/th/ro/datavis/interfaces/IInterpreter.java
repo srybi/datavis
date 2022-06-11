@@ -18,9 +18,9 @@ public interface IInterpreter {
      * Gives back a Vextor3 List from a File, based on the given inputstream or file.
      * @return a List of Vector3's
      */
-    Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(InputStream stream, double scalingFactor, ArrayList<Integer> tiltValues, int antennaId) throws FFSInterpretException;
+    Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(InputStream stream, double scalingFactor, int tiltValue, int antennaId) throws FFSInterpretException;
 
-    Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(File file, double scalingFactor, ArrayList<Integer> tiltValues, int antennaId) throws FFSInterpretException;
+    Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(File file, double scalingFactor, int tiltValue, int antennaId) throws FFSInterpretException;
 
     Result<AtomicField> interpretDataAsStream(Stream<String> stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException;
 

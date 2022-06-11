@@ -325,7 +325,7 @@ public class ImportActivity extends BaseActivity{
         }
 
         try {
-            ffsService.interpretData(in,0.4, antennaId);
+            ffsService.interpretData(in,0.4, antennaId, name);
         } catch (FFSInterpretException e) {
             e.printStackTrace();
             runOnUiThread(new Runnable() {
