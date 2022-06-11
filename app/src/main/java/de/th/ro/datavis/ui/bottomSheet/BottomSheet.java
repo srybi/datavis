@@ -1,47 +1,32 @@
 package de.th.ro.datavis.ui.bottomSheet;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.icu.text.CaseMap;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.slider.Slider;
 
-import java.io.DataOutput;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.th.ro.datavis.R;
-import de.th.ro.datavis.db.daos.MetadataDao;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interfaces.ISubject;
-import de.th.ro.datavis.interpreter.ffs.FFSService;
-import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.MetaData;
+import de.th.ro.datavis.ui.progressBar.ProgressbarHolder;
 import de.th.ro.datavis.util.Helper;
-import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 /**
@@ -58,6 +43,8 @@ public class BottomSheet implements ISubject{
     private Switch modeSwitch;
     private Slider frequencySlider;
     private Button applyButton;
+
+    private ProgressbarHolder progressbar;
 
 
     private List<Double> frequencies;
@@ -109,6 +96,9 @@ public class BottomSheet implements ISubject{
     public void showBottomSheetDialog() {
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
         bottomSheetDialog.setContentView(R.layout.modal_bottom_sheet);
+
+        // init ProgressBar
+        progressbar = new ProgressbarHolder(bottomSheetDialog.findViewById(R.id.simpleProgressBar));
 
 
         //get all interactables
@@ -174,6 +164,8 @@ public class BottomSheet implements ISubject{
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick - applyButton");
+
+                progressbar.showProgressBar();
 
                 if(checkChanges()){ //check if anything has changed
                     updateSetting(); //if so update settings

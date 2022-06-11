@@ -15,11 +15,14 @@ import de.th.ro.datavis.main.AntennaFieldAdapter;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.MetaData;
+import de.th.ro.datavis.ui.progressBar.ProgressbarHolder;
 
 public abstract class ImportView implements IImportOptions {
 
 
     private ListView listViewAntennaFields;
+
+    private ProgressbarHolder progressBar;
 
     private Button btnAddNewConfig;
     private Button btnChooseConfig;
@@ -46,7 +49,7 @@ public abstract class ImportView implements IImportOptions {
         initAntennaHeadLine(fa, antenna);
         initListView(fa, fieldList);
         initMetaDataIndicator(fa, metaData);
-
+        initProgressBar(fa);
     }
 
     private void initListView(FragmentActivity fa, List<AntennaField> antennaFieldList){
@@ -113,6 +116,18 @@ public abstract class ImportView implements IImportOptions {
         String s = "MetaData Added";
         tvMetaIndicator.setText(s);
 
+    }
+
+    private void initProgressBar(FragmentActivity fa){
+        progressBar = new ProgressbarHolder(fa.findViewById(R.id.simpleProgressBar));
+    }
+
+    public void hideProgressBar(){
+        progressBar.hideProgressBar();
+    }
+
+    public void showProgressBar(){
+        progressBar.showProgressBar();
     }
 
 

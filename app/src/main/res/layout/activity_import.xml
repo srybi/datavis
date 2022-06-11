@@ -21,6 +21,9 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <include
+        android:id="@+id/progressbar"
+        layout="@layout/progressbar" />
 
     <include
         android:id="@+id/fragment_import"

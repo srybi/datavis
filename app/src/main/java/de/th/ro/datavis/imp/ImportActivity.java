@@ -16,10 +16,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
-import org.w3c.dom.Text;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -38,7 +34,7 @@ import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.activity.BaseActivity;
-import de.th.ro.datavis.util.constants.*;
+import de.th.ro.datavis.util.constants.FileRequests;
 import de.th.ro.datavis.util.dialog.DialogExistingAntenna;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 import de.th.ro.datavis.util.filehandling.FileHandler;
@@ -505,6 +501,9 @@ public class ImportActivity extends BaseActivity{
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        importView.showProgressBar();
+
         Log.d(TAG, "Activity result");
         if(resultCode == Activity.RESULT_OK){
             Log.d(TAG, "Request Code: "+requestCode);
