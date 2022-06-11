@@ -30,6 +30,7 @@ public class FFSService {
     private AtomicField atomicField;
     private List<Double> frequencies;
     private List<Integer> tilts;
+    private int tilt;
 
     public FFSService(IInterpreter interpreter, Context context) {
         executor = Executors.newSingleThreadExecutor();
@@ -38,7 +39,10 @@ public class FFSService {
     }
 
     public void interpretData(InputStream stream, double scalingFactor, int antennaId, String filename) throws FFSInterpretException{
+        //int floatingPoint = Math;
         int start = filename.indexOf("_T") + 2, end = start + 2;
+        if (filename.charAt(start+1)=='.' || (filename.charAt(start+3)!='f')&&filename.charAt(start+2)=='.')
+            end = filename.indexOf("e+0");
         Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, Integer.parseInt(filename.substring(start, end)), antennaId);
         if(fields.isSuccess()){
             Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> pair = fields.getData();
@@ -135,26 +139,21 @@ public class FFSService {
         return new ArrayList<>();
     }
 
-    public List<Integer> TiltsFromFilename(int antennaID) {
+    public int TiltsForAntenna(int antennaID) {
         Future future = executor.submit(new Runnable(){
             @Override
             public void run() {
-                List<AntennaField> antennas = db.antennaFieldDao().findByAntennaId_BackGround(antennaID);
-                for (AntennaField antenna : antennas) {
-                    String filename = antenna.filename;
-                    int start = filename.indexOf("_T") + 2, end = start + 2;
-                    tilts.add(Integer.parseInt(filename.substring(start, end)));
-                }
+                tilt = db.atomicFieldDao().getAtomicFieldsByAntennaFieldIdSync(antennaID).get(0).tilt;
             }
         });
 
         try {
             future.get();
-            return tilts;
+            return tilt;
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
-        return new ArrayList<>();
+        return tilt;
     }
 
     public FFSIntensityColor mapToColor(double intensity, double maxItensity) {
