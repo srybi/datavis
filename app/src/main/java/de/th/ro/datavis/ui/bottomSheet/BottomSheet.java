@@ -82,8 +82,8 @@ public class BottomSheet implements ISubject{
         this.changedFrequency = frequencies.get(0);
 
         db = AppDatabase.getInstance(ctx);
-        tilt = 2;
-        changedTilt  = 2;
+        tilt = 3;
+        changedTilt  = 3;
     }
 
     /**
