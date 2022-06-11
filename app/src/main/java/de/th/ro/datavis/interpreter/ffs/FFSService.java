@@ -44,6 +44,8 @@ public class FFSService {
         if (filename.charAt(start+1)=='.') {
             end = filename.indexOf("e+");
             floatingPoint = Math.pow(10, Double.parseDouble(filename.substring(end+2, end+4)));
+            if (filename.charAt(end+1)=='-')
+                floatingPoint = Math.pow(10, -1 * Double.parseDouble(filename.substring(end+2, end+4)));
         }
         Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPoint, antennaId);
         if(fields.isSuccess()){
