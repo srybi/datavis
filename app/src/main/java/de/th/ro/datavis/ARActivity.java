@@ -10,7 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
@@ -34,7 +33,6 @@ import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -304,8 +302,8 @@ public class ARActivity extends BaseActivity implements
 
     private void handleCorruptGLB(Renderable renderable){
         TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
-        model.getScaleController().setMaxScale(0.20f);
-        model.getScaleController().setMinScale(0.15f);
+        model.getScaleController().setMaxScale(0.1f);
+        model.getScaleController().setMinScale(0.05f);
         model.setParent(anchorNode);
         model.setRenderable(renderable)
                 .animate(true).start();
