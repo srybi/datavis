@@ -37,9 +37,9 @@ public class FFSService {
         this.interpreter = interpreter;
     }
 
-    public void interpretData(InputStream stream, double scalingFactor, int antennaId) throws FFSInterpretException{
-
-        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, (ArrayList<Integer>) TiltsFromFilename(antennaId), antennaId);
+    public void interpretData(InputStream stream, double scalingFactor, int antennaId, String filename) throws FFSInterpretException{
+        int start = filename.indexOf("_T") + 2, end = start + 2;
+        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, Integer.parseInt(filename.substring(start, end)), antennaId);
         if(fields.isSuccess()){
             Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> pair = fields.getData();
             saveSpheresIfNotExist(pair.first, pair.second);
@@ -48,7 +48,9 @@ public class FFSService {
     }
 
     public void interpretData(File file, double scalingFactor, int antennaId) throws FFSInterpretException{
-        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(file, scalingFactor, (ArrayList<Integer>) TiltsFromFilename(antennaId), antennaId);
+        String filename = file.getName();
+        int start = filename.indexOf("_T") + 2, end = start + 2;
+        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(file, scalingFactor, Integer.parseInt(filename.substring(start, end)), antennaId);
         if(fields.isSuccess()){
             Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> pair = fields.getData();
             saveSpheresIfNotExist(pair.first, pair.second);

@@ -38,20 +38,20 @@ public class FFSInterpreter implements IInterpreter {
 
 
     @Override
-    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(InputStream stream, double scalingFactor, ArrayList<Integer>tiltValues, int antennaId) throws FFSInterpretException {
+    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(InputStream stream, double scalingFactor, int tiltValue, int antennaId) throws FFSInterpretException {
             InputStreamReader reader = new InputStreamReader(stream);
             BufferedReader bufferedReader = new BufferedReader(reader);
 
-            return interpretData(bufferedReader, scalingFactor,tiltValues, antennaId);
+            return interpretData(bufferedReader, scalingFactor,tiltValue, antennaId);
     }
 
     @Override
-    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(File file, double scalingFactor, ArrayList<Integer> tiltValues, int antennaId) throws FFSInterpretException {
+    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(File file, double scalingFactor, int tiltValue, int antennaId) throws FFSInterpretException {
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-            return interpretData(bufferedReader, scalingFactor, tiltValues, antennaId);
+            return interpretData(bufferedReader, scalingFactor, tiltValue, antennaId);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return Result.error("File Not Found.");
@@ -59,7 +59,7 @@ public class FFSInterpreter implements IInterpreter {
     }
 
 
-    private Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(BufferedReader reader, double scalingFactor, ArrayList<Integer> tiltValues, int antennaId) throws FFSInterpretException {
+    private Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(BufferedReader reader, double scalingFactor, int tiltValue, int antennaId) throws FFSInterpretException {
         AtomicField atomicField;
         maxItensity = -1;
         Log.d(LOG_TAG, "Start Interpretation...");
@@ -102,13 +102,9 @@ public class FFSInterpreter implements IInterpreter {
                     findNextAtomicField(reader);
             }
 
-            ArrayList<AtomicField> atomicFieldsLog = new ArrayList<AtomicField>();
-            ArrayList<AtomicField> atomicFieldsLin = new ArrayList<AtomicField>();
+            ArrayList<AtomicField> atomicFieldsLog = interpretValues(values, frequencyValues, tiltValue, scalingFactor, InterpretationMode.Logarithmic, antennaId);
+            ArrayList<AtomicField> atomicFieldsLin = interpretValues(values, frequencyValues, tiltValue, scalingFactor, InterpretationMode.Linear, antennaId);
 
-            for (int tiltValue : tiltValues) {
-                atomicFieldsLog.addAll(interpretValues(values, frequencyValues, tiltValue, scalingFactor, InterpretationMode.Logarithmic, antennaId));
-                atomicFieldsLin.addAll(interpretValues(values, frequencyValues, tiltValue, scalingFactor, InterpretationMode.Linear, antennaId));
-            }
             Log.d(LOG_TAG, "Interpretation finished");
             return Result.success(Pair.create(atomicFieldsLog, atomicFieldsLin));
 
