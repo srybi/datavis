@@ -206,6 +206,8 @@ public class ARActivity extends BaseActivity implements
 
         try {
             AtomicField field = ffsService.getSpheresByPrimaryKey(antennaId, frequency, tilt, mode);
+            if(field == null)
+                return null;
             maxIntensity = field.maxIntensity;
             coordinates = field.spheres;
 
@@ -242,7 +244,11 @@ public class ARActivity extends BaseActivity implements
             list = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
         }
 
-        processRenderList(anchorNode, renderableList, list);
+        //If List is null -> No corresponding atomic field was found
+        if(list != null)
+            processRenderList(anchorNode, renderableList, list);
+        else
+            Toast.makeText(this, "No Spheres found", Toast.LENGTH_SHORT).show();
 
 
         if(ffsAvailable){

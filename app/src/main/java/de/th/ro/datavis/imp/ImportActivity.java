@@ -308,6 +308,7 @@ public class ImportActivity extends BaseActivity{
             ffsService.interpretData(in,0.4, antennaId);
         } catch (FFSInterpretException e) {
             e.printStackTrace();
+            Toast.makeText(this, "Error interpreting .ffs File", Toast.LENGTH_SHORT).show();
         }
 
         handelGetAntennaInBackground(appDb, antennaId);

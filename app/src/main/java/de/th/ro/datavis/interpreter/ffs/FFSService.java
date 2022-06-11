@@ -37,10 +37,13 @@ public class FFSService {
     private AtomicField atomicField;
     private List<Double> frequencies;
 
+    private Context context;
+
     public FFSService(IInterpreter interpreter, Context context) {
         executor = Executors.newSingleThreadExecutor();
         db = AppDatabase.getInstance(context);
         this.interpreter = interpreter;
+        this.context = context;
     }
 
     public void interpretData(InputStream stream, double scalingFactor, int antennaId) throws FFSInterpretException{
@@ -49,6 +52,8 @@ public class FFSService {
         if(fields.isSuccess()){
             Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> pair = fields.getData();
             saveSpheresIfNotExist(pair.first, pair.second);
+        }else{
+            throw new FFSInterpretException(fields.getMessage());
         }
 
     }
@@ -58,11 +63,13 @@ public class FFSService {
         if(fields.isSuccess()){
             Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> pair = fields.getData();
             saveSpheresIfNotExist(pair.first, pair.second);
+        }else{
+            throw new FFSInterpretException(fields.getMessage());
         }
     }
 
     private void saveSpheresIfNotExist(ArrayList<AtomicField> fieldsLog, ArrayList<AtomicField> fieldsLin) {
-
+        boolean success = true;
                 //Save all logarithmic spheres
                 for (AtomicField field : fieldsLog) {
                     try {
@@ -70,6 +77,7 @@ public class FFSService {
                     }catch (SQLiteConstraintException e){
                         e.printStackTrace();
                         Log.d("FFSService", "SQL Error: " + e.getMessage());
+                        success = false;
                     }
                 }
                 //Save all linear spheres
@@ -79,8 +87,11 @@ public class FFSService {
                     }catch (SQLiteConstraintException e){
                         e.printStackTrace();
                         Log.d("FFSService", "SQL Error: " + e.getMessage());
+                        success = false;
                     }
                 }
+                if(!success)
+                    Toast.makeText(context, "Error saving data", Toast.LENGTH_SHORT).show();
             }
 
 
