@@ -50,6 +50,7 @@ public class BottomSheet implements ISubject{
 
     private List<Double> frequencies;
     private List<Double> tilts;
+    private int antennaID;
 
     /**
      * List of all settings. All setting have their actual State and a changing state.
@@ -73,7 +74,7 @@ public class BottomSheet implements ISubject{
         return this.mode;
     }
 
-    public BottomSheet(Context ctx, List<Double> frequencies, List<Double>tilts){
+    public BottomSheet(Context ctx, List<Double> frequencies, List<Double>tilts, int antennaID){
         this.context = ctx;
         observers = new LinkedList<>();
         //default values
@@ -86,6 +87,8 @@ public class BottomSheet implements ISubject{
         this.tilts = tilts;
         this.tilt = tilts.get(0);
         this.changedTilt  = tilts.get(0);
+
+        this.antennaID=antennaID;
 
         db = AppDatabase.getInstance(ctx);
     }
@@ -281,7 +284,7 @@ public class BottomSheet implements ISubject{
      */
     private void readMetaDataFromDB(){
         //TODO: Antenna Hardcoded
-        sqlQueryMetadata = db.metadataDao().findAll_Background(5,frequency,tilt);
+        sqlQueryMetadata = db.metadataDao().findAll_Background(antennaID,frequency,tilt);
         Log.d(TAG, "sqlQueryMetadata built "+sqlQueryMetadata.toString());
     }
 

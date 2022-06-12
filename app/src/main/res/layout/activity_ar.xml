@@ -78,7 +78,7 @@
                     android:visibility="visible" />
 
                 <TextView
-                    android:id="@+id/meta_VHPBW_deg2"
+                    android:id="@+id/meta_VHPBW_deg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@color/black_20"
