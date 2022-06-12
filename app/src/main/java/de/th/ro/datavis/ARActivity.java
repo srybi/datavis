@@ -160,9 +160,21 @@ public class ARActivity extends BaseActivity implements
     private void buildAntennaModel(){
         Log.d(TAG, "buildAntennaModel: "+ antennaURI);
 
-        String py = "Pyramiede.glb";
+        if (antennaFileName == null){
+            // antennaFileName == null -> No Antenna chosen -> Use Default Antenna
+            buildDefaultModel();
+            return;
+        }
 
         Uri antennaUri = FileProviderDatavis.getURIForAntenna(getApplicationContext(), antennaFileName);
+        if (antennaUri == null){
+
+            Toast.makeText(this,  "File not Found: " + antennaFileName + " -> Building Default Antenna", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "Antenna URI: File not Found: " + antennaFileName);
+            buildDefaultModel();
+            return;
+        }
+
 
             ModelRenderable.builder()
                     .setSource(this, antennaUri)
@@ -189,7 +201,9 @@ public class ARActivity extends BaseActivity implements
                     .setAsyncLoadEnabled(true)
                     .build()
                     .thenAccept(model -> {
+                        renderableList.put("antenne", model);
                         handleCorruptGLB(model);
+
                         Log.d(TAG, "Antenna model done");
                     }).exceptionally(throwable -> {
                          throwable.printStackTrace();

@@ -19,11 +19,16 @@ public class FileProviderDatavis extends FileProvider {
      * Provides the Uri to a File based on the given FileName
      * @param context context
      * @param fileName Name of the File
-     * @return Uri to a File with the given Filename
+     * @return return Uri to a File with the given Filename, return null on Exeption
      */
     public static Uri getURIForAntenna(Context context, String fileName){
 
         File antennaFile = FileProviderDatavis.getAFileByFileName_FromDownloadDir(fileName);
+
+        if (antennaFile == null){
+            return null;
+        }
+
         return FileProviderDatavis.getUriForFile(context, AUTHORITY, antennaFile);
 
     }
