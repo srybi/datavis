@@ -21,17 +21,13 @@ public class BottomSheetHandler extends GestureDetector.SimpleOnGestureListener 
         final int SWIPE_MIN_DISTANCE = 120;
         final int SWIPE_MAX_OFF_PATH = 250;
         final int SWIPE_THRESHOLD_VELOCITY = 200;
-        try {
-            if (Math.abs(e1.getX() - e2.getX()) > SWIPE_MAX_OFF_PATH)
-                return false;
-            if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
-                    && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
-                Log.d(TAG, "Up to Down");
-                makeCueVisible(false);
-                bottomSheet.showBottomSheetDialog();
-            }
-        } catch (Exception e) {
-            // nothing
+        if (Math.abs(e1.getX() - e2.getX()) > SWIPE_MAX_OFF_PATH)
+            return false;
+        if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE
+                && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+            Log.d(TAG, "Up to Down");
+            makeCueVisible(false);
+            bottomSheet.showBottomSheetDialog();
         }
         return false;
     }
