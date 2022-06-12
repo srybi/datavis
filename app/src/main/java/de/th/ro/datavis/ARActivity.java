@@ -160,7 +160,7 @@ public class ARActivity extends BaseActivity implements
     private void buildAntennaModel(){
         Log.d(TAG, "buildAntennaModel: "+ antennaURI);
 
-        if (antennaFileName == null){
+        if (antennaFileName == null || antennaFileName.equals("datavis_default")){
             // antennaFileName == null -> No Antenna chosen -> Use Default Antenna
             buildDefaultModel();
             return;
