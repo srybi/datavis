@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteConstraintException;
 import android.util.Log;
 import android.util.Pair;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.InputStream;
@@ -163,7 +164,7 @@ public class FFSService {
         return new ArrayList<>();
     }
 
-    public double TiltsForAntenna(int antennaID) {
+    public double TiltForAntenna(int antennaID) {
         Future future = executor.submit(new Runnable(){
             @Override
             public void run() {

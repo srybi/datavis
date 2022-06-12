@@ -42,12 +42,14 @@ public class BottomSheet implements ISubject{
 
     private Switch modeSwitch;
     private Slider frequencySlider;
+    private Slider tiltSlider;
     private Button applyButton;
 
     private ProgressbarHolder progressbar;
 
 
     private List<Double> frequencies;
+    private List<Double> tilts;
 
     /**
      * List of all settings. All setting have their actual State and a changing state.
@@ -62,8 +64,8 @@ public class BottomSheet implements ISubject{
 
     private double frequency;
     private double changedFrequency;
-    private int tilt;
-    private int changedTilt;
+    private double tilt;
+    private double changedTilt;
 
 
     private LiveData<List<MetaData>> sqlQueryMetadata;
@@ -71,7 +73,7 @@ public class BottomSheet implements ISubject{
         return this.mode;
     }
 
-    public BottomSheet(Context ctx, List<Double> frequencies){
+    public BottomSheet(Context ctx, List<Double> frequencies, List<Double>tilts){
         this.context = ctx;
         observers = new LinkedList<>();
         //default values
@@ -81,9 +83,11 @@ public class BottomSheet implements ISubject{
         this.frequency = frequencies.get(0);
         this.changedFrequency = frequencies.get(0);
 
+        this.tilts = tilts;
+        this.tilt = tilts.get(0);
+        this.changedTilt  = tilts.get(0);
+
         db = AppDatabase.getInstance(ctx);
-        tilt = 2;
-        changedTilt  = 2;
     }
 
     /**
@@ -103,6 +107,7 @@ public class BottomSheet implements ISubject{
         Button applyButton = bottomSheetDialog.findViewById(R.id.apply);
 
         Log.d(TAG, Double.toString(frequency));
+        Log.d(TAG, Double.toString(tilt));
 
         //fetches Metadata
         try {
@@ -114,6 +119,7 @@ public class BottomSheet implements ISubject{
 
         modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
         frequencySlider = bottomSheetDialog.findViewById(R.id.sliderFrequency);
+        tiltSlider = bottomSheetDialog.findViewById(R.id.sliderTilt);
         applyButton = bottomSheetDialog.findViewById(R.id.apply);
         //init with current setting
         if(frequencies.size() > 1) {
@@ -133,6 +139,23 @@ public class BottomSheet implements ISubject{
         }else{
             frequencySlider.setEnabled(false);
         }
+        if(tilts.size() > 1) {
+            float from = tilts.get(0).floatValue();
+            float to = tilts.get(tilts.size() - 1).floatValue();
+
+            tiltSlider.setValueFrom(from);
+            tiltSlider.setValueTo(to);
+
+            //dynamically calculate step size for slider
+            double stepSize = (float)(tilts.get(1) - tilts.get(0));
+
+            double truncatedDouble = Helper.scaleDouble(3, stepSize);
+
+            tiltSlider.setStepSize((float)truncatedDouble);
+
+        }else{
+            tiltSlider.setEnabled(false);
+        }
         keepSettings(bottomSheetDialog);
 
         //handler for ModeSwitch
@@ -143,6 +166,7 @@ public class BottomSheet implements ISubject{
                 handleModeSwitch(compoundButton, isChecked);
             }
         });
+        //handler for Tilt Slider
         if(frequencies.size() > 1) {
             frequencySlider.addOnChangeListener(new Slider.OnChangeListener() {
                 @Override
@@ -155,6 +179,18 @@ public class BottomSheet implements ISubject{
                 }
             });
         }
+
+        //handler for Tilt Slider
+        if (tilts.size() > 1) {
+            tiltSlider.addOnChangeListener(new Slider.OnChangeListener() {
+                @Override
+                public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                    Log.d(TAG, "onValueChange: handeling TiltSlider");
+                    handleTiltSlider((int)value);
+                }
+            });
+        }
+
 
         //handler for applyButton
         applyButton.setOnClickListener(new View.OnClickListener() {
@@ -196,6 +232,9 @@ public class BottomSheet implements ISubject{
         }
 
         //tilt slider
+        if (tilts.size() > 1) {
+            tiltSlider.setValue((float)tilt);
+        }
     }
 
 
@@ -220,7 +259,7 @@ public class BottomSheet implements ISubject{
     private void updateSetting(){
         mode = changedMode;
         frequency = Helper.scaleDouble(3,changedFrequency);
-        tilt = changedTilt;
+        tilt = Helper.scaleDouble(3, changedTilt);
     }
 
     private void handleModeSwitch(CompoundButton switchBtn, boolean isChecked){
@@ -281,7 +320,7 @@ public class BottomSheet implements ISubject{
     public double getFrequency() {
         return this.frequency;
     }
-    public int getTilt() {
+    public double getTilt() {
         return this.tilt;
     }
     public Context getContext() {

@@ -30,6 +30,7 @@
 
     <!-- BottomSheet -->
     <string name="frequency">Frequency</string>
+    <string name="tilt">Tilt</string>
     <string name="meta_NF">[NF]</string>
     <string name="Nullfill_dB">Nullfill:</string>
     <string name="Squint_deg">Squint:</string>

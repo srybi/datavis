@@ -107,11 +107,12 @@ public class ARActivity extends BaseActivity implements
         Bundle b = getIntent().getExtras();
         antennaId = b.getInt("antennaId");
         antennaURI = b.getString("antennaURI");
-        List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, 2, InterpretationMode.Logarithmic);
+        List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, ffsService.TiltForAntenna(antennaId), InterpretationMode.Logarithmic);
+        List<Double> tilts = ffsService.TiltsForAntenna(antennaId, frequencies.get(0), InterpretationMode.Logarithmic);
         ffsAvailable = frequencies.size() != 0;
         //only initialize bottom sheet, if there is a ffs data to manipulate
         if(ffsAvailable){
-            bottomSheet = new BottomSheet(this, frequencies);
+            bottomSheet = new BottomSheet(this, frequencies, tilts);
             bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
             gestureDetector = new GestureDetector(this, bottomSheetHandler);
         }else{
@@ -200,7 +201,7 @@ public class ARActivity extends BaseActivity implements
         Log.d(TAG, "buildSpheres: done");
     }
 
-    private List<Sphere> loadCoordinates(InterpretationMode mode, double frequency, int tilt){
+    private List<Sphere> loadCoordinates(InterpretationMode mode, double frequency, double tilt){
         List<Sphere> coordinates = null;
         Log.d(TAG, "Start coordinate Loading...");
 
