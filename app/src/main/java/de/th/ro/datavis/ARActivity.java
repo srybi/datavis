@@ -50,7 +50,9 @@ import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheet;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
+import de.th.ro.datavis.util.FileProviderDatavis;
 import de.th.ro.datavis.util.activity.BaseActivity;
+import de.th.ro.datavis.util.constants.IntentConst;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 public class ARActivity extends BaseActivity implements
@@ -74,6 +76,7 @@ public class ARActivity extends BaseActivity implements
     private TransformableNode middleNode;
     private int antennaId;
     private String antennaURI;
+    private String antennaFileName;
     private String TAG = "ARActivity";
     private boolean ffsAvailable;
     private final AppDatabase db = AppDatabase.getInstance(this);
@@ -105,8 +108,10 @@ public class ARActivity extends BaseActivity implements
         ffsService = new FFSService(ffsInterpreter, this);
 
         Bundle b = getIntent().getExtras();
-        antennaId = b.getInt("antennaId");
-        antennaURI = b.getString("antennaURI");
+        antennaId = b.getInt(IntentConst.INTENT_EXTRA_ANTENNA_ID);
+        antennaURI = b.getString(IntentConst.INTENT_EXTRA_ANTENNA_URI);
+        antennaFileName = b.getString(IntentConst.INTENT_EXTRA_ANTENNA_FILENAME);
+
         List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, 2, InterpretationMode.Logarithmic);
         ffsAvailable = frequencies.size() != 0;
         //only initialize bottom sheet, if there is a ffs data to manipulate
@@ -153,9 +158,14 @@ public class ARActivity extends BaseActivity implements
     }
 
     private void buildAntennaModel(){
-            Log.d(TAG, "buildAntennaModel: "+ antennaURI);
+        Log.d(TAG, "buildAntennaModel: "+ antennaURI);
+
+        String py = "Pyramiede.glb";
+
+        Uri antennaUri = FileProviderDatavis.getURIForAntenna(getApplicationContext(), antennaFileName);
+
             ModelRenderable.builder()
-                    .setSource(this, Uri.parse(antennaURI))
+                    .setSource(this, antennaUri)
                     .setIsFilamentGltf(true)
                     .setAsyncLoadEnabled(true)
                     .build()

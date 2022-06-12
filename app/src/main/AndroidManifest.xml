@@ -43,23 +43,36 @@
         <activity
             android:name=".ARActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Datavis.NoActionBar"></activity>
+            android:theme="@style/Theme.Datavis.NoActionBar"/>
         <activity
             android:name=".imp.ImportActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Datavis.NoActionBar"></activity>
+            android:theme="@style/Theme.Datavis.NoActionBar"/>
         <activity
             android:name=".about.AboutActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Datavis.NoActionBar"></activity>
+            android:theme="@style/Theme.Datavis.NoActionBar"/>
         <activity
             android:name=".instructions.ImportInstructionsActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Datavis.NoActionBar"></activity>
+            android:theme="@style/Theme.Datavis.NoActionBar"/>
         <activity
             android:name=".instructions.AppInstructionsActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Datavis.NoActionBar"></activity>
+            android:theme="@style/Theme.Datavis.NoActionBar"/>
+
+        <provider
+            android:name="de.th.ro.datavis.util.FileProviderDatavis"
+            android:authorities="de.th.ro.datavis.util.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <!-- resource file to persist -->
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths">
+            </meta-data>
+        </provider>
+
     </application>
 
 </manifest>

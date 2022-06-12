@@ -1,5 +1,7 @@
 package de.th.ro.datavis.main;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -27,7 +29,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.navigation.fragment.DialogFragmentNavigatorDestinationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,10 +42,9 @@ import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.ui.adapter.AntennaAdapter;
 import de.th.ro.datavis.ui.settings.SettingsActivity;
+import de.th.ro.datavis.util.constants.IntentConst;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 import de.th.ro.datavis.util.fragment.BaseFragment;
-
-import static android.os.Build.VERSION.SDK_INT;
 
 public class MainFragment extends BaseFragment {
 
@@ -112,8 +112,10 @@ public class MainFragment extends BaseFragment {
                 Log.d(TAG, "onItemClick: Clicked on item");
                 Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
                 Antenna item = antennas.getValue().get(i);
-                intent.putExtra("antennaId", item.id);
-                intent.putExtra("antennaURI", checkAntenna(item));
+                intent.putExtra(IntentConst.INTENT_EXTRA_ANTENNA_ID, item.id);
+                intent.putExtra(IntentConst.INTENT_EXTRA_ANTENNA_URI, checkAntenna(item));
+                intent.putExtra(IntentConst.INTENT_EXTRA_ANTENNA_FILENAME, item.filename);
+
                 getActivity().startActivity(intent);
             }
         });
