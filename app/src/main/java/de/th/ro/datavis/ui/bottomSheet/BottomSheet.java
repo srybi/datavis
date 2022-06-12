@@ -253,7 +253,7 @@ public class BottomSheet implements ISubject{
         boolean modeChange = changedMode != mode;
         boolean frequencyChange = changedFrequency != frequency;
         boolean tiltChange = changedTilt != tilt;
-        return modeChange || frequencyChange;
+        return modeChange || frequencyChange || tiltChange;
     }
 
     /**
