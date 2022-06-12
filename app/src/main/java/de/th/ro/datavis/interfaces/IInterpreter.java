@@ -24,6 +24,4 @@ public interface IInterpreter {
 
     Result<AtomicField> interpretDataAsStream(Stream<String> stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException;
 
-    FFSIntensityColor mapToColor(double intensity);
-
 }

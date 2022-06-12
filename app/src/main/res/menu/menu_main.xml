@@ -4,32 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="de.th.ro.datavis.MainActivity">
     <item
-        android:id="@+id/instructions"
-        android:icon="@drawable/ic_instructions"
-        android:title="@string/instructions"
+        android:id="@+id/about"
+        android:icon="@drawable/ic_about"
+        android:title="@string/about"
         app:showAsAction="ifRoom">
-        <menu>
-            <item
-                android:id="@+id/import_instructions"
-                android:title="@string/import_instructions"
-                app:showAsAction="never" />
 
-            <item
-                android:id="@+id/app_instructions"
-                android:title="@string/app_instructions"
-                app:showAsAction="never" />
-        </menu>
     </item>
     <item
-        android:id="@+id/action_import"
-        android:orderInCategory="100"
-        android:title="@string/action_import"
-        app:showAsAction="never" />
+        android:id="@+id/app_instructions"
+        android:icon="@drawable/ic_instructions"
+        android:title="@string/app_instructions"
+        app:showAsAction="ifRoom">
+    </item>
 
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="200"
-        android:title="@string/action_settings"
-        android:iconTint="@color/black"
-        app:showAsAction="never" />
 </menu>

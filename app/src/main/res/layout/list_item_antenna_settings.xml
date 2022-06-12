@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="3"
+    android:layout_margin="1dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_view_antenna_id"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:layout_gravity="fill"
+        android:textStyle="bold" />
+
+    <View style="@style/VerticalDivider" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_view_antenna_name"
+        android:layout_weight="1"
+        android:gravity="start"
+        android:layout_gravity="fill" />
+
+    <ImageButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_antenna_delete"
+        android:src="@android:drawable/ic_delete"
+        android:background="@color/white"
+        android:layout_weight="1"
+        android:layout_gravity="fill"/>
+
+</LinearLayout>

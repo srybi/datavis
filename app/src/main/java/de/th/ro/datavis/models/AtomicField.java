@@ -12,10 +12,7 @@ import java.util.List;
 
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
-@Entity(tableName = "atomic_field", primaryKeys = {"antennaId","" + "tilt", "frequency", "interpretationMode"}, foreignKeys ={ @ForeignKey(entity = AntennaField.class,
-        parentColumns = "id",
-        childColumns = "antennaFieldId",
-        onDelete = CASCADE), @ForeignKey(entity = Antenna.class,
+@Entity(tableName = "atomic_field", primaryKeys = {"antennaId","" + "tilt", "frequency", "interpretationMode"}, foreignKeys ={ @ForeignKey(entity = Antenna.class,
                 parentColumns = "id",
                 childColumns = "antennaId",
                 onDelete = CASCADE)})

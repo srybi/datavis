@@ -6,30 +6,94 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <include
+        android:id="@+id/progressbar"
+        layout="@layout/progressbar" />
+
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="wrap_content">
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="72dp">
+            android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/field_HPBW"
+                android:id="@+id/field_Nullfill_dB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="12dp"
                 android:paddingTop="12dp"
-                android:text="@string/meta_HPBW"
+                android:text="@string/Nullfill_dB"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/meta_HPBW"
+                android:id="@+id/meta_Nullfill_dB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="12dp"
+                android:paddingTop="12dp"
+                android:text="@string/meta_NF"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/field_Squint_deg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="12dp"
+                android:paddingTop="12dp"
+                android:text="@string/Squint_deg"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/meta_Squint_deg"
                 android:layout_width="118dp"
                 android:layout_height="wrap_content"
                 android:paddingLeft="12dp"
                 android:paddingTop="12dp"
-                android:text="N/A ..."
+                android:text="@string/meta_NF"
+                android:textSize="18sp" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/field_Tilt_deg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="12dp"
+                android:paddingTop="12dp"
+                android:text="@string/Tilt_deg"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/meta_Tilt_deg"
+                android:layout_width="118dp"
+                android:layout_height="wrap_content"
+                android:paddingLeft="12dp"
+                android:paddingTop="12dp"
+                android:text="@string/meta_NF"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/field_TiltDeviation_deg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="12dp"
+                android:paddingTop="12dp"
+                android:text="@string/TiltDeviation_deg"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/meta_TiltDeviation_deg"
+                android:layout_width="118dp"
+                android:layout_height="wrap_content"
+                android:paddingLeft="12dp"
+                android:paddingTop="12dp"
+                android:text="@string/meta_NF"
                 android:textSize="18sp" />
 
         </TableRow>

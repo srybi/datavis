@@ -26,10 +26,10 @@ public class AntennaAdapter extends ArrayAdapter<Antenna> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         Antenna antenna = getItem(position);
          if(convertView == null){
-             convertView = LayoutInflater.from(getContext()).inflate(R.layout.antenna_list_item, parent, false);
+             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_antenna, parent, false);
          }
          TextView tvName = (TextView) convertView.findViewById(R.id.field_name);
-         tvName.setText(antenna.filename);
+         tvName.setText(antenna.description);
 
          return convertView;
     }

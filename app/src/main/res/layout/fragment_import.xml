@@ -6,8 +6,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".main.MainFragment"
     android:orientation="vertical"
-
     >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/configName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            style="@style/HeadLine"
+            android:text="      " />
+
+        <Button
+            android:id="@+id/btn_choose_config"
+            android:layout_width="67dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="v"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/btn_add_config"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="+"
+            android:textColor="@color/white" />
+
+
+    </LinearLayout>
 
 
     <TextView
@@ -27,28 +58,22 @@
         >
 
         <Button
-            android:id="@+id/btn_import_choose_antenna"
+            android:id="@+id/btn_add_default"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/btn_choose_existing"
-            android:gravity="start"
+            android:text="@string/btn_add_default"
             android:textColor="@color/white"
-            />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
             android:layout_weight="1"
-            android:text=""
             />
 
         <Button
-            android:id="@+id/btn_import_add_antenna"
+            android:id="@+id/btn_import_antenna"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/btn_add_new_antenna"
-            android:gravity="end"
             android:textColor="@color/white"
+            android:layout_weight="1"
             />
 
     </LinearLayout>
@@ -60,14 +85,31 @@
         android:text="@string/metaData"
         style="@style/HeadLine"/>
 
-    <Button
-        android:id="@+id/btn_import_add_metadata"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/btn_add_metaData"
-        android:textColor="@color/white"
-        />
+        android:orientation="horizontal"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp">
+
+        <Button
+            android:id="@+id/btn_import_add_metadata"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:text="@string/btn_add_metaData"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/btn_import_add_metadataFolder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/btn_add_metaFolder"
+            android:textColor="@color/white"
+            />
+    </LinearLayout>
+
 
     <TextView
         android:layout_width="match_parent"
@@ -92,7 +134,6 @@
         android:layout_marginBottom="20dp">
 
     </ListView>
-
 
 
 </LinearLayout>

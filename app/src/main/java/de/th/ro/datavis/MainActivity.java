@@ -16,12 +16,14 @@ import androidx.appcompat.widget.Toolbar;
 
 import java.util.concurrent.Executors;
 
+import de.th.ro.datavis.about.AboutActivity;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.imp.ImportActivity;
 import de.th.ro.datavis.instructions.AppInstructionsActivity;
 import de.th.ro.datavis.instructions.ImportInstructionsActivity;
 import de.th.ro.datavis.main.MainFragment;
 import de.th.ro.datavis.models.AntennaField;
+import de.th.ro.datavis.ui.settings.SettingsActivity;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 
@@ -48,25 +50,19 @@ public class MainActivity extends BaseActivity{
 
     }
 
-
-
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        MenuItem itemImportInstructions = menu.findItem(R.id.import_instructions);
+        MenuItem itemAbout = menu.findItem(R.id.about);
         MenuItem itemAppInstructions = menu.findItem(R.id.app_instructions);
-        MenuItem itemImport = menu.findItem(R.id.action_import);
-        MenuItem itemSettings = menu.findItem(R.id.action_settings);
+        //replace these two with actuall buttons
 
-        itemImportInstructions.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        itemAbout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                // switch to import instructions
-
-                Intent intent = new Intent(getApplicationContext(), ImportInstructionsActivity.class);
+                // switch to about
+                Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
                 startActivity(intent);
 
                 return false;
@@ -84,28 +80,6 @@ public class MainActivity extends BaseActivity{
                 return false;
             }
         });
-
-        itemImport.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                // switch to import
-
-                Intent intent = new Intent(getApplicationContext(), ImportActivity.class);
-                startActivity(intent);
-
-                return false;
-            }
-        });
-
-        itemSettings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                // switch to settings
-
-                return false;
-            }
-        });
-
         return true;
     }
 

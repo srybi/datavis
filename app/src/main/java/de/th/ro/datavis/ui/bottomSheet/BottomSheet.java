@@ -1,46 +1,32 @@
 package de.th.ro.datavis.ui.bottomSheet;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.icu.text.CaseMap;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.slider.Slider;
 
-import java.io.DataOutput;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.th.ro.datavis.R;
-import de.th.ro.datavis.db.daos.MetadataDao;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interfaces.ISubject;
-import de.th.ro.datavis.interpreter.ffs.FFSService;
-import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.MetaData;
+import de.th.ro.datavis.ui.progressBar.ProgressbarHolder;
 import de.th.ro.datavis.util.Helper;
-import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 /**
@@ -56,11 +42,12 @@ public class BottomSheet implements ISubject{
 
     private Switch modeSwitch;
     private Slider frequencySlider;
-    private Slider tiltSlider;
     private Button applyButton;
 
+    private ProgressbarHolder progressbar;
+
+
     private List<Double> frequencies;
-    private List<Double> tilts;
 
     /**
      * List of all settings. All setting have their actual State and a changing state.
@@ -68,23 +55,23 @@ public class BottomSheet implements ISubject{
      */
     private InterpretationMode mode;
     private InterpretationMode changedMode;
-    private LiveData<MetaData> HPBW = new MutableLiveData<>();
-    private String Squint;
+
+
 
     private final AppDatabase db;
 
     private double frequency;
     private double changedFrequency;
+    private int tilt;
+    private int changedTilt;
 
-    private double tilt;
-    private double changedTilt;
 
-
+    private LiveData<List<MetaData>> sqlQueryMetadata;
     public InterpretationMode getMode(){
         return this.mode;
     }
 
-    public BottomSheet(Context ctx, List<Double> frequencies, List<Double> tilts){
+    public BottomSheet(Context ctx, List<Double> frequencies){
         this.context = ctx;
         observers = new LinkedList<>();
         //default values
@@ -94,11 +81,9 @@ public class BottomSheet implements ISubject{
         this.frequency = frequencies.get(0);
         this.changedFrequency = frequencies.get(0);
 
-        this.tilts = tilts;
-        this.tilt = tilts.get(0);
-        this.changedTilt = tilts.get(0);
-
         db = AppDatabase.getInstance(ctx);
+        tilt = 2;
+        changedTilt  = 2;
     }
 
     /**
@@ -109,33 +94,26 @@ public class BottomSheet implements ISubject{
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
         bottomSheetDialog.setContentView(R.layout.modal_bottom_sheet);
 
+        // init ProgressBar
+        progressbar = new ProgressbarHolder(bottomSheetDialog.findViewById(R.id.simpleProgressBar));
+
+
         //get all interactables
         Switch modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
         Button applyButton = bottomSheetDialog.findViewById(R.id.apply);
 
         Log.d(TAG, Double.toString(frequency));
-        Log.d(TAG, Double.toString(tilt));
 
+        //fetches Metadata
         try {
-            Log.d(TAG, "Meta ID: " + db.metadataDao().findByMetadata_Background(1, frequency, tilt , "HHPBW_deg"));
-            HPBW = db.metadataDao().findByMetadata_Background(1, frequency, tilt, "HHPBW_deg");
+            readMetaDataFromDB();
         } catch (Exception e) { e.printStackTrace();}
 
         //Create Observer for Metadata
-        final Observer<MetaData> nameObserver = new Observer<MetaData>() {
-            @Override
-            public void onChanged(@Nullable final MetaData changeMetaData) {
-                // Update the UI, in this case, a TextView.
-                updateMetadataViews(bottomSheetDialog, changeMetaData);
-            }
-        };
-        HPBW.observe((AppCompatActivity)context,nameObserver);
-
-        Log.d(TAG, "Call Metadata");
+        createMetaDataObserver(bottomSheetDialog);
 
         modeSwitch = bottomSheetDialog.findViewById(R.id.switchMode);
         frequencySlider = bottomSheetDialog.findViewById(R.id.sliderFrequency);
-        tiltSlider = bottomSheetDialog.findViewById(R.id.sliderTilt);
         applyButton = bottomSheetDialog.findViewById(R.id.apply);
         //init with current setting
         if(frequencies.size() > 1) {
@@ -155,26 +133,7 @@ public class BottomSheet implements ISubject{
         }else{
             frequencySlider.setEnabled(false);
         }
-        if(tilts.size() > 1) {
-            float from = tilts.get(0).floatValue();
-            float to = tilts.get(tilts.size() - 1).floatValue();
-
-            tiltSlider.setValueFrom(from);
-            tiltSlider.setValueTo(to);
-
-            //dynamically calculate step size for slider
-            double stepSize = (float)(tilts.get(1) - tilts.get(0));
-
-            double truncatedDouble = Helper.scaleDouble(3, stepSize);
-
-            tiltSlider.setStepSize((float)truncatedDouble);
-
-        }else{
-            tiltSlider.setEnabled(false);
-        }
         keepSettings(bottomSheetDialog);
-
-
 
         //handler for ModeSwitch
         modeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -184,25 +143,15 @@ public class BottomSheet implements ISubject{
                 handleModeSwitch(compoundButton, isChecked);
             }
         });
-
-        //handler for Frequency Slider
         if(frequencies.size() > 1) {
             frequencySlider.addOnChangeListener(new Slider.OnChangeListener() {
                 @Override
                 public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
                     Log.d(TAG, "onValueChange: handeling FrequencySlider");
                     handleFrequencySlider(value);
-                }
-            });
-        }
 
-        //handler for Tilt Slider
-        if (tilts.size() > 1) {
-            tiltSlider.addOnChangeListener(new Slider.OnChangeListener() {
-                @Override
-                public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                    Log.d(TAG, "onValueChange: handeling TiltSlider");
-                    handleTiltSlider((int)value);
+                    //With AntennaID possible to live update Metadata:
+                    //updateMetadataViews();
                 }
             });
         }
@@ -212,6 +161,8 @@ public class BottomSheet implements ISubject{
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick - applyButton");
+
+                progressbar.showProgressBar();
 
                 if(checkChanges()){ //check if anything has changed
                     updateSetting(); //if so update settings
@@ -245,19 +196,9 @@ public class BottomSheet implements ISubject{
         }
 
         //tilt slider
-        if (tilts.size() > 1) {
-            tiltSlider.setValue((float)tilt);
-        }
     }
-    private void updateMetadataViews(BottomSheetDialog b, MetaData changeMetaData){
-        //TODO
-        Log.d(TAG, "Update Metadata");
-        TextView hpbw = b.findViewById(R.id.meta_HPBW);
-        try {        hpbw.setText(changeMetaData.getValue());
-        } catch (Exception e){         Log.d(TAG, "Couldn't match Metadata");}
 
 
-    }
 
     /**
      * This function checks if the bottom sheet has changed while being open.
@@ -292,6 +233,37 @@ public class BottomSheet implements ISubject{
         switchBtn.setChecked(isChecked);
     }
 
+    /**
+     * Methods to display and update Metadata:
+     * readMetaDataFromDB() fetches a List of all available Metadata for a certain AntennaID, frequency and tilt
+     * createMetaDataObserver() assigns an Observer to check for updates in the LiveData
+     * updateMetaData() on a change goes through the List of available Metadata and for each tries to find a TextView to update
+     *      this is done by String matching the [Metadata type] to the [TextView ID]
+     */
+    private void readMetaDataFromDB(){
+        //TODO: Antenna Hardcoded
+        sqlQueryMetadata = db.metadataDao().findAll_Background(5,frequency,tilt);
+        Log.d(TAG, "sqlQueryMetadata built "+sqlQueryMetadata.toString());
+    }
+
+    private void createMetaDataObserver(BottomSheetDialog bsd){
+        Observer<List<MetaData>> sqlMetadataObs = changeMetaData -> { updateMetadata(bsd, changeMetaData);};
+        sqlQueryMetadata.observe((AppCompatActivity)context, sqlMetadataObs);
+    }
+
+    private void updateMetadata(BottomSheetDialog bsd, List<MetaData> changeMetaData){
+        for(MetaData m: changeMetaData) {
+
+            int resID = context.getResources().getIdentifier(("meta_" + m.getType()), "id", context.getPackageName());
+            try {
+                TextView textView = bsd.findViewById(resID);
+                textView.setText(m.getValue());
+                Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
+            } catch (Exception e) {
+            }
+        }
+    }
+
     private void handleFrequencySlider(float value) {
         changedFrequency = value;
     }
@@ -309,7 +281,10 @@ public class BottomSheet implements ISubject{
     public double getFrequency() {
         return this.frequency;
     }
-    public double getTilt() {
+    public int getTilt() {
         return this.tilt;
+    }
+    public Context getContext() {
+        return this.context;
     }
 }

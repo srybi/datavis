@@ -14,12 +14,14 @@ public class Antenna {
     public int id;
     public String uri;
     public String filename;
+    public String description;
 
 
-    public Antenna(int id, String uri, String filename) {
+    public Antenna(int id, String uri, String filename, String description) {
         this.id = id;
         this.uri = uri;
         this.filename = filename;
+        this.description = description;
     }
 
     @Ignore
@@ -28,10 +30,23 @@ public class Antenna {
         this.filename = filename;
     }
 
+    @Ignore
+    public Antenna(String description){
+        this.description = description;
+    }
+
+    public void setAntennaFile(String uri, String filename){
+        this.uri = uri;
+        this.filename = filename;
+    }
+
+    public void setDescription(String description){
+        this.description = description;
+    }
+
     @NonNull
     @Override
     public String toString() {
-        return "[" + id + "] "
-                + "[" + filename + "] ";
+        return String.format("id: %2d; description: %s; uri: %s; filename: %s", id, description, uri, filename);
     }
 }

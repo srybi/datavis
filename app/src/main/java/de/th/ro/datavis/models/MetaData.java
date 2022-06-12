@@ -3,33 +3,28 @@ package de.th.ro.datavis.models;
 
 import static androidx.room.ForeignKey.CASCADE;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import de.th.ro.datavis.util.enums.MetadataType;
-
-@Entity(foreignKeys = {
+@Entity(primaryKeys = {"antennaID", "freq", "tilt", "type"},
+        foreignKeys = {
         @ForeignKey(entity = Antenna.class , parentColumns = "id", childColumns="antennaID", onDelete = CASCADE)
 })
 public class MetaData {
 
-    @PrimaryKey(autoGenerate = true)
-    public int id;
     public int antennaID;
+    @NonNull
     public String type;
 
     public double freq;
-    public int tilt;
+    public double tilt;
     public String value;
 
-
-    // todo Fields
-
-    //ID, Tilt, Freq, Value, Type
-
-    public MetaData(double freq, int tilt, String value) {
+    //ID, Tilt, Freq, Value
+    public MetaData(double freq, double tilt, String value) {
         this.freq = freq;
         this.tilt = tilt;
         this.value = value;
@@ -42,17 +37,9 @@ public class MetaData {
 
     @Override
     public String toString() {
-        return "Metadata "+this.type+"("+id+")" + " Freq: "+this.freq+" Tilt: "+this.tilt+" = "+this.value;
+        return "Metadata "+this.type+ " Freq: "+this.freq+" Tilt: "+this.tilt+" = "+this.value;
     }
 
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public int getAntennaID() {
         return antennaID;
@@ -70,7 +57,7 @@ public class MetaData {
         this.freq = freq;
     }
 
-    public int getTilt() {
+    public double getTilt() {
         return tilt;
     }
 

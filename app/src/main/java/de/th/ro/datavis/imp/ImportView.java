@@ -1,6 +1,7 @@
 package de.th.ro.datavis.imp;
 
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -13,29 +14,41 @@ import de.th.ro.datavis.interfaces.IImportOptions;
 import de.th.ro.datavis.main.AntennaFieldAdapter;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
+import de.th.ro.datavis.models.MetaData;
+import de.th.ro.datavis.ui.progressBar.ProgressbarHolder;
 
 public abstract class ImportView implements IImportOptions {
 
 
     private ListView listViewAntennaFields;
 
-    private Button btnChooseAntena;
-    private Button btnAddNewAntenna;
+    private ProgressbarHolder progressBar;
+
+    private Button btnAddNewConfig;
+    private Button btnChooseConfig;
+    private Button btnAddImportAntenna;
+    private Button btnAddDefaultAntenna;
     private Button btnAddMetaData;
     private Button btnAddFFS;
+    private Button btnAddMetaDataFolder;
+
+    private EditText configName;
+
 
     TextView tvHeadLine;
+    TextView tvMetaIndicator;
 
     FragmentActivity fragmentActivity;
 
 
-    public ImportView(FragmentActivity fa, Antenna antenna, List<AntennaField> fieldList) {
+    public ImportView(FragmentActivity fa, Antenna antenna, List<AntennaField> fieldList, MetaData metaData) {
 
         fragmentActivity = fa;
         initButtons(fa);
+        initConfigName(fa, antenna);
         initAntennaHeadLine(fa, antenna);
         initListView(fa, fieldList);
-
+        initProgressBar(fa);
     }
 
     private void initListView(FragmentActivity fa, List<AntennaField> antennaFieldList){
@@ -53,15 +66,31 @@ public abstract class ImportView implements IImportOptions {
     }
     private void initButtons(FragmentActivity fa){
 
-        btnChooseAntena = fa.findViewById(R.id.btn_import_choose_antenna);
-        btnAddNewAntenna = fa.findViewById(R.id.btn_import_add_antenna);
+        configName = fa.findViewById(R.id.configName);
+        btnAddNewConfig = fa.findViewById(R.id.btn_add_config);
+        btnChooseConfig = fa.findViewById(R.id.btn_choose_config);
+        btnAddImportAntenna = fa.findViewById(R.id.btn_import_antenna);
+        btnAddDefaultAntenna = fa.findViewById(R.id.btn_add_default);
         btnAddMetaData = fa.findViewById(R.id.btn_import_add_metadata);
+        btnAddMetaDataFolder = fa.findViewById(R.id.btn_import_add_metadataFolder);
         btnAddFFS = fa.findViewById(R.id.btn_import_add_ffs);
 
-        btnChooseAntena.setOnClickListener( v -> { chooseExistingAntenna(); });
-        btnAddNewAntenna.setOnClickListener( v -> { addNewAntenna(); });
+        configName.addTextChangedListener(descriptionChanged());
+        btnAddNewConfig.setOnClickListener(v -> {insertNewConfig(); });
+        btnChooseConfig.setOnClickListener(v -> { chooseExistingConfig(); });
+        btnAddImportAntenna.setOnClickListener(v -> { addImportAntenna(); });
+        btnAddDefaultAntenna.setOnClickListener(v -> {addDefaultAntenna();});
         btnAddMetaData.setOnClickListener( v -> { addMetaData(); });
+        btnAddMetaDataFolder.setOnClickListener( v -> { addMetaDataFolder(); });
         btnAddFFS.setOnClickListener( v -> { addFFS(); });
+    }
+
+    private void initConfigName(FragmentActivity fragmentActivity, Antenna antenna){
+        configName = fragmentActivity.findViewById(R.id.configName);
+        if (antenna == null){
+            return;
+        }
+        configName.setText(antenna.description);
     }
 
     private void initAntennaHeadLine(FragmentActivity fragmentActivity, Antenna antenna){
@@ -73,10 +102,22 @@ public abstract class ImportView implements IImportOptions {
 
         String s = "Antenna " + antenna.filename;
         tvHeadLine.setText(s);
-
     }
 
-    public void updateData(FragmentActivity fa, Antenna antenna, List<AntennaField> antennaFieldList){
+    private void initProgressBar(FragmentActivity fa){
+        progressBar = new ProgressbarHolder(fa.findViewById(R.id.simpleProgressBar));
+    }
+
+    public void hideProgressBar(){
+        progressBar.hideProgressBar();
+    }
+
+    public void showProgressBar(){
+        progressBar.showProgressBar();
+    }
+
+
+    public void updateData(FragmentActivity fa, Antenna antenna, List<AntennaField> antennaFieldList, MetaData metaData){
         initAntennaHeadLine(fa, antenna);
         initListView(fa, antennaFieldList);
     }

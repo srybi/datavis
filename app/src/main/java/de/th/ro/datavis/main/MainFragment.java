@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -26,6 +27,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.navigation.fragment.DialogFragmentNavigatorDestinationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +36,11 @@ import java.util.concurrent.Executors;
 import de.th.ro.datavis.ARActivity;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
-import de.th.ro.datavis.interfaces.IInterpreter;
-import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
+import de.th.ro.datavis.imp.ImportActivity;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.ui.adapter.AntennaAdapter;
+import de.th.ro.datavis.ui.settings.SettingsActivity;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 import de.th.ro.datavis.util.fragment.BaseFragment;
 
@@ -46,6 +48,7 @@ import static android.os.Build.VERSION.SDK_INT;
 
 public class MainFragment extends BaseFragment {
 
+    private final String TAG = "MainFragment";
     private AppDatabase appDb;
 
     private ListView listView;
@@ -96,33 +99,21 @@ public class MainFragment extends BaseFragment {
         context = getActivity();
 
         initAntennaList();
+        //find two buttons
         findButton();
-        findTriggerButton();
 
     }
 
     private void findListView() {
         listView = getActivity().findViewById(R.id.list_antenna_fields);
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
-                Antenna item = antennas.getValue().get(i);
-                intent.putExtra("antennaId", item.id);
-                intent.putExtra("interpretationMode", "Linear");
-                getActivity().startActivity(intent);
-
-                return true;
-            }
-        });
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.d(TAG, "onItemClick: Clicked on item");
                 Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
                 Antenna item = antennas.getValue().get(i);
                 intent.putExtra("antennaId", item.id);
-                intent.putExtra("interpretationMode", "Logarithmic");
+                intent.putExtra("antennaURI", checkAntenna(item));
                 getActivity().startActivity(intent);
             }
         });
@@ -143,29 +134,43 @@ public class MainFragment extends BaseFragment {
 
 
     private void findButton(){
-        Button button = getActivity().findViewById(R.id.btn_ar_main);
-        button.setOnClickListener(new View.OnClickListener() {
+        Button btn_import = getActivity().findViewById(R.id.btn_import);
+        Button btn_delete = getActivity().findViewById(R.id.btn_delete);
+        btn_import.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity().getApplicationContext(), ARActivity.class);
-                getActivity().startActivity(intent);
+                Intent intent = new Intent(context.getApplicationContext(), ImportActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        btn_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context.getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
             }
         });
 
     }
 
-    private void findTriggerButton(){
-        Button button = getActivity().findViewById(R.id.btn_ffs_interpret);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openFileDialog(view);
-            }
-        });
-
+    private String checkAntenna(Antenna item){
+        if(item.uri == null){
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "No antenna model to display. Showing default", Toast.LENGTH_LONG).show();
+            return "models/datavis_antenna_asm.glb";
+        }else{
+            return item.uri;
+        }
     }
 
 
+    /**
+     *==========================================
+     *      All of the functions below          |
+     *      are never used. -srybi              |
+     *==========================================
+     */
 
     public void openFileDialog(View view){
 

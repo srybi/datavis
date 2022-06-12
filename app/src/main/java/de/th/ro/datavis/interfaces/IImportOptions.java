@@ -1,13 +1,22 @@
 package de.th.ro.datavis.interfaces;
 
+import android.text.TextWatcher;
+
 public interface IImportOptions {
 
+    TextWatcher descriptionChanged();
 
-    void chooseExistingAntenna();
+    void insertNewConfig();
 
-    void addNewAntenna();
+    void chooseExistingConfig();
+
+    void addImportAntenna();
+
+    void addDefaultAntenna();
 
     void addMetaData();
+
+    void addMetaDataFolder();
 
     void addFFS();
 

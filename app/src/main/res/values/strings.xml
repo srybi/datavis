@@ -13,18 +13,28 @@
     <!-- Misc -->
     <string name="antenna">Antenna</string>
     <string name="metaData">Metadata</string>
+    <string name="metaDataIndicator">Metadata Imported</string>
     <string name="farFieldSource">Farfield Source</string>
 
     <!-- Main -->
-    <string name="introduction">Upload a file using the Upload File Button.</string>
-    <string name="howtoChooseFile">Long Press the item to start rendering in linear mode. Press the item to use the logarithmic mode</string>
-    <string name="howtoAr">Tap on a plane to place the antenna. This might take a few seconds. Be patient</string>
-    <string name="open_ar">Open AR</string>
-    <string name="upload_field">Upload File</string>
+    <string name="introduction">Visualize antennas and electric fields in AR.</string>
+    <string name="howToinstructions">Click on the question mark to receive app instructions.</string>
+    <string name="howtoAr">Click on one of the items to start the visualization. If there are none, click Import.</string>
+    <string name="import_btn">Import</string>
+    <string name="delete_btn">Manage</string>
+
+    <!-- AR Activity -->
+    <string name="HHPBW_deg">HPBW:</string>
+    <string name="VHPBW_deg">VHPBW:</string>
+    <string name="Directivity_dBi">Directivity:</string>
 
     <!-- BottomSheet -->
-    <string name="meta_HPBW">HPBW:</string>
-    <string name="meta_Squint">Squint:</string>
+    <string name="frequency">Frequency</string>
+    <string name="meta_NF">[NF]</string>
+    <string name="Nullfill_dB">Nullfill:</string>
+    <string name="Squint_deg">Squint:</string>
+    <string name="Tilt_deg">Tilt real:</string>
+    <string name="TiltDeviation_deg">Tilt deviation:</string>
 
     <!-- MainMenu -->
     <string name="instructions">Instructions</string>
@@ -34,21 +44,41 @@
     <string name="action_import">Import</string>
 
     <!-- Import -->
-    <string name="btn_choose_existing">Choose Existing</string>
-    <string name="btn_add_new_antenna">Add new antenna</string>
+    <string name="btn_add_default">Add Default</string>
+    <string name="btn_add_new_antenna">Add antenna</string>
     <string name="btn_add_metaData">Add Metadata</string>
+    <string name="btn_add_metaFolder">Add Metadata Folder</string>
     <string name="btn_add_ffs">Add FFS</string>
     <string name="apply_changes">Apply Changes</string>
     <string name="log">Log</string>
     <string name="linear">Linear</string>
+    <string name="toastInvalidAntenna">Not a valid Antenna!</string>
+    <string name="toastInvalidFFS">Not a valid .ffs File!</string>
+    <string name="toastInvalidMetadata">Not a valid .csv Metadata file!</string>
+    <string name="toastValidMetadata">Metadata File imported</string>
+    <string name="toastValidMetadataFolder">Metadata Folder imported</string>
+    <string name="toastRedundantMetadata">Metadata already read!</string>
 
-    <!-- Bottom Sheet -->
-    <string name="frequency">Frequency</string>
-    <string name="tilt">Tilt</string>
 
     <!-- Instructions -->
     <string name="app_instructions_text">1) Press the Checkboxes of the antennas you want to display\n\n2) Press the button \'Open In AR\'\n\n3) Use the Bottom Sheet to get more information about the field strength of the antenna and to change frequency and tilt</string>
-    <string name="import_instructions_text">1) Press the menu icon in the top right corner\n\n2) Press \'Import\'\n\n3) Select an existing antenna or add a new one\n\n4) Add Metadata and .ffs files</string>
+    <string name="import_instructions_text">1) Press \'⌄\' to select an existing configuration\nor \'+\' to add a new one\n\n2) *OPTOINAL*\nChange the name by clicking on it\n\n3) If you want to use a custom antenna,\nadd one by clicking on \'ADD ANTENNA\',\notherwise click on \'ADD DEFAULT\'\n\n4) Add Metadata and .ffs files</string>
+
+    <!-- about -->
+    <string name="about">About</string>
+    <string name="datavis">datavis</string>
+    <string name="about_text">AR-App for\ndata visualisation\nof antenna signals\n\nProject within the scope\nof the module\nSoftware Engineering Practice\nin collaboration with Ericsson\n\nBy\nTassilo Heinemann\nDominik Kauth\nSamuel Kern\nStefan Rybinski\nLeopold Straub</string>
+
+
+    <!-- Settings -->
+    <string name="tab_antenna">Antenna</string>
+    <string name="tab_ffs">Fields</string>
+    <string name="tab_metadata">Metadata</string>
+    <string name="clear_all_confirm">Clear Database?</string>
+    <string name="clear_one_confirm">Delete</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 
 
 </resources>
