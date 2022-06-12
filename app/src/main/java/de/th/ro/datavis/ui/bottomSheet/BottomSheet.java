@@ -189,7 +189,7 @@ public class BottomSheet implements ISubject{
                 @Override
                 public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
                     Log.d(TAG, "onValueChange: handeling TiltSlider");
-                    handleTiltSlider((int)value);
+                    handleTiltSlider(value);
                 }
             });
         }
@@ -310,7 +310,7 @@ public class BottomSheet implements ISubject{
         changedFrequency = value;
     }
 
-    private void handleTiltSlider(int value) {
+    private void handleTiltSlider(float value) {
         changedTilt = value;
     }
 

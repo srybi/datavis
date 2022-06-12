@@ -48,7 +48,7 @@ public class FFSService {
         double floatingPoint = 1;
         int start = filename.indexOf("_T") + 2, end = start + 2;
         if (filename.charAt(start+1)=='.') {
-            end = filename.indexOf("e+");
+            end = filename.indexOf("0e"+1);
             floatingPoint = Math.pow(10, Double.parseDouble(filename.substring(end+2, end+4)));
             if (filename.charAt(end+1)=='-')
                 floatingPoint = Math.pow(10, -1 * Double.parseDouble(filename.substring(end+2, end+4)));
