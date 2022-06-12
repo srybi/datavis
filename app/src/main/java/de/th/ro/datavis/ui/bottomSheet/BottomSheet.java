@@ -15,6 +15,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
 
 import java.util.LinkedList;
@@ -126,35 +127,32 @@ public class BottomSheet implements ISubject{
         applyButton = bottomSheetDialog.findViewById(R.id.apply);
         //init with current setting
         if(frequencies.size() > 1) {
-            float from = frequencies.get(0).floatValue();
-            float to = frequencies.get(frequencies.size() - 1).floatValue();
+
+
+            float from = 0;
+            float to = frequencies.size()-1;
 
             frequencySlider.setValueFrom(from);
             frequencySlider.setValueTo(to);
+            frequencySlider.setStepSize(1);
 
-            //dynamically calculate step size for slider
-            double stepSize = (float)(frequencies.get(1) - frequencies.get(0));
-
-            double truncatedDouble = Helper.scaleDouble(3, stepSize);
-
-            frequencySlider.setStepSize((float)truncatedDouble);
+            frequencySlider.setLabelFormatter(new LabelFormatter() {
+                @Override
+                public String getFormattedValue(float value) {
+                    return frequencies.get((int)value).toString();
+                }
+            });
 
         }else{
             frequencySlider.setEnabled(false);
         }
         if(tilts.size() > 1) {
-            float from = tilts.get(0).floatValue();
-            float to = tilts.get(tilts.size() - 1).floatValue();
+            float from = 0;
+            float to = tilts.size()-1;
 
             tiltSlider.setValueFrom(from);
             tiltSlider.setValueTo(to);
-
-            //dynamically calculate step size for slider
-            double stepSize = (float)(tilts.get(1) - tilts.get(0));
-
-            double truncatedDouble = Helper.scaleDouble(3, stepSize);
-
-            tiltSlider.setStepSize((float)truncatedDouble);
+            tiltSlider.setStepSize(1);
 
         }else{
             tiltSlider.setEnabled(false);
@@ -231,12 +229,12 @@ public class BottomSheet implements ISubject{
 
         //frequency slider
         if(frequencies.size() > 1) {
-            frequencySlider.setValue((float) frequency);
+            frequencySlider.setValue((float) frequencies.indexOf(frequency));
         }
 
         //tilt slider
         if (tilts.size() > 1) {
-            tiltSlider.setValue((float)tilt);
+            tiltSlider.setValue(tilts.indexOf(tilt));
         }
     }
 
@@ -307,11 +305,11 @@ public class BottomSheet implements ISubject{
     }
 
     private void handleFrequencySlider(float value) {
-        changedFrequency = value;
+        changedFrequency = frequencies.get((int)value);
     }
 
     private void handleTiltSlider(float value) {
-        changedTilt = value;
+        changedTilt = tilts.get((int)value);
     }
 
     //Observer Pattern
