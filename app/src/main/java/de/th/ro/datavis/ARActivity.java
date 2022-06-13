@@ -178,7 +178,7 @@ public class ARActivity extends BaseActivity implements
 
             Log.d(TAG, "buildAntennaModel: "+ antennaURI);
             ModelRenderable.builder()
-                    .setSource(this, Uri.parse(antennaURI))
+                    .setSource(this, antennaUri)
                     .setIsFilamentGltf(true)
                     .setAsyncLoadEnabled(true)
                     .build()
@@ -326,12 +326,13 @@ public class ARActivity extends BaseActivity implements
         try{
             model.setRenderable(renderable)
                     .animate(true).start();
-        }catch(IllegalStateException e){
+        }catch(Exception e ){
             Log.e(TAG, "attachAntennaToAnchorNode: failed because of corrupt glb file");
             Toast.makeText(this, "Found corrupt .glb file! Displaying default antenna", Toast.LENGTH_LONG).show();
             anchorNode.removeChild(model);
             renderableList.put("antenne", renderable);
             buildDefaultModel();
+
         }finally {
             model.select();
         }
