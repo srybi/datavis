@@ -13,13 +13,13 @@ public class Calc {
                 * Math.cos(line.getPhiRadians());
     }
 
-    public static double y_polarToCartesian(FFSLine line, InterpretationMode mode) {
+    public static double z_polarToCartesian(FFSLine line, InterpretationMode mode) {
         return calcIntensity(line.getRePhi(), line.getImPhi(), line.getReTheta(), line.getImTheta(), mode)
                 * Math.sin(line.getThetaRadians())
                 * Math.sin(line.getPhiRadians());
     }
 
-    public static double z_polarToCartesian(FFSLine line, InterpretationMode mode) {
+    public static double y_polarToCartesian(FFSLine line, InterpretationMode mode) {
         return calcIntensity(line.getRePhi(), line.getImPhi(), line.getReTheta(), line.getImTheta(), mode)
                 * Math.cos(line.getThetaRadians());
     }
