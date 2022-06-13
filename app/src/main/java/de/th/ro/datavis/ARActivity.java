@@ -282,6 +282,12 @@ public class ARActivity extends BaseActivity implements
         scalingFactor = calcScalingFactor(maxIntensity);
         Log.d(TAG, "ScalingFactor " + scalingFactor);
         int i = 0;
+
+        if (coords == null){
+            Toast.makeText(this, "Keine Coordinaten für diese Kombination von Frequenz und Tilt vorhanden" , Toast.LENGTH_LONG).show();
+            return;
+        }
+
         for(Sphere s : coords){
             FFSIntensityColor intensityColor = ffsService.mapToColor(s.getIntensity(), maxIntensity);
             attachSphereToAnchorNode(middle, list.get(intensityColor.getName()+"Sphere"), s, scalingFactor);
