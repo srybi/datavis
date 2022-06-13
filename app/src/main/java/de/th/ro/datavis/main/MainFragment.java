@@ -53,7 +53,7 @@ public class MainFragment extends BaseFragment {
 
     private ListView listView;
 
-    private LiveData<List<Antenna>> antennas = new MutableLiveData<>(new ArrayList<>());
+    private LiveData<List<Antenna>> antennas;
 
     private FragmentActivity context;
 
@@ -83,12 +83,12 @@ public class MainFragment extends BaseFragment {
                 ActivityCompat.requestPermissions(getActivity(),
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.MANAGE_EXTERNAL_STORAGE}, 1);//permission request code is just an int
+
+                Intent i = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivity(i);
             }
 
-
-
-            Intent i = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-            startActivity(i);
+            antennas = new MutableLiveData<>(new ArrayList<>());
 
         }else {
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {

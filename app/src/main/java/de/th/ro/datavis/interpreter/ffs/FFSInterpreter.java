@@ -217,7 +217,7 @@ public class FFSInterpreter implements IInterpreter {
         final int stepSize = (ffsLines.get(1).getTheta() - ffsLines.get(0).getTheta()) < 3 ? 3 : 1;
 
         //Bugfix: filter all negative intensities
-        coordinates = ffsLines.stream().filter(l -> (l.getPhi()%stepSize == 0) && (l.getTheta()%stepSize == 0)).filter(l -> Calc.calcIntensity(l, mode) > 0).map(l -> {
+        coordinates = ffsLines.stream().filter(l -> (l.getPhi()%stepSize == 0) && (l.getTheta()%stepSize == 0)).filter(l -> Calc.calcIntensity(l, InterpretationMode.Logarithmic) > 0).map(l -> {
 
             double x = Calc.x_polarToCartesian(l, mode);
             double y = Calc.y_polarToCartesian(l, mode);

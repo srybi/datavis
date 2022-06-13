@@ -46,8 +46,6 @@ public class MainActivity extends BaseActivity{
 
         mainFragment = new MainFragment(getFragmentContainerView());
 
-        navigateTo( mainFragment);
-
     }
 
     @Override

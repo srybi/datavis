@@ -5,11 +5,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentOnAttachListener;
@@ -43,7 +46,6 @@ import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
-import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.MetaData;
@@ -54,6 +56,8 @@ import de.th.ro.datavis.util.FileProviderDatavis;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.IntentConst;
 import de.th.ro.datavis.util.enums.InterpretationMode;
+import androidx.appcompat.widget.Toolbar;
+
 
 public class ARActivity extends BaseActivity implements
         FragmentOnAttachListener,
@@ -79,14 +83,18 @@ public class ARActivity extends BaseActivity implements
     private String antennaFileName;
     private String TAG = "ARActivity";
     private boolean ffsAvailable;
-    private final AppDatabase db = AppDatabase.getInstance(this);
+    private AppDatabase db;
 
     private LiveData<List<MetaData>> sqlQueryMetadata;
     private Observer<List<MetaData>> sqlMetadataObs;
-    //private LiveData<MetaData> HHPBW_deg, VHPBW_deg, Directivity_dBi = new MutableLiveData<>();
 
     private double maxIntensity = -1;
     private float scalingFactor = 1;
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,28 +104,47 @@ public class ARActivity extends BaseActivity implements
         setContentView(R.layout.activity_ar);
         getSupportFragmentManager().addFragmentOnAttachListener(this);
 
-        if (savedInstanceState == null) {
-            if (Sceneform.isSupported(this)) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.arFragment, ArFragment.class, null)
-                        .commit();
-            }
+        //get toolbar and set default back button
+        Toolbar toolbar = findViewById(R.id.toolbar_ar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        ffsInterpreter = new FFSInterpreter();
+        db = AppDatabase.getInstance(this);
+
+        //set fragment
+        if (Sceneform.isSupported(this)) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.arFragment, ArFragment.class, null)
+                    .commit();
+        }
+
+        if (savedInstanceState == null) {
+            savedInstanceState = getIntent().getExtras();
+        }
+        antennaId = savedInstanceState.getInt("antennaId");
+        antennaURI = savedInstanceState.getString("antennaURI");
+        antennaFileName = savedInstanceState.getString(IntentConst.INTENT_EXTRA_ANTENNA_FILENAME);
+        initalSetup(antennaId, antennaURI, antennaFileName);
+    }
+
+
+
+    private void initalSetup(int internalAntennaId, String internalAntennaURI, String internalAntennaFileName) {
+
         ffsService = new FFSService(ffsInterpreter, this);
 
-        Bundle b = getIntent().getExtras();
-        antennaId = b.getInt("antennaId");
-        antennaURI = b.getString("antennaURI");
-        antennaFileName = b.getString(IntentConst.INTENT_EXTRA_ANTENNA_FILENAME);
-        List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, ffsService.TiltForAntenna(antennaId), InterpretationMode.Logarithmic);
+
+
+        List<Double> frequencies = ffsService.FrequenciesForAntenna(internalAntennaId, ffsService.TiltForAntenna(internalAntennaId), InterpretationMode.Logarithmic);
         List<Double> tilts;
         ffsAvailable = frequencies.size() != 0;
         //only initialize bottom sheet, if there is a ffs data to manipulate
         if(ffsAvailable){
-            tilts = ffsService.TiltsForAntenna(antennaId, frequencies.get(0), InterpretationMode.Logarithmic);
-            bottomSheet = new BottomSheet(this, frequencies, tilts, antennaId);
+            tilts = ffsService.TiltsForAntenna(internalAntennaId, frequencies.get(0), InterpretationMode.Logarithmic);
+            bottomSheet = new BottomSheet(this, frequencies, tilts, internalAntennaId);
             bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
             gestureDetector = new GestureDetector(this, bottomSheetHandler);
         }else{
@@ -129,12 +156,39 @@ public class ARActivity extends BaseActivity implements
         buildAntennaModel();
         buildSpheres();
         Log.d(TAG, "onCreate: " + renderableList.size());
+    }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Make sure to call the super method so that the states of our views are saved
+        super.onSaveInstanceState(outState);
+        // Save our own state now
+        outState.putInt("antennaId", antennaId);
+        outState.putString("antennaURI", antennaURI);
+        outState.putString(IntentConst.INTENT_EXTRA_ANTENNA_FILENAME, antennaFileName);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)  {
+        getMenuInflater().inflate(R.menu.menu_ar, menu);
+
+        MenuItem itemSettings = menu.findItem(R.id.app_settings);
+
+        itemSettings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                //open bottom sheet
+                bottomSheetHandler.showBottomSheet();
+                return false;
+            }
+        });
+        return true;
     }
 
     @Override
     public void onAttachFragment(@NonNull FragmentManager fragmentManager, @NonNull Fragment fragment) {
         if (fragment.getId() == R.id.arFragment) {
+
             arFragment = (ArFragment) fragment;
             arFragment.setOnSessionConfigurationListener(this);
             arFragment.setOnViewCreatedListener(this);

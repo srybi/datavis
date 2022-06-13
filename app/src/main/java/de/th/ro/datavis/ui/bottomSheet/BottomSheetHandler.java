@@ -46,4 +46,8 @@ public class BottomSheetHandler extends GestureDetector.SimpleOnGestureListener 
         }
     }
 
+    public void showBottomSheet(){
+        bottomSheet.showBottomSheetDialog();
+    }
+
 }

@@ -27,6 +27,8 @@
     <string name="HHPBW_deg">HPBW:</string>
     <string name="VHPBW_deg">VHPBW:</string>
     <string name="Directivity_dBi">Directivity:</string>
+    <string name="back_arrow">Back</string>
+    <string name="settings_icon">Settings</string>
 
     <!-- BottomSheet -->
     <string name="frequency">Frequency</string>
