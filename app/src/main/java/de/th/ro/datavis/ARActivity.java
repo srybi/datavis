@@ -50,7 +50,9 @@ import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheet;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
+import de.th.ro.datavis.util.FileProviderDatavis;
 import de.th.ro.datavis.util.activity.BaseActivity;
+import de.th.ro.datavis.util.constants.IntentConst;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 public class ARActivity extends BaseActivity implements
@@ -74,6 +76,7 @@ public class ARActivity extends BaseActivity implements
     private TransformableNode middleNode;
     private int antennaId;
     private String antennaURI;
+    private String antennaFileName;
     private String TAG = "ARActivity";
     private boolean ffsAvailable;
     private final AppDatabase db = AppDatabase.getInstance(this);
@@ -107,6 +110,7 @@ public class ARActivity extends BaseActivity implements
         Bundle b = getIntent().getExtras();
         antennaId = b.getInt("antennaId");
         antennaURI = b.getString("antennaURI");
+        antennaFileName = b.getString(IntentConst.INTENT_EXTRA_ANTENNA_FILENAME);
         List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, ffsService.TiltForAntenna(antennaId), InterpretationMode.Logarithmic);
         List<Double> tilts;
         ffsAvailable = frequencies.size() != 0;
@@ -155,6 +159,23 @@ public class ARActivity extends BaseActivity implements
     }
 
     private void buildAntennaModel(){
+        Log.d(TAG, "buildAntennaModel: "+ antennaURI);
+
+        if (antennaFileName == null || antennaFileName.equals("datavis_default")){
+            // antennaFileName == null -> No Antenna chosen -> Use Default Antenna
+            buildDefaultModel();
+            return;
+        }
+
+        Uri antennaUri = FileProviderDatavis.getURIForAntenna(getApplicationContext(), antennaFileName);
+        if (antennaUri == null){
+
+            Toast.makeText(this,  "File not Found: " + antennaFileName + " -> Building Default Antenna", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "Antenna URI: File not Found: " + antennaFileName);
+            buildDefaultModel();
+            return;
+        }
+
             Log.d(TAG, "buildAntennaModel: "+ antennaURI);
             ModelRenderable.builder()
                     .setSource(this, Uri.parse(antennaURI))
@@ -181,6 +202,7 @@ public class ARActivity extends BaseActivity implements
                     .setAsyncLoadEnabled(true)
                     .build()
                     .thenAccept(model -> {
+                        renderableList.put("antenne", model);
                         handleCorruptGLB(model);
                         Log.d(TAG, "Antenna model done");
                     }).exceptionally(throwable -> {
@@ -308,6 +330,7 @@ public class ARActivity extends BaseActivity implements
             Log.e(TAG, "attachAntennaToAnchorNode: failed because of corrupt glb file");
             Toast.makeText(this, "Found corrupt .glb file! Displaying default antenna", Toast.LENGTH_LONG).show();
             anchorNode.removeChild(model);
+            renderableList.put("antenne", renderable);
             buildDefaultModel();
         }finally {
             model.select();
