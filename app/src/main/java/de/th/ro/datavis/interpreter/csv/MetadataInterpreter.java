@@ -64,8 +64,12 @@ public class MetadataInterpreter {
         List<MetaData> mList = new ArrayList<>();
         for(int i=1; i<matrix.length; i++) {
             for(int j=1; j<matrix[i].length; j++) {
-                MetaData m = new MetaData(Double.parseDouble(matrix[i][0]),Double.parseDouble(matrix[0][j]),matrix[i][j]);
-                mList.add(m);
+                try {
+                    MetaData m = new MetaData(Double.parseDouble(matrix[i][0]),Double.parseDouble(matrix[0][j]),matrix[i][j]);
+                    mList.add(m);
+                } catch (Exception e){
+                    Log.d(LOG_TAG,"Empty string found in .csv: "+ i+j);
+                }
             }
         }
         Log.d(LOG_TAG, "Finished making MetaData from .csv matrix with "+ mList.size() + " entries");
