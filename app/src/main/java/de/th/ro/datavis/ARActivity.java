@@ -256,6 +256,12 @@ public class ARActivity extends BaseActivity implements
     @Override
     public void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
         Log.d(TAG, "Plane Tab");
+
+        if (anchorNode != null){
+            // Antenna is already Placed
+            return;
+        }
+
         // Create the Anchor.
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
