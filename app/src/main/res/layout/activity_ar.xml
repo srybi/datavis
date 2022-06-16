@@ -19,61 +19,30 @@
             android:id="@+id/RelativeLayout01"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
-            <TextView
-                android:id="@+id/field_Directivity_dBi"
-                android:layout_alignParentLeft="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/Directivity_dBi"
-                android:background="@color/black_50"
-                android:textColor="@color/white"/>
 
             <TextView
-                android:id="@+id/meta_Directivity_dBi"
+                android:id="@+id/field_Directivity_dBi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/field_Directivity_dBi"
-                android:text="@string/meta_NF"
+                android:layout_alignParentLeft="true"
                 android:background="@color/black_50"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/field_HHPBW_deg"
                 android:layout_below="@id/field_Directivity_dBi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/HHPBW_deg"
                 android:background="@color/black_50"
                 android:textColor="@color/white" />
-
-            <TextView
-                android:id="@+id/meta_HHPBW_deg"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/field_HHPBW_deg"
-                android:layout_below="@id/field_Directivity_dBi"
-                android:text="@string/meta_NF"
-                android:background="@color/black_50"
-                android:textColor="@color/white"/>
 
             <TextView
                 android:id="@+id/field_VHPBW_deg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/field_HHPBW_deg"
-                android:text="@string/VHPBW_deg"
                 android:background="@color/black_50"
                 android:textColor="@color/white"/>
-
-            <TextView
-                android:id="@+id/meta_VHPBW_deg"
-                android:layout_toRightOf="@id/field_VHPBW_deg"
-                android:layout_below="@id/meta_HHPBW_deg"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/meta_NF"
-                android:background="@color/black_50"
-                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/field_Frequency"

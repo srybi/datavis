@@ -121,12 +121,6 @@ public class ARActivity extends BaseActivity implements
             bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
             gestureDetector = new GestureDetector(this, bottomSheetHandler);
 
-            //Show FFS creating data on the right
-            try {
-                updateFFSCreatingData();
-            } catch (Exception e){
-                e.printStackTrace();
-            }
         }else{
             Toast.makeText(
                     this, "No ffs data to display!", Toast.LENGTH_LONG).show();
@@ -295,6 +289,7 @@ public class ARActivity extends BaseActivity implements
             createMetaDataObserver();
             bottomSheetHandler.makeCueVisible(true);
             bottomSheet.subscribe(this);
+            updateFFSCreatingData();
         }
 
     }
@@ -446,14 +441,16 @@ public class ARActivity extends BaseActivity implements
 
     private void updateMetadata(List<MetaData> changeMetaData){
         for(MetaData m: changeMetaData) {
-            int resID = this.getResources().getIdentifier(("meta_" + m.getType()), "id", this.getPackageName());
+            int resID = this.getResources().getIdentifier(("field_" + m.getType()), "id", this.getPackageName());
             try {
                 TextView textView = findViewById(resID);
-                if(MetadataType.MetaDataDEG.contains(m.getType()))
+                if(m.getType().equals("HHPBW_deg"))
                 {
-                    textView.setText(m.getValue()+"°");
+                    textView.setText(getResources().getString(R.string.HHPBW_deg)+" "+ m.getValue()+"°");
+                } else if(m.getType().equals("VHPBW_deg")) {
+                    textView.setText(getResources().getString(R.string.VHPBW_deg) + " " + m.getValue() + "°");
                 } else if(m.getType().equals("Directivity_dBi")){
-                    textView.setText(m.getValue()+" dBi");
+                    textView.setText(getResources().getString(R.string.Directivity_dBi) + " " + m.getValue() + "dBi");
                 } else textView.setText(m.getValue());
 
                 Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
@@ -467,11 +464,11 @@ public class ARActivity extends BaseActivity implements
         TextView tvTilt = findViewById(R.id.field_Tilt);
         TextView tvViewMode = findViewById(R.id.field_ViewMode);
 
-        tvFreq.setText("Frequency: "+bottomSheet.getFrequency());
-        tvTilt.setText("Tilt: "+bottomSheet.getTilt());
+        tvFreq.setText(getResources().getString(R.string.label_frequency)+" "+bottomSheet.getFrequency());
+        tvTilt.setText(getResources().getString(R.string.label_tilt)+" "+bottomSheet.getTilt());
         if(bottomSheet.getMode().name().equals("Linear")){
-            tvViewMode.setText("Linear View");
-        } else tvViewMode.setText("Log View");
+            tvViewMode.setText(getResources().getString(R.string.linearView));
+        } else tvViewMode.setText(getResources().getString(R.string.logView));
     }
 
 }
