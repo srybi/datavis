@@ -53,6 +53,7 @@ import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
 import de.th.ro.datavis.util.FileProviderDatavis;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.IntentConst;
+import de.th.ro.datavis.util.constants.MetadataType;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 public class ARActivity extends BaseActivity implements
@@ -441,7 +442,13 @@ public class ARActivity extends BaseActivity implements
             int resID = this.getResources().getIdentifier(("meta_" + m.getType()), "id", this.getPackageName());
             try {
                 TextView textView = findViewById(resID);
-                textView.setText(m.getValue());
+                if(MetadataType.MetaDataDEG.contains(m.getType()))
+                {
+                    textView.setText(m.getValue()+"°");
+                } else if(m.getType().equals("Directivity_dBi")){
+                    textView.setText(m.getValue()+" dBi");
+                } else textView.setText(m.getValue());
+
                 Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
             } catch (Exception e) {
             }
