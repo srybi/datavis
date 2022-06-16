@@ -46,6 +46,8 @@ public class BottomSheet implements ISubject{
     private Slider frequencySlider;
     private Slider tiltSlider;
     private Button applyButton;
+    private TextView tvFreq;
+    private TextView tvTilt;
 
     private ProgressbarHolder progressbar;
 
@@ -126,9 +128,14 @@ public class BottomSheet implements ISubject{
         frequencySlider = bottomSheetDialog.findViewById(R.id.sliderFrequency);
         tiltSlider = bottomSheetDialog.findViewById(R.id.sliderTilt);
         applyButton = bottomSheetDialog.findViewById(R.id.apply);
+        //Show Freq & Tilt
+        tvFreq = bottomSheetDialog.findViewById(R.id.value_Frequency);
+        tvTilt = bottomSheetDialog.findViewById(R.id.value_Tilt);
+        tvFreq.setText(Double.toString(frequency));
+        tvTilt.setText(Double.toString(tilt));
+
         //init with current setting
         if(frequencies.size() > 1) {
-
 
             float from = 0;
             float to = frequencies.size()-1;
