@@ -84,7 +84,6 @@ public class ARActivity extends BaseActivity implements
 
     private LiveData<List<MetaData>> sqlQueryMetadata;
     private Observer<List<MetaData>> sqlMetadataObs;
-    //private LiveData<MetaData> HHPBW_deg, VHPBW_deg, Directivity_dBi = new MutableLiveData<>();
 
     private double maxIntensity = -1;
     private float scalingFactor = 1;
@@ -121,6 +120,13 @@ public class ARActivity extends BaseActivity implements
             bottomSheet = new BottomSheet(this, frequencies, tilts, antennaId);
             bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
             gestureDetector = new GestureDetector(this, bottomSheetHandler);
+
+            //Show FFS creating data on the right
+            try {
+                updateFFSCreatingData();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
         }else{
             Toast.makeText(
                     this, "No ffs data to display!", Toast.LENGTH_LONG).show();
@@ -388,6 +394,7 @@ public class ARActivity extends BaseActivity implements
     public void update() {
         Log.d(TAG, "update: the bottomsheet called an update");
         deleteAllSpheres();
+        updateFFSCreatingData();
 
         //Metadaten werden neu geladen
         sqlQueryMetadata = db.metadataDao().findAll_Background(antennaId,bottomSheet.getFrequency(),bottomSheet.getTilt());
@@ -453,6 +460,18 @@ public class ARActivity extends BaseActivity implements
             } catch (Exception e) {
             }
         }
+    }
+    //Updates Frequency, Tilt and ViewMode textviews
+    private void updateFFSCreatingData(){
+        TextView tvFreq = findViewById(R.id.field_Frequency);
+        TextView tvTilt = findViewById(R.id.field_Tilt);
+        TextView tvViewMode = findViewById(R.id.field_ViewMode);
+
+        tvFreq.setText("Frequency: "+bottomSheet.getFrequency());
+        tvTilt.setText("Tilt: "+bottomSheet.getTilt());
+        if(bottomSheet.getMode().name().equals("Linear")){
+            tvViewMode.setText("Linear View");
+        } else tvViewMode.setText("Log View");
     }
 
 }

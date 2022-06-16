@@ -9,6 +9,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="black_20">#33000000</color>
+    <color name="black_50">#80000000</color>
 
     <!-- Ericsson brand colors. -->
     <color name="colorEricsson_Black">#000000</color>
