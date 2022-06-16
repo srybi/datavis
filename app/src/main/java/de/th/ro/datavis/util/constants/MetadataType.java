@@ -22,4 +22,17 @@ public class MetadataType {
 
     }};
 
+    public static List<String> MetaDataDEG=new ArrayList<String>(){{
+        add("HHPBW_deg");
+        add("VHPBW_deg");
+        add("Squint_deg");
+        add("Tilt_deg");
+        add("TiltDeviation_deg");
+    }};
+
+    public static List<String> MetaDatadBi=new ArrayList<String>(){{
+        add("Directivity_dBi");
+        add("Nullfill_dB");
+    }};
+
 }

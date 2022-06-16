@@ -28,6 +28,7 @@ import de.th.ro.datavis.interfaces.ISubject;
 import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.ui.progressBar.ProgressbarHolder;
 import de.th.ro.datavis.util.Helper;
+import de.th.ro.datavis.util.constants.MetadataType;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 /**
@@ -297,7 +298,13 @@ public class BottomSheet implements ISubject{
             int resID = context.getResources().getIdentifier(("meta_" + m.getType()), "id", context.getPackageName());
             try {
                 TextView textView = bsd.findViewById(resID);
-                textView.setText(m.getValue());
+
+                if(MetadataType.MetaDataDEG.contains(m.getType()))
+                {
+                    textView.setText(m.getValue()+"°");
+                } else if(m.getType().equals("Nullfill_dB")){
+                    textView.setText(m.getValue()+" dB");
+                } else textView.setText(m.getValue());
                 Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
             } catch (Exception e) {
             }

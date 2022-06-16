@@ -122,14 +122,23 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
         android:layout_marginTop="8dp">
 
         <TextView
+            android:id="@+id/label_Frequency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/frequency"
-            android:layout_gravity="center"/>
+            android:text="@string/label_frequency" />
+        <TextView
+            android:id="@+id/value_Frequency"
+            android:paddingLeft="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="_no freq found"/>
+
+    </LinearLayout>
 
         <com.google.android.material.slider.Slider
             app:labelStyle="@style/MyTooltip"
@@ -139,29 +148,37 @@
             android:stepSize="1"
             app:labelBehavior="floating" />
 
-    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
         android:layout_marginTop="8dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/tilt"
-            android:layout_gravity="center"/>
 
-        <com.google.android.material.slider.Slider
-            app:labelStyle="@style/MyTooltip"
-            android:id="@+id/sliderTilt"
+        <TextView
+            android:id="@+id/label_Tilt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:stepSize="1"
-            app:labelBehavior="floating" />
+            android:text="@string/label_tilt" />
+        <TextView
+            android:id="@+id/value_Tilt"
+            android:paddingLeft="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="_no tilt found"/>
 
     </LinearLayout>
+
+    <com.google.android.material.slider.Slider
+        app:labelStyle="@style/MyTooltip"
+        android:id="@+id/sliderTilt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:stepSize="1"
+        app:labelBehavior="floating" />
 
     <LinearLayout
         android:id="@+id/button"

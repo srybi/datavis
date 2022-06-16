@@ -29,13 +29,13 @@
     <string name="Directivity_dBi">Directivity:</string>
 
     <!-- BottomSheet -->
-    <string name="frequency">Frequency</string>
-    <string name="tilt">Tilt</string>
+    <string name="label_frequency">Frequency:</string>
+    <string name="label_tilt">Tilt:</string>
     <string name="meta_NF">[NF]</string>
     <string name="Nullfill_dB">Nullfill:</string>
     <string name="Squint_deg">Squint:</string>
-    <string name="Tilt_deg">Tilt real:</string>
-    <string name="TiltDeviation_deg">Tilt deviation:</string>
+    <string name="Tilt_deg">Tilt Real:</string>
+    <string name="TiltDeviation_deg">Tilt Deviation:</string>
 
     <!-- MainMenu -->
     <string name="instructions">Instructions</string>
