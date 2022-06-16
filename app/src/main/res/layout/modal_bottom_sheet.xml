@@ -143,6 +143,7 @@
             android:layout_gravity="center"/>
 
         <com.google.android.material.slider.Slider
+            app:labelStyle="@style/MyTooltip"
             android:id="@+id/sliderFrequency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -164,6 +165,7 @@
             android:layout_gravity="center"/>
 
         <com.google.android.material.slider.Slider
+            app:labelStyle="@style/MyTooltip"
             android:id="@+id/sliderTilt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
