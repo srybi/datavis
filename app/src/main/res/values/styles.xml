@@ -22,4 +22,7 @@
         <item name="android:textColor">@color/colorEricsson_White</item>
     </style>
 
+    <style name="MySwitch" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorAccent">@color/colorEricsson_Blue</item>
+    </style>
 </resources>

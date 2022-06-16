@@ -106,6 +106,7 @@
             android:text="@string/log"/>
 
         <Switch
+            android:theme="@style/MySwitch"
             android:id="@+id/switchMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
