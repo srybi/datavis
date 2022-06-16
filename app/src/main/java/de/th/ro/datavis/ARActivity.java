@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -448,6 +449,7 @@ public class ARActivity extends BaseActivity implements
             int resID = this.getResources().getIdentifier(("field_" + m.getType()), "id", this.getPackageName());
             try {
                 TextView textView = findViewById(resID);
+                textView.setVisibility(View.VISIBLE);
                 if(m.getType().equals("HHPBW_deg"))
                 {
                     textView.setText(getResources().getString(R.string.HHPBW_deg)+" "+ m.getValue()+"°");

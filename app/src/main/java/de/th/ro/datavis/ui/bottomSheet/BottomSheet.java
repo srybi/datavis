@@ -305,6 +305,7 @@ public class BottomSheet implements ISubject{
             int resID = context.getResources().getIdentifier(("field_" + m.getType()), "id", context.getPackageName());
             try {
                 TextView textView = bsd.findViewById(resID);
+                textView.setVisibility(View.VISIBLE);
 
                 if(m.getType().equals("Nullfill_dB"))
                 {
@@ -315,18 +316,13 @@ public class BottomSheet implements ISubject{
                     textView.setText(context.getString(R.string.Tilt_deg)+" "+ m.getValue()+"°");
                 }else if(m.getType().equals("TiltDeviation_deg")){
                     textView.setText(context.getString(R.string.TiltDeviation_deg)+" "+ m.getValue()+"°");
-                }
-                else if(m.getType().equals("Phi_max")){
+                }else if(m.getType().equals("Phi_max")){
                     textView.setText(context.getString(R.string.Phi_max)+" "+ m.getValue()+"°");
-                }
-                else if(m.getType().equals("Theta_max")){
+                }else if(m.getType().equals("Theta_max")){
                     textView.setText(context.getString(R.string.Theta_max)+" "+ m.getValue()+"°");
-                }
-                else if(m.getType().equals("Total_power_30deg")){
+                }else if(m.getType().equals("Total_power_30deg")){
                     textView.setText(context.getString(R.string.Total_power_30deg)+" "+ m.getValue());
-                }
-
-                else textView.setText(m.getValue());
+                }else textView.setText(m.getValue());
                 Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
             } catch (Exception e) {
             }
