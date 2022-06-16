@@ -17,4 +17,9 @@
         <item name="android:textColor">@color/colorEricsson_White</item>
     </style>
 
+    <style name="ApplyButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/colorEricsson_Blue</item>
+        <item name="android:textColor">@color/colorEricsson_White</item>
+    </style>
+
 </resources>

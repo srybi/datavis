@@ -182,7 +182,8 @@
         android:orientation="horizontal"
         android:padding="8dp">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
+            android:theme="@style/ApplyButton"
             android:id="@+id/apply"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
