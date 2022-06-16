@@ -27,6 +27,7 @@
     <string name="HHPBW_deg">HPBW:</string>
     <string name="VHPBW_deg">VHPBW:</string>
     <string name="Directivity_dBi">Directivity:</string>
+    <string name="ar_hint">Tap on Surface to Place Antenna</string>
 
     <!-- BottomSheet -->
     <string name="frequency">Frequency</string>
@@ -81,6 +82,5 @@
     <string name="no">No</string>
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="manage">Manage</string>
-
 
 </resources>

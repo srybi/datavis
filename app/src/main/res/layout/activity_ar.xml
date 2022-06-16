@@ -105,6 +105,17 @@
             tools:src="@drawable/arrow_up">
 
         </pl.droidsonroids.gif.GifImageView>
+
+        <TextView
+            android:id="@+id/visualCue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/textview_background"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:text="@string/ar_hint"
+            android:layout_centerInParent="true"/>
+
     </RelativeLayout>
 
 
