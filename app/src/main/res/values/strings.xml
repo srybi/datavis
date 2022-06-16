@@ -38,6 +38,9 @@
     <string name="Squint_deg">Squint:</string>
     <string name="Tilt_deg">Tilt Real:</string>
     <string name="TiltDeviation_deg">Tilt Deviation:</string>
+    <string name="Phi_max">Phi_max:</string>
+    <string name="Theta_max">Theta_max:</string>
+    <string name="Total_power_30deg">F/B Ratio 30°:</string>
 
     <!-- MainMenu -->
     <string name="instructions">Instructions</string>

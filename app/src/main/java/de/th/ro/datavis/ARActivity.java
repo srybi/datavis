@@ -439,6 +439,10 @@ public class ARActivity extends BaseActivity implements
         } catch (NullPointerException e) {}
     }
 
+    /**
+     *  TOP LEFT Updates Metadata
+     */
+
     private void updateMetadata(List<MetaData> changeMetaData){
         for(MetaData m: changeMetaData) {
             int resID = this.getResources().getIdentifier(("field_" + m.getType()), "id", this.getPackageName());
@@ -458,7 +462,11 @@ public class ARActivity extends BaseActivity implements
             }
         }
     }
-    //Updates Frequency, Tilt and ViewMode textviews
+
+    /**
+     *  TOP RIGHT: Updates Frequency, Tilt and ViewMode textviews
+     */
+
     private void updateFFSCreatingData(){
         TextView tvFreq = findViewById(R.id.field_Frequency);
         TextView tvTilt = findViewById(R.id.field_Tilt);

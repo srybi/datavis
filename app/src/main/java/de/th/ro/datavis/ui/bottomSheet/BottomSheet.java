@@ -302,16 +302,31 @@ public class BottomSheet implements ISubject{
     private void updateMetadata(BottomSheetDialog bsd, List<MetaData> changeMetaData){
         for(MetaData m: changeMetaData) {
 
-            int resID = context.getResources().getIdentifier(("meta_" + m.getType()), "id", context.getPackageName());
+            int resID = context.getResources().getIdentifier(("field_" + m.getType()), "id", context.getPackageName());
             try {
                 TextView textView = bsd.findViewById(resID);
 
-                if(MetadataType.MetaDataDEG.contains(m.getType()))
+                if(m.getType().equals("Nullfill_dB"))
                 {
-                    textView.setText(m.getValue()+"°");
-                } else if(m.getType().equals("Nullfill_dB")){
-                    textView.setText(m.getValue()+" dB");
-                } else textView.setText(m.getValue());
+                    textView.setText(context.getString(R.string.Nullfill_dB)+" "+ m.getValue()+"dB");
+                } else if(m.getType().equals("Squint_deg")){
+                    textView.setText(context.getString(R.string.Squint_deg)+" "+ m.getValue()+"°");
+                } else if(m.getType().equals("Tilt_deg")){
+                    textView.setText(context.getString(R.string.Tilt_deg)+" "+ m.getValue()+"°");
+                }else if(m.getType().equals("TiltDeviation_deg")){
+                    textView.setText(context.getString(R.string.TiltDeviation_deg)+" "+ m.getValue()+"°");
+                }
+                else if(m.getType().equals("Phi_max")){
+                    textView.setText(context.getString(R.string.Phi_max)+" "+ m.getValue()+"°");
+                }
+                else if(m.getType().equals("Theta_max")){
+                    textView.setText(context.getString(R.string.Theta_max)+" "+ m.getValue()+"°");
+                }
+                else if(m.getType().equals("Total_power_30deg")){
+                    textView.setText(context.getString(R.string.Total_power_30deg)+" "+ m.getValue());
+                }
+
+                else textView.setText(m.getValue());
                 Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
             } catch (Exception e) {
             }

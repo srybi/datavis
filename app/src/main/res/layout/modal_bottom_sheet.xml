@@ -10,83 +10,83 @@
         android:id="@+id/progressbar"
         layout="@layout/progressbar" />
 
-    <TableLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-        <TableRow
-            android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!--Left Side-->
+        <LinearLayout
+            android:id="@+id/LinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:paddingLeft="5dp">
 
             <TextView
                 android:id="@+id/field_Nullfill_dB"
-                android:paddingLeft="3dp"
-                android:text="@string/Nullfill_dB"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/meta_Nullfill_dB"
-                android:layout_weight="1"
-                android:paddingLeft="3dp"
-                android:text="@string/meta_NF"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/field_Squint_deg"
-                android:paddingLeft="3dp"
-                android:text="@string/Squint_deg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textSize="15sp" />
 
             <TextView
-                android:layout_weight="1"
-                android:id="@+id/meta_Squint_deg"
-                android:paddingLeft="3dp"
-                android:text="@string/meta_NF"
+                android:id="@+id/field_Phi_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textSize="15sp" />
 
-        </TableRow>
+            <TextView
+                android:id="@+id/field_Theta_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp" />
+        </LinearLayout>
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <!--Right Side-->
+        <LinearLayout
+            android:id="@+id/LinearLayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:paddingRight="5dp">
+
 
             <TextView
                 android:id="@+id/field_Tilt_deg"
-                android:paddingLeft="3dp"
-                android:paddingTop="6dp"
-                android:text="@string/Tilt_deg"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/meta_Tilt_deg"
-                android:layout_weight="1"
-                android:paddingLeft="3dp"
-                android:paddingTop="6dp"
-                android:text="@string/meta_NF"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/field_TiltDeviation_deg"
-                android:paddingLeft="3dp"
-                android:paddingTop="6dp"
-                android:text="@string/TiltDeviation_deg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textSize="15sp" />
 
             <TextView
-                android:id="@+id/meta_TiltDeviation_deg"
-                android:layout_weight="1"
-                android:paddingLeft="3dp"
-                android:paddingTop="6dp"
-                android:text="@string/meta_NF"
+                android:id="@+id/field_Total_power_30deg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textSize="15sp" />
 
-        </TableRow>
+        </LinearLayout>
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:layout_margin="10dp"
-            android:background="@color/colorEricsson_Gray5" />
+    </LinearLayout>
 
-    </TableLayout>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_margin="10dp"
+        android:background="@color/colorEricsson_Gray5" />
 
 
     <LinearLayout
@@ -98,6 +98,7 @@
         android:gravity="center"
         android:orientation="horizontal"
         tools:ignore="UseSwitchCompatOrMaterialXml">
+
 
         <TextView
             android:id="@+id/log"
@@ -119,6 +120,7 @@
             android:text="@string/linear" />
 
     </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"

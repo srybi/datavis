@@ -19,6 +19,9 @@ public class MetadataType {
         add("Squint_deg");
         add("Tilt_deg");
         add("TiltDeviation_deg");
+        add("Phi_max");
+        add("Theta_max");
+        add("Total_power_30deg");
 
     }};
 
@@ -28,6 +31,9 @@ public class MetadataType {
         add("Squint_deg");
         add("Tilt_deg");
         add("TiltDeviation_deg");
+        add("Phi_max");
+        add("Theta_max");
+        add("Total_power_30deg");
     }};
 
     public static List<String> MetaDatadBi=new ArrayList<String>(){{
