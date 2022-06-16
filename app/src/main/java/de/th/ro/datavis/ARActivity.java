@@ -140,7 +140,6 @@ public class ARActivity extends BaseActivity implements
             arFragment.setOnSessionConfigurationListener(this);
             arFragment.setOnViewCreatedListener(this);
             arFragment.setOnTapArPlaneListener(this);
-            findViewById(R.id.visualCue).setVisibility(View.VISIBLE);
         }
     }
 
@@ -155,6 +154,8 @@ public class ARActivity extends BaseActivity implements
     public void onViewCreated(ArSceneView arSceneView) {
         arFragment.setOnViewCreatedListener(null);
         arSceneView.getPlaneRenderer().setShadowReceiver(false);
+        if (arSceneView.hasTrackedPlane())
+            findViewById(R.id.visualCue).setVisibility(View.VISIBLE);
 
         // Fine adjust the maximum frame rate
         arSceneView.setFrameRateFactor(SceneView.FrameRate.FULL);
