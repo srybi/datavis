@@ -117,7 +117,8 @@ android:textColor="@color/white"-->
             android:textColor="@color/white"
             android:textSize="18sp"
             android:text="@string/ar_hint"
-            android:layout_centerInParent="true"/>
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
 
     </RelativeLayout>
 

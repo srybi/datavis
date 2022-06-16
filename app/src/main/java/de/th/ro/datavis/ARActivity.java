@@ -196,6 +196,7 @@ public class ARActivity extends BaseActivity implements
             arFragment.setOnSessionConfigurationListener(this);
             arFragment.setOnViewCreatedListener(this);
             arFragment.setOnTapArPlaneListener(this);
+            findViewById(R.id.visualCue).setVisibility(View.VISIBLE);
         }
     }
 
