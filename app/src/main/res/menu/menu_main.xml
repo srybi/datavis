@@ -17,4 +17,9 @@
         app:showAsAction="ifRoom">
     </item>
 
+    <item
+        android:id="@+id/manage"
+        android:title="@string/manage">
+    </item>
+
 </menu>

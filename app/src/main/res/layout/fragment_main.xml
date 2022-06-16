@@ -68,14 +68,6 @@
             android:text="@string/import_btn"
             android:textColor="@color/white" />
 
-        <Button
-            android:id="@+id/btn_delete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="@string/delete_btn"
-            android:textColor="@color/white" />
-
         <ListView
             android:id="@+id/list_antenna_fields"
             android:layout_width="match_parent"

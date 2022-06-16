@@ -38,6 +38,7 @@
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1695" />
         <entry key="app/src/main/res/layout/activity_ar.xml" value="0.23229166666666667" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_settings.xml" value="0.5911458333333334" />
         <entry key="app/src/main/res/layout/antenna_field_list_item.xml" value="0.2" />
         <entry key="app/src/main/res/layout/antenna_list_item.xml" value="0.14447463768115942" />
         <entry key="app/src/main/res/layout/antenna_settings_list_item.xml" value="0.335" />
