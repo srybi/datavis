@@ -314,6 +314,8 @@ public class ARActivity extends BaseActivity implements
     public void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
         Log.d(TAG, "Plane Tab");
 
+        findViewById(R.id.visualCue).setVisibility(View.GONE);
+
         if (anchorNode != null){
             // Antenna is already Placed
             return;
@@ -349,7 +351,6 @@ public class ARActivity extends BaseActivity implements
         }
 
     }
-
 
     private void processRenderList(AnchorNode anchorNode, Map<String, Renderable> list, List<Sphere> coords){
         Log.d(TAG, "Start processing RenderList");

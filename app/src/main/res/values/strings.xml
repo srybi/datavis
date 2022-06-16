@@ -31,6 +31,7 @@
     <string name="settings_icon">Settings</string>
     <string name="logView">Log View</string>
     <string name="linearView">Linear View</string>
+    <string name="ar_hint">Tap on Surface to Place Antenna</string>
 
     <!-- BottomSheet -->
     <string name="label_frequency">Frequency:</string>
@@ -91,6 +92,5 @@
     <string name="no">No</string>
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="manage">Manage</string>
-
 
 </resources>
