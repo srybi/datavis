@@ -67,6 +67,20 @@ public abstract class ImportView implements IImportOptions {
         ViewCompat.setNestedScrollingEnabled(ffsList, true);
     }
 
+    private void initMetaDataScrollable(FragmentActivity fa, List<AntennaField> antennaFieldList){
+        ffsList = fa.findViewById(R.id.lv_import_antenna_fields);
+        Log.d("ImportActivity", "initFFSScrollable: " + ffsList);
+
+        if (antennaFieldList == null || antennaFieldList.isEmpty()){
+            ffsList.setAdapter(null);
+            return;
+        }
+
+        AntennaFieldAdapter adapter = new AntennaFieldAdapter(fa, antennaFieldList);
+        ffsList.setAdapter(adapter);
+        ViewCompat.setNestedScrollingEnabled(ffsList, true);
+    }
+
     private void initButtons(FragmentActivity fa){
 
         configName = fa.findViewById(R.id.configName);
