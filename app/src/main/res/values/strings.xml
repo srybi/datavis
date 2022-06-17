@@ -53,7 +53,7 @@
 
     <!-- Import -->
     <string name="btn_add_default">Add Default</string>
-    <string name="btn_add_new_antenna">Add antenna</string>
+    <string name="btn_add_new_antenna">Import Antenna</string>
     <string name="btn_add_metaData">Add Metadata</string>
     <string name="btn_add_metaFolder">Add Metadata Folder</string>
     <string name="btn_add_ffs">Add FFS</string>
