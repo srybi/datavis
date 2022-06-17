@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import de.th.ro.datavis.MainActivity;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.instructions.ImportInstructionsActivity;
@@ -87,7 +88,8 @@ public class ImportActivity extends BaseActivity{
         ffsService = new FFSService(new FFSInterpreter(), this);
         workManager = WorkManager.getInstance(this);
 
-        setDefaultAntennaData();
+        executeRunnable(initImport());
+        initImportView();
     }
 
     @Override
@@ -128,7 +130,6 @@ public class ImportActivity extends BaseActivity{
                             @Override
                             public void run() {
                                 currentAntenna.setDescription(editable.toString());
-                                appDb.antennaDao().update(currentAntenna);
                             }
                         });
                     }
@@ -149,7 +150,8 @@ public class ImportActivity extends BaseActivity{
             }
 
             public void addDefaultAntenna(){
-                executeRunnable(getSetDefaultAntennaRunnable());
+                currentAntenna.filename = "datavis_default";
+                currentAntenna.uri = "models/datavis_antenna_asm.glb";
                 initImportView();
             }
 
@@ -176,10 +178,18 @@ public class ImportActivity extends BaseActivity{
                 openFileDialog(FileRequests.REQUEST_CODE_FFS);
             }
 
+            @Override
+            public void confirmImport(){
+                executeRunnable(saveImport());
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+
             private void setPreferenceID(){
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFragmentActivity());
                 preferences.edit().putInt("ID", currentAntenna.id).apply();
             }
+
         };
     }
 
@@ -200,7 +210,8 @@ public class ImportActivity extends BaseActivity{
                         case FileRequests.REQUEST_CODE_ANTENNA:
                             String antennaName = FileHandler.queryName(getContentResolver(), uri);
                             if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
-                                updateAntenna(appDb, uri, antennaName);
+                                currentAntenna.filename = antennaName;
+                                currentAntenna.uri = uri.toString();
                             } else {
                                 showToast(getString(R.string.toastInvalidAntenna));
                             }
@@ -248,17 +259,14 @@ public class ImportActivity extends BaseActivity{
         };
     }
 
-    public Runnable addNewAntennaConfig(Antenna antenna){
+    public Runnable initImport(){
         Log.d(TAG, "addNewAntennaConfig: executing background thread");
         return new Runnable() {
             @Override
             public void run() {
                 AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
-                //changing default antenna name
                 int currentSize = appDb.antennaDao().getAll_Background().size();
-                antenna.description = antenna.description + (currentSize+1);
-                appDb.antennaDao().insert(antenna);
-                handleNewlyInsertedAntenna(appDb);
+                currentAntenna = new Antenna("Antenna #" + (currentSize+1));
             }
         };
     }
@@ -270,6 +278,22 @@ public class ImportActivity extends BaseActivity{
                 AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
                 List<Antenna> antennaList = appDb.antennaDao().getAll_Background();
                 allAntennas = antennaList;
+            }
+        };
+    }
+
+    private Runnable saveImport(){
+        return new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "run: " +currentAntenna);
+                //save antenna
+                appDb.antennaDao().insert(currentAntenna);
+                //save ffs files
+
+                //save spheres
+
+                //save meta data
             }
         };
     }
@@ -331,6 +355,7 @@ public class ImportActivity extends BaseActivity{
     /**
      * Gets new Antenna from database and sets it as the current antenna
      */
+    /*
     private void handleNewlyInsertedAntenna(AppDatabase appDb){
         Log.d(TAG, "handleNewlyInsertedAntenna: Setting newly insert antenna as current");
         // Background
@@ -339,6 +364,7 @@ public class ImportActivity extends BaseActivity{
         // Last Antenna
         this.currentAntenna = data.get(data.size() - 1);
     }
+     */
 
     private void handleNewlyInsertedMetadata(AppDatabase appDb){
         // Background
@@ -356,6 +382,7 @@ public class ImportActivity extends BaseActivity{
      * Sets the currentAntenna to the first antenna in the DB. If DB is empty,
      * the default ImportView will be shown.
      */
+    /*
     private void setDefaultAntennaData(){
         if (currentAntenna != null || !firstRun){
             return;
@@ -371,6 +398,8 @@ public class ImportActivity extends BaseActivity{
             initImportView();
         }
     }
+     */
+
 
 
     //This needs to be changed. LiveData causes site effects

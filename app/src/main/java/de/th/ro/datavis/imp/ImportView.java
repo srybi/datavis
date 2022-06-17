@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentActivity;
 import java.util.List;
 
 import de.th.ro.datavis.R;
+import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IImportOptions;
 import de.th.ro.datavis.main.AntennaFieldAdapter;
 import de.th.ro.datavis.models.Antenna;
@@ -24,7 +25,6 @@ public abstract class ImportView implements IImportOptions {
 
 
     private ListView ffsList;
-    private NestedScrollView ffsScrollable;
 
     private ProgressbarHolder progressBar;
 
@@ -32,6 +32,7 @@ public abstract class ImportView implements IImportOptions {
     private Button btnAddDefaultAntenna;
     private Button btnAddFFS;
     private Button btnAddMetaDataFolder;
+    private Button btnConfirm;
 
     private EditText configName;
 
@@ -73,12 +74,14 @@ public abstract class ImportView implements IImportOptions {
         btnAddDefaultAntenna = fa.findViewById(R.id.btn_add_default);
         btnAddMetaDataFolder = fa.findViewById(R.id.btn_import_add_metadataFolder);
         btnAddFFS = fa.findViewById(R.id.btn_import_add_ffs);
+        btnConfirm = fa.findViewById(R.id.btn_confirm);
 
         configName.addTextChangedListener(descriptionChanged());
         btnAddImportAntenna.setOnClickListener(v -> { addImportAntenna(); });
         btnAddDefaultAntenna.setOnClickListener(v -> {addDefaultAntenna();});
         btnAddMetaDataFolder.setOnClickListener( v -> { addMetaDataFolder(); });
         btnAddFFS.setOnClickListener( v -> { addFFS(); });
+        btnConfirm.setOnClickListener(v -> {confirmImport(); });
     }
 
     private void initConfigName(FragmentActivity fragmentActivity, Antenna antenna){

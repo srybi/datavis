@@ -127,7 +127,7 @@
     </androidx.core.widget.NestedScrollView>
 
     <Button
-        android:id="@+id/confirm_button"
+        android:id="@+id/btn_confirm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/btn_confirm"

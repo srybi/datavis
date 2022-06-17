@@ -14,4 +14,6 @@ public interface IImportOptions {
 
     void addFFS();
 
+    void confirmImport();
+
 }
