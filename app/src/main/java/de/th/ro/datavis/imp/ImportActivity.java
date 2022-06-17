@@ -479,6 +479,7 @@ public class ImportActivity extends BaseActivity{
                     // Work success
                     loadAntennaFieldsByAntennaId(currentAntenna.id);
                     initImportView();
+                    showToast(getString(R.string.toastFolderImportDone));
                 }
             }
         });
@@ -492,7 +493,7 @@ public class ImportActivity extends BaseActivity{
      */
     public void showToast(final String toast)
     {
-        runOnUiThread(() -> Toast.makeText(this, toast, Toast.LENGTH_SHORT).show());
+        runOnUiThread(() -> Toast.makeText(this, toast, Toast.LENGTH_LONG).show());
     }
 
 }
