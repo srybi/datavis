@@ -150,14 +150,6 @@ public class ImportActivity extends BaseActivity{
             }
 
             @Override
-            public void addFFS() {
-
-                setPreferenceID();
-
-                openFileDialog(FileRequests.REQUEST_CODE_FFS);
-            }
-
-            @Override
             public void confirmImport(){
                 executeRunnable(saveAntenna());
                 setPreferenceID();

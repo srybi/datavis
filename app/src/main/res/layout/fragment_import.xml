@@ -77,13 +77,6 @@
             android:textColor="@color/white"
             />
 
-        <Button
-            android:id="@+id/btn_import_add_ffs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/btn_add_ffs"
-            android:textColor="@color/white" />
     </LinearLayout>
 
 

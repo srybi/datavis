@@ -30,7 +30,6 @@ public abstract class ImportView implements IImportOptions {
 
     private Button btnAddImportAntenna;
     private Button btnAddDefaultAntenna;
-    private Button btnAddFFS;
     private Button btnAddMetaDataFolder;
     private Button btnConfirm;
 
@@ -88,14 +87,12 @@ public abstract class ImportView implements IImportOptions {
         btnAddImportAntenna = fa.findViewById(R.id.btn_import_antenna);
         btnAddDefaultAntenna = fa.findViewById(R.id.btn_add_default);
         btnAddMetaDataFolder = fa.findViewById(R.id.btn_import_add_metadataFolder);
-        btnAddFFS = fa.findViewById(R.id.btn_import_add_ffs);
         btnConfirm = fa.findViewById(R.id.btn_confirm);
 
         configName.addTextChangedListener(descriptionChanged());
         btnAddImportAntenna.setOnClickListener(v -> { addImportAntenna(); });
         btnAddDefaultAntenna.setOnClickListener(v -> {addDefaultAntenna();});
         btnAddMetaDataFolder.setOnClickListener( v -> { addMetaDataFolder(); });
-        btnAddFFS.setOnClickListener( v -> { addFFS(); });
         btnConfirm.setOnClickListener(v -> {confirmImport(); });
     }
 
