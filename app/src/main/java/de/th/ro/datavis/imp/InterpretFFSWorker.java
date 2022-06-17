@@ -12,10 +12,13 @@ import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +39,7 @@ public class InterpretFFSWorker extends Worker {
    String[] inputURIs;
    String[] inputFilenames;
    FFSService ffsService;
+   ObjectMapper objectMapper;
 
    public InterpretFFSWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
       super(context, workerParams);
@@ -47,20 +51,38 @@ public class InterpretFFSWorker extends Worker {
 
       handleInputData();
       ffsService = new FFSService(new FFSInterpreter(), getApplicationContext());
+      objectMapper = new ObjectMapper();
+
+      List<AtomicField> logFields = new LinkedList<>();
+      List<AtomicField> linearFields = new LinkedList<>();
 
       for(int i = 0; i < inputURIs.length; i++){
          Uri uri = Uri.parse(inputURIs[i]);
          String filename = inputFilenames[i];
          Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> atomicFields = interpretFFS(uri, filename);
+         logFields.addAll(atomicFields.first);
+         linearFields.addAll(atomicFields.second);
       }
 
+      Data.Builder builder = new Data.Builder();
+      builder.putStringArray("result_log", prepareOutput(logFields));
+      builder.putStringArray("result_linear", prepareOutput(linearFields));
+      Data output = builder.build();
 
-
-      return Result.success();
+      return Result.success(output);
    }
 
-   private String[] prepareOutput(List<MetaData> result){
+   private String[] prepareOutput(List<AtomicField> result){
       String[] dataArray = new String[result.size()];
+      int i = 0;
+      for(AtomicField md : result){
+         try {
+            dataArray[i] = objectMapper.writeValueAsString(md);
+            i++;
+         } catch (IOException e) {
+            Log.d(TAG, "prepareOutput: Something went wrong...Skipping meta data object");
+         }
+      }
       return dataArray;
    }
 
