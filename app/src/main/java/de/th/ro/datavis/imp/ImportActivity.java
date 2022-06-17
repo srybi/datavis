@@ -19,6 +19,11 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -42,10 +47,11 @@ import de.th.ro.datavis.util.constants.FileRequests;
 import de.th.ro.datavis.util.dialog.DialogExistingAntenna;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 import de.th.ro.datavis.util.filehandling.FileHandler;
+import de.th.ro.datavis.util.worker.WorkerRequestUtil;
 
 public class ImportActivity extends BaseActivity{
 
-    private final String TAG = "ImportActivity";
+    private final String TAG = "ImportActivityTAG";
 
     AppDatabase appDb;
     FFSService ffsService;
@@ -61,10 +67,14 @@ public class ImportActivity extends BaseActivity{
 
     static boolean firstRun = true;
 
+    WorkManager workManager;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d(TAG, "OnCreate");
 
         setContentView(R.layout.activity_import);
         setFragmentContainerView(R.id.importFragment);
@@ -75,6 +85,7 @@ public class ImportActivity extends BaseActivity{
 
         appDb  = AppDatabase.getInstance(getApplicationContext());
         ffsService = new FFSService(new FFSInterpreter(), this);
+        workManager = WorkManager.getInstance(this);
 
         setDefaultAntennaData();
     }
@@ -216,14 +227,6 @@ public class ImportActivity extends BaseActivity{
                                 showToast(getString(R.string.toastInvalidAntenna));
                             }
                             break;
-                        case FileRequests.REQUEST_CODE_FFS:
-                            String ffsName = FileHandler.queryName( getContentResolver(), uri);
-                            if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
-                                persistFFS(appDb, uri, ffsName, data);
-                            } else {
-                                showToast(getString(R.string.toastInvalidFFS));
-                            }
-                            break;
                         case FileRequests.REQUEST_CODE_METADATA:
                             if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
                                 //If Metadata with the same Primary Key are read, it runs into a System.err and is caught here
@@ -311,6 +314,9 @@ public class ImportActivity extends BaseActivity{
     }
 
     public void persistFFS(AppDatabase appDb, Uri uri, String name, Intent intent){
+
+        Log.d(TAG, "persistFFS");
+
         // Background
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         int antennaId = preferences.getInt("ID", 1);
@@ -323,11 +329,13 @@ public class ImportActivity extends BaseActivity{
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        Log.d(TAG, "got InputStream");
 
         try {
             ffsService.interpretData(in,0.4, antennaId, name);
         } catch (FFSInterpretException e) {
             e.printStackTrace();
+            Log.d(TAG, "FFSInterpretException " + e.getMessage());
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -336,6 +344,7 @@ public class ImportActivity extends BaseActivity{
             });
             return;
         }
+        Log.d(TAG, "interprete Data done");
         //Save Antenna and file to database
         AntennaField antennaField = new AntennaField(uri, name, antennaId);
         appDb.antennaFieldDao().insert(antennaField);
@@ -343,7 +352,9 @@ public class ImportActivity extends BaseActivity{
         handelGetAntennaInBackground(appDb, antennaId);
         handleNewlyInsertedAntennaField(appDb, antennaId);
 
+        Log.d(TAG, "persistFFS done");
     }
+
     /**
      * Uses MetadataInterpreter to run through a .csv
      * then adds antennaID
@@ -547,14 +558,73 @@ public class ImportActivity extends BaseActivity{
         super.onActivityResult(requestCode, resultCode, data);
 
         importView.showProgressBar();
-
         Log.d(TAG, "Activity result");
         if(resultCode == Activity.RESULT_OK){
-            Log.d(TAG, "Request Code: "+requestCode);
-            executeRunnable(getHandelResultRunnable( data, requestCode));
-            initImportView();
+//            Log.d(TAG, "Request Code: "+requestCode);
+//            executeRunnable(getHandelResultRunnable( data, requestCode));
+//            initImportView();
+
+            Uri uri = data.getData();
+
+            // Handle FFS separately since its Work
+            if (requestCode == FileRequests.REQUEST_CODE_FFS){
+                String ffsName = FileHandler.queryName( getContentResolver(), uri);
+                if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
+                    handleFFSImportWork(uri, ffsName);
+                } else {
+                    showToast(getString(R.string.toastInvalidFFS));
+                }
+            } else {
+                // Antenna, Metadata, ...
+                executeRunnable(getHandelResultRunnable( data, requestCode));
+                initImportView();
+            }
+
         }
+
+
+
     }
+
+
+    /**
+     * Handle Import Result of FFD Data.
+     * Queue Work to an Non blocking Thread
+     * @param uri Uri to the FFS file
+     */
+    private void handleFFSImportWork(Uri uri, String fileName){
+
+        // Build InputData
+        Data.Builder builder = new Data.Builder();
+        builder.putString("URI", uri.toString());
+        builder.putString("FILENAME", fileName);
+        Data input = builder.build();
+
+        // Create WorkRequest
+        OneTimeWorkRequest workRequest = WorkerRequestUtil.getOneTimeRequest(ImportWorker.class, input);
+        workManager.enqueue( workRequest);
+        workManager.getWorkInfoByIdLiveData(workRequest.getId()).observe(this, new Observer<WorkInfo>() {
+            @Override
+            public void onChanged(WorkInfo workInfo) {
+                Log.d(TAG, "WorkState FFS " + workInfo.getState());
+                if (workInfo.getState().isFinished()){
+
+                    if (workInfo.getState() == WorkInfo.State.FAILED
+                            || workInfo.getState() == WorkInfo.State.CANCELLED){
+                        // Work Problem
+
+                        return;
+                    }
+
+                    // Work success
+                    loadAntennaFieldsByAntennaId(currentAntenna.id);
+                    initImportView();
+                }
+            }
+        });
+
+    }
+
 
     /**
      * Utility method to call Toasts in UI Thread

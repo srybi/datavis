@@ -54,6 +54,7 @@ public class MainActivity extends BaseActivity{
 
         MenuItem itemAbout = menu.findItem(R.id.about);
         MenuItem itemAppInstructions = menu.findItem(R.id.app_instructions);
+        MenuItem itemManage = menu.findItem(R.id.manage);
         //replace these two with actuall buttons
 
         itemAbout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -75,6 +76,17 @@ public class MainActivity extends BaseActivity{
                 Intent intent = new Intent(getApplicationContext(), AppInstructionsActivity.class);
                 startActivity(intent);
 
+                return false;
+            }
+        });
+
+        itemManage.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                // switch to manage page
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
                 return false;
             }
         });

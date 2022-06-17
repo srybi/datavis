@@ -8,6 +8,7 @@ import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,6 +56,7 @@ import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
 import de.th.ro.datavis.util.FileProviderDatavis;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.IntentConst;
+import de.th.ro.datavis.util.constants.MetadataType;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 import androidx.appcompat.widget.Toolbar;
 
@@ -147,6 +149,7 @@ public class ARActivity extends BaseActivity implements
             bottomSheet = new BottomSheet(this, frequencies, tilts, internalAntennaId);
             bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
             gestureDetector = new GestureDetector(this, bottomSheetHandler);
+
         }else{
             Toast.makeText(
                     this, "No ffs data to display!", Toast.LENGTH_LONG).show();
@@ -310,6 +313,12 @@ public class ARActivity extends BaseActivity implements
     @Override
     public void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
         Log.d(TAG, "Plane Tab");
+
+        if (anchorNode != null){
+            // Antenna is already Placed
+            return;
+        }
+
         // Create the Anchor.
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
@@ -336,6 +345,7 @@ public class ARActivity extends BaseActivity implements
             createMetaDataObserver();
             bottomSheetHandler.makeCueVisible(true);
             bottomSheet.subscribe(this);
+            updateFFSCreatingData();
         }
 
     }
@@ -435,6 +445,7 @@ public class ARActivity extends BaseActivity implements
     public void update() {
         Log.d(TAG, "update: the bottomsheet called an update");
         deleteAllSpheres();
+        updateFFSCreatingData();
 
         //Metadaten werden neu geladen
         sqlQueryMetadata = db.metadataDao().findAll_Background(antennaId,bottomSheet.getFrequency(),bottomSheet.getTilt());
@@ -484,16 +495,45 @@ public class ARActivity extends BaseActivity implements
         } catch (NullPointerException e) {}
     }
 
+    /**
+     *  TOP LEFT Updates Metadata
+     */
+
     private void updateMetadata(List<MetaData> changeMetaData){
         for(MetaData m: changeMetaData) {
-            int resID = this.getResources().getIdentifier(("meta_" + m.getType()), "id", this.getPackageName());
+            int resID = this.getResources().getIdentifier(("field_" + m.getType()), "id", this.getPackageName());
             try {
                 TextView textView = findViewById(resID);
-                textView.setText(m.getValue());
+                textView.setVisibility(View.VISIBLE);
+                if(m.getType().equals("HHPBW_deg"))
+                {
+                    textView.setText(getResources().getString(R.string.HHPBW_deg)+" "+ m.getValue()+"°");
+                } else if(m.getType().equals("VHPBW_deg")) {
+                    textView.setText(getResources().getString(R.string.VHPBW_deg) + " " + m.getValue() + "°");
+                } else if(m.getType().equals("Directivity_dBi")){
+                    textView.setText(getResources().getString(R.string.Directivity_dBi) + " " + m.getValue() + "dBi");
+                } else textView.setText(m.getValue());
+
                 Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
             } catch (Exception e) {
             }
         }
+    }
+
+    /**
+     *  TOP RIGHT: Updates Frequency, Tilt and ViewMode textviews
+     */
+
+    private void updateFFSCreatingData(){
+        TextView tvFreq = findViewById(R.id.field_Frequency);
+        TextView tvTilt = findViewById(R.id.field_Tilt);
+        TextView tvViewMode = findViewById(R.id.field_ViewMode);
+
+        tvFreq.setText(getResources().getString(R.string.label_frequency)+" "+bottomSheet.getFrequency());
+        tvTilt.setText(getResources().getString(R.string.label_tilt)+" "+bottomSheet.getTilt());
+        if(bottomSheet.getMode().name().equals("Linear")){
+            tvViewMode.setText(getResources().getString(R.string.linearView));
+        } else tvViewMode.setText(getResources().getString(R.string.logView));
     }
 
 }

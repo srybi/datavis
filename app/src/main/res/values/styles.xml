@@ -7,4 +7,31 @@
         <item name="android:layout_marginEnd">6dp</item>
         <item name="android:background">#86BCB7B7</item>
     </style>
+
+    <style name="MyTooltip" parent="Widget.MaterialComponents.Tooltip">
+        <item name="backgroundTint">@color/black</item>
+        <item name="android:textAppearance">@style/MyTooltip.TextAppearance</item>
+    </style>
+
+    <style name="MyTooltip.TextAppearance" parent="@style/TextAppearance.MaterialComponents.Tooltip">
+        <item name="android:textColor">@color/colorEricsson_White</item>
+    </style>
+
+    <style name="ApplyButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/colorEricsson_Blue</item>
+        <item name="android:textColor">@color/colorEricsson_White</item>
+        <item name="android:textAppearance">"@style/Button.TextStyle"</item>
+    </style>
+
+    <style name="Button.TextStyle" parent="@style/TextAppearance.AppCompat.Button">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/colorEricsson_White</item>
+    </style>
+
+    <style name="MySwitch" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorAccent">@color/colorEricsson_Blue</item>
+    </style>
+
+
+
 </resources>

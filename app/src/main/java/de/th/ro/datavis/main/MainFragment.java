@@ -137,19 +137,10 @@ public class MainFragment extends BaseFragment {
 
     private void findButton(){
         Button btn_import = getActivity().findViewById(R.id.btn_import);
-        Button btn_delete = getActivity().findViewById(R.id.btn_delete);
         btn_import.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context.getApplicationContext(), ImportActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        btn_delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(context.getApplicationContext(), SettingsActivity.class);
                 startActivity(intent);
             }
         });

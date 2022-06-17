@@ -29,15 +29,20 @@
     <string name="Directivity_dBi">Directivity:</string>
     <string name="back_arrow">Back</string>
     <string name="settings_icon">Settings</string>
+    <string name="logView">Log View</string>
+    <string name="linearView">Linear View</string>
 
     <!-- BottomSheet -->
-    <string name="frequency">Frequency</string>
-    <string name="tilt">Tilt</string>
+    <string name="label_frequency">Frequency:</string>
+    <string name="label_tilt">Tilt:</string>
     <string name="meta_NF">[NF]</string>
     <string name="Nullfill_dB">Nullfill:</string>
     <string name="Squint_deg">Squint:</string>
-    <string name="Tilt_deg">Tilt real:</string>
-    <string name="TiltDeviation_deg">Tilt deviation:</string>
+    <string name="Tilt_deg">Tilt Real:</string>
+    <string name="TiltDeviation_deg">Tilt Deviation:</string>
+    <string name="Phi_max">Phi_max:</string>
+    <string name="Theta_max">Theta_max:</string>
+    <string name="Total_power_30deg">F/B Ratio 30°:</string>
 
     <!-- MainMenu -->
     <string name="instructions">Instructions</string>
@@ -82,6 +87,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="manage">Manage</string>
 
 
 </resources>

@@ -10,95 +10,92 @@
         android:id="@+id/progressbar"
         layout="@layout/progressbar" />
 
-    <TableLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <!--Left Side-->
+        <LinearLayout
+            android:id="@+id/LinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:paddingLeft="5dp">
 
             <TextView
                 android:id="@+id/field_Nullfill_dB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="12dp"
-                android:paddingTop="12dp"
-                android:text="@string/Nullfill_dB"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/meta_Nullfill_dB"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="12dp"
-                android:paddingTop="12dp"
-                android:text="@string/meta_NF"
-                android:textSize="18sp" />
+                android:textSize="15sp"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/field_Squint_deg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="12dp"
-                android:paddingTop="12dp"
-                android:text="@string/Squint_deg"
-                android:textSize="18sp" />
+                android:textSize="15sp"
+                android:visibility="gone"/>
 
             <TextView
-                android:id="@+id/meta_Squint_deg"
-                android:layout_width="118dp"
+                android:id="@+id/field_Phi_max"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="12dp"
-                android:paddingTop="12dp"
-                android:text="@string/meta_NF"
-                android:textSize="18sp" />
+                android:textSize="15sp"
+                android:visibility="gone"/>
 
-        </TableRow>
+            <TextView
+                android:id="@+id/field_Theta_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:visibility="gone"/>
+        </LinearLayout>
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <!--Right Side-->
+        <LinearLayout
+            android:id="@+id/LinearLayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:paddingEnd="5dp">
+
 
             <TextView
                 android:id="@+id/field_Tilt_deg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="12dp"
-                android:paddingTop="12dp"
-                android:text="@string/Tilt_deg"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/meta_Tilt_deg"
-                android:layout_width="118dp"
-                android:layout_height="wrap_content"
-                android:paddingLeft="12dp"
-                android:paddingTop="12dp"
-                android:text="@string/meta_NF"
-                android:textSize="18sp" />
+                android:textSize="15sp"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/field_TiltDeviation_deg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="12dp"
-                android:paddingTop="12dp"
-                android:text="@string/TiltDeviation_deg"
-                android:textSize="18sp" />
+                android:textSize="15sp"
+                android:visibility="gone"/>
 
             <TextView
-                android:id="@+id/meta_TiltDeviation_deg"
-                android:layout_width="118dp"
+                android:id="@+id/field_Total_power_30deg"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="12dp"
-                android:paddingTop="12dp"
-                android:text="@string/meta_NF"
-                android:textSize="18sp" />
+                android:textSize="15sp"
+                android:visibility="gone" />
 
-        </TableRow>
+        </LinearLayout>
 
-    </TableLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_margin="10dp"
+        android:background="@color/colorEricsson_Gray5" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -110,6 +107,7 @@
         android:orientation="horizontal"
         tools:ignore="UseSwitchCompatOrMaterialXml">
 
+
         <TextView
             android:id="@+id/log"
             android:layout_width="wrap_content"
@@ -117,6 +115,7 @@
             android:text="@string/log"/>
 
         <Switch
+            android:theme="@style/MySwitch"
             android:id="@+id/switchMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -130,47 +129,67 @@
 
     </LinearLayout>
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
         android:layout_marginTop="8dp">
 
         <TextView
+            android:id="@+id/label_Frequency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/frequency"
-            android:layout_gravity="center"/>
+            android:text="@string/label_frequency" />
+        <TextView
+            android:id="@+id/value_Frequency"
+            android:paddingStart="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="_no freq found"/>
+
+    </LinearLayout>
 
         <com.google.android.material.slider.Slider
+            app:labelStyle="@style/MyTooltip"
             android:id="@+id/sliderFrequency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:stepSize="1"
             app:labelBehavior="floating" />
 
-    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
         android:layout_marginTop="8dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/tilt"
-            android:layout_gravity="center"/>
 
-        <com.google.android.material.slider.Slider
-            android:id="@+id/sliderTilt"
+        <TextView
+            android:id="@+id/label_Tilt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:stepSize="1"
-            app:labelBehavior="floating" />
+            android:text="@string/label_tilt" />
+        <TextView
+            android:id="@+id/value_Tilt"
+            android:paddingStart="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="_no tilt found"/>
 
     </LinearLayout>
+
+    <com.google.android.material.slider.Slider
+        app:labelStyle="@style/MyTooltip"
+        android:id="@+id/sliderTilt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:stepSize="1"
+        app:labelBehavior="floating" />
 
     <LinearLayout
         android:id="@+id/button"
@@ -180,12 +199,14 @@
         android:orientation="horizontal"
         android:padding="8dp">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
+            android:theme="@style/ApplyButton"
             android:id="@+id/apply"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/apply_changes"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            />
 
     </LinearLayout>
 
