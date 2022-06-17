@@ -6,10 +6,6 @@ public interface IImportOptions {
 
     TextWatcher descriptionChanged();
 
-    void insertNewConfig();
-
-    void chooseExistingConfig();
-
     void addImportAntenna();
 
     void addDefaultAntenna();

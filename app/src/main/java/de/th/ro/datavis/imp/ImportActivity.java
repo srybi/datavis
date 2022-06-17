@@ -141,18 +141,7 @@ public class ImportActivity extends BaseActivity{
                 };
             }
 
-            @Override
-            public void insertNewConfig(){
-                Log.d(TAG, "insertNewConfig: new Config");
-                handleNewConfigInsert();
-            }
 
-            @Override
-            public void chooseExistingConfig() {
-                // Antennen zeigen
-                executeRunnable(getAllAntennas());
-                displayChooseAntennaDialog(allAntennas);
-            }
 
             @Override
             public void addImportAntenna() {
@@ -313,47 +302,6 @@ public class ImportActivity extends BaseActivity{
         appDb.antennaDao().update(currentAntenna);
     }
 
-    public void persistFFS(AppDatabase appDb, Uri uri, String name, Intent intent){
-
-        Log.d(TAG, "persistFFS");
-
-        // Background
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int antennaId = preferences.getInt("ID", 1);
-
-
-
-        InputStream in = null;
-        try {
-            in = getContentResolver().openInputStream(intent.getData());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        Log.d(TAG, "got InputStream");
-
-        try {
-            ffsService.interpretData(in,0.4, antennaId, name);
-        } catch (FFSInterpretException e) {
-            e.printStackTrace();
-            Log.d(TAG, "FFSInterpretException " + e.getMessage());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-            return;
-        }
-        Log.d(TAG, "interprete Data done");
-        //Save Antenna and file to database
-        AntennaField antennaField = new AntennaField(uri, name, antennaId);
-        appDb.antennaFieldDao().insert(antennaField);
-
-        handelGetAntennaInBackground(appDb, antennaId);
-        handleNewlyInsertedAntennaField(appDb, antennaId);
-
-        Log.d(TAG, "persistFFS done");
-    }
 
     /**
      * Uses MetadataInterpreter to run through a .csv
@@ -391,14 +339,6 @@ public class ImportActivity extends BaseActivity{
         }
     }
 
-
-    private void updateAntennaField(AppDatabase appDb){
-        // Background
-        List<AntennaField> fieldList = new ArrayList<>();
-        fieldList = appDb.antennaFieldDao().findByAntennaId_BackGround(currentAntenna.id); // todo anpassen
-        this.currentAntenaFields = fieldList;
-    }
-
     /**
      * Gets new Antenna from database and sets it as the current antenna
      */
@@ -411,13 +351,6 @@ public class ImportActivity extends BaseActivity{
         this.currentAntenna = data.get(data.size() - 1);
     }
 
-    private void handleNewlyInsertedAntennaField(AppDatabase appDb, int antennaId){
-        // Background
-        List<AntennaField> data =new ArrayList<>();
-        data = appDb.antennaFieldDao().findByAntennaId_BackGround(antennaId);
-        this.currentAntenaFields = data;
-    }
-
     private void handleNewlyInsertedMetadata(AppDatabase appDb){
         // Background
         List<MetaData> data =new ArrayList<>();
@@ -428,23 +361,6 @@ public class ImportActivity extends BaseActivity{
         this.currentMetaData = meta;
     }
 
-    private void handelGetAntennaInBackground(AppDatabase appDb, int antennaId){
-        // Background
-        List<Antenna> data =new ArrayList<>();
-        data = appDb.antennaDao().find_Background(antennaId);
-        this.currentAntenna = data.get(0);
-    }
-
-    private void handleNewConfigInsert(){
-        Log.d(TAG, "handleNewConfigInsert: creating background thread");
-        Antenna insert = new Antenna("Antenna #");
-        //Background
-        executeRunnable(addNewAntennaConfig(insert));
-        //Reset other options
-        currentAntenaFields = null;
-        currentMetaData = null;
-        initImportView();
-    }
 
     /**
      * Method is called when the import activity is opened for the first time.
@@ -467,28 +383,6 @@ public class ImportActivity extends BaseActivity{
         }
     }
 
-    /**
-     * Opens a dialog with all available antennas. If one is selected, the dialog will close and
-     * a new current antenna will be set
-     * @param antennaList - all available antennas from the database
-     */
-    private void displayChooseAntennaDialog( List<Antenna> antennaList){
-        Log.d(TAG, "displayChooseAntennaDialog: Opening...");
-        DialogExistingAntenna dialog = new DialogExistingAntenna(this, "Antenna", R.layout.dialog_import_existing_antenna, antennaList) {
-            @Override
-            public void handelAntennaItemClick(Antenna antenna) {
-
-                Toast.makeText(getApplicationContext(), "Antenna " + antenna.description, Toast.LENGTH_LONG).show();
-                currentAntenna = antenna;
-                loadAntennaFieldsByAntennaId(currentAntenna.id);
-
-
-                initImportView();
-                this.getDialog().dismiss();
-            }
-        };
-        dialog.showDialog();
-    }
 
     //This needs to be changed. LiveData causes site effects
     public void loadAntennaFieldsByAntennaId(int antennaId){

@@ -24,8 +24,6 @@ public abstract class ImportView implements IImportOptions {
 
     private ProgressbarHolder progressBar;
 
-    private Button btnAddNewConfig;
-    private Button btnChooseConfig;
     private Button btnAddImportAntenna;
     private Button btnAddDefaultAntenna;
     private Button btnAddMetaData;
@@ -67,8 +65,6 @@ public abstract class ImportView implements IImportOptions {
     private void initButtons(FragmentActivity fa){
 
         configName = fa.findViewById(R.id.configName);
-        btnAddNewConfig = fa.findViewById(R.id.btn_add_config);
-        btnChooseConfig = fa.findViewById(R.id.btn_choose_config);
         btnAddImportAntenna = fa.findViewById(R.id.btn_import_antenna);
         btnAddDefaultAntenna = fa.findViewById(R.id.btn_add_default);
         btnAddMetaData = fa.findViewById(R.id.btn_import_add_metadata);
@@ -76,8 +72,6 @@ public abstract class ImportView implements IImportOptions {
         btnAddFFS = fa.findViewById(R.id.btn_import_add_ffs);
 
         configName.addTextChangedListener(descriptionChanged());
-        btnAddNewConfig.setOnClickListener(v -> {insertNewConfig(); });
-        btnChooseConfig.setOnClickListener(v -> { chooseExistingConfig(); });
         btnAddImportAntenna.setOnClickListener(v -> { addImportAntenna(); });
         btnAddDefaultAntenna.setOnClickListener(v -> {addDefaultAntenna();});
         btnAddMetaData.setOnClickListener( v -> { addMetaData(); });

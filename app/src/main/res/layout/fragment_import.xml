@@ -14,28 +14,12 @@
 
         <EditText
             android:id="@+id/configName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName"
             style="@style/HeadLine"
             android:text="      " />
-
-        <Button
-            android:id="@+id/btn_choose_config"
-            android:layout_width="67dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="v"
-            android:textColor="@color/white" />
-
-        <Button
-            android:id="@+id/btn_add_config"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="+"
-            android:textColor="@color/white" />
 
 
     </LinearLayout>
