@@ -166,46 +166,6 @@ public class ImportActivity extends BaseActivity{
         };
     }
 
-    /**
-     * Handles a chosen file and stores it (using a background thread)
-     * Uses the requestCode to find the correct Method to parse the data
-     * FileHandler checks the file for validity
-     * @return
-     */
-    public Runnable getHandelResultRunnable(Intent data, int requestCode){
-        return new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Uri uri = data.getData();
-                    AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
-                    switch (requestCode) {
-                        case FileRequests.REQUEST_CODE_ANTENNA:
-                            String antennaName = FileHandler.queryName(getContentResolver(), uri);
-                            if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
-                                currentAntenna.filename = antennaName;
-                                currentAntenna.uri = uri.toString();
-                            } else {
-                                showToast(getString(R.string.toastInvalidAntenna));
-                            }
-                            break;
-                        case FileRequests.REQUEST_CODE_FOLDER:
-                            Log.d(TAG, "run: Importing Metaddatafolder");
-                            //Currently does not return whether any files from the Folder were imported
-                            setMetaDataUris(uri);
-                            showToast(getString(R.string.toastValidMetadataFolder));
-                            break;
-                        default: throw new RuntimeException();
-                    }
-                } catch(Exception e){
-                    e.printStackTrace();
-                    Log.e(TAG, "Exception " + e.getMessage());
-                }
-            }
-        };
-    }
-
-
     public Runnable initImport(){
         Log.d(TAG, "addNewAntennaConfig: executing background thread");
         return new Runnable() {
@@ -366,40 +326,25 @@ public class ImportActivity extends BaseActivity{
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         importView.showProgressBar();
+
         Log.d(TAG, "Activity result");
         if(resultCode == Activity.RESULT_OK){
-//            Log.d(TAG, "Request Code: "+requestCode);
-//            executeRunnable(getHandelResultRunnable( data, requestCode));
-//            initImportView();
-
             Uri uri = data.getData();
-
-            // Handle FFS separately since its Work
-            /*
-            if (requestCode == FileRequests.REQUEST_CODE_FFS){
-                String ffsName = FileHandler.queryName( getContentResolver(), uri);
-                if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
-                    handleFFSImportWork(uri, ffsName);
-                } else {
-                    showToast(getString(R.string.toastInvalidFFS));
-                }
-
-
+            switch(requestCode){
+                case FileRequests.REQUEST_CODE_FOLDER:
+                    handleFolderImport(uri);
+                    showToast(getString(R.string.toastFolderImport));
+                    break;
+                case FileRequests.REQUEST_CODE_ANTENNA:
+                    String antennaName = FileHandler.queryName(getContentResolver(), uri);
+                    if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
+                        currentAntenna.filename = antennaName;
+                        currentAntenna.uri = uri.toString();
+                    } else {
+                        showToast(getString(R.string.toastInvalidAntenna));
+                    }
             }
-            */
-            if(requestCode == FileRequests.REQUEST_CODE_FOLDER){
-                //Currently does not return whether any files from the Folder were imported
-                handleFolderImport(uri);
-                showToast(getString(R.string.toastFolderImport));
-            } else{
-                // Antenna, Metadata, ...
-                executeRunnable(getHandelResultRunnable( data, requestCode));
-                initImportView();
-
-            }
-
         }
 
     }
@@ -433,9 +378,6 @@ public class ImportActivity extends BaseActivity{
 
                         return;
                     }
-
-
-
                     // Work success
                     loadAntennaFieldsByAntennaId(currentAntenna.id);
                     initImportView();
