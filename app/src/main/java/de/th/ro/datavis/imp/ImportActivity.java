@@ -154,17 +154,6 @@ public class ImportActivity extends BaseActivity{
             }
 
             @Override
-            public void addMetaData() {
-                if (currentAntenna == null){
-                    Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                setPreferenceID();
-
-                openFileDialog(FileRequests.REQUEST_CODE_METADATA);
-            }
-
-            @Override
             public void addMetaDataFolder() {
                 if (currentAntenna == null){
                     Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();

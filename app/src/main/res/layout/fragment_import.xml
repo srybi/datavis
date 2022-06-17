@@ -77,14 +77,6 @@
         android:layout_marginEnd="10dp">
 
         <Button
-            android:id="@+id/btn_import_add_metadata"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:text="@string/btn_add_metaData"
-            android:textColor="@color/white" />
-
-        <Button
             android:id="@+id/btn_import_add_metadataFolder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -92,6 +84,14 @@
             android:text="@string/btn_add_metaFolder"
             android:textColor="@color/white"
             />
+
+        <Button
+            android:id="@+id/btn_import_add_ffs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/btn_add_ffs"
+            android:textColor="@color/white" />
     </LinearLayout>
 
 
@@ -100,15 +100,6 @@
         android:layout_height="wrap_content"
         android:text="@string/farFieldSource"
         style="@style/HeadLine"/>
-
-    <Button
-        android:id="@+id/btn_import_add_ffs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/btn_add_ffs"
-        android:textColor="@color/white"
-        />
 
     <ListView
         android:id="@+id/lv_import_antenna_fields"
