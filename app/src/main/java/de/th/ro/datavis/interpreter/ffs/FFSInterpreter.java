@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,7 +30,7 @@ import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 public class FFSInterpreter implements IInterpreter {
 
-    private static final String LOG_TAG = "Interpretation";
+    private static final String TAG = "Interpretation";
     private double maxItensity = -1;
 
     private static final int MAX_HAMMING_DISTANCE = 10;
@@ -62,7 +63,7 @@ public class FFSInterpreter implements IInterpreter {
     private Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(BufferedReader reader, double scalingFactor, double tiltValue) throws FFSInterpretException {
         AtomicField atomicField;
         maxItensity = -1;
-        Log.d(LOG_TAG, "Start Interpretation...");
+        Log.d(TAG, "Start Interpretation...");
         List<Sphere> coordinates;
         int frequencies = -1;
         int samples = -1;
@@ -114,7 +115,7 @@ public class FFSInterpreter implements IInterpreter {
 
             ArrayList<AtomicField> atomicFieldsLog = interpretValues(values,frequencyValues, tiltValue, scalingFactor, InterpretationMode.Logarithmic);
             ArrayList<AtomicField> atomicFieldsLin = interpretValues(values,frequencyValues, tiltValue, scalingFactor, InterpretationMode.Linear);
-            Log.d(LOG_TAG, "Interpretation finished");
+            Log.d(TAG, "Interpretation finished");
             return Result.success(Pair.create(atomicFieldsLog, atomicFieldsLin));
 
         } catch (Exception e) {
@@ -189,6 +190,7 @@ public class FFSInterpreter implements IInterpreter {
     @Override
     public Result<AtomicField> interpretDataAsStream(Stream<String> stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
         maxItensity = -1;
+        Log.d(TAG, "interpretDataAsStream: IM HERE");
         AtomicField atomicField = new AtomicField(2,1,mode, new ArrayList<>(),maxItensity , 1, 1);
         List<Sphere> coordinates;
         AtomicBoolean error = new AtomicBoolean(false);
@@ -229,6 +231,7 @@ public class FFSInterpreter implements IInterpreter {
         }).collect(Collectors.toList());
 
         atomicField.setSpheres(coordinates);
+        Log.d(TAG, "interpretDataAsStream: I DID IT");
         return Result.success(atomicField);
     }
 }

@@ -40,6 +40,7 @@ public class InterpretFFSWorker extends Worker {
    String[] inputFilenames;
    FFSService ffsService;
    ObjectMapper objectMapper;
+   List<AtomicField> resultFields;
 
    public InterpretFFSWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
       super(context, workerParams);
@@ -52,27 +53,33 @@ public class InterpretFFSWorker extends Worker {
       handleInputData();
       ffsService = new FFSService(new FFSInterpreter(), getApplicationContext());
       objectMapper = new ObjectMapper();
+      resultFields = new LinkedList<>();
 
-      List<AtomicField> logFields = new LinkedList<>();
-      List<AtomicField> linearFields = new LinkedList<>();
-
-      for(int i = 0; i < inputURIs.length; i++){
-         Uri uri = Uri.parse(inputURIs[i]);
-         String filename = inputFilenames[i];
-         Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> atomicFields = interpretFFS(uri, filename);
-         logFields.addAll(atomicFields.first);
-         linearFields.addAll(atomicFields.second);
-      }
+      Log.d(TAG, "doWork: Stating interpretation....");
+      storeAtomicFields();
+      Log.d(TAG, "doWork: Finished interpretation...." + resultFields.size());
 
       Data.Builder builder = new Data.Builder();
-      builder.putStringArray("result_log", prepareOutput(logFields));
-      builder.putStringArray("result_linear", prepareOutput(linearFields));
+      builder.putStringArray("result", prepareOutput(resultFields));
       Data output = builder.build();
 
       return Result.success(output);
    }
 
+   private void storeAtomicFields(){
+      for(int i = 0; i < inputURIs.length; i++){
+         Uri uri = Uri.parse(inputURIs[i]);
+         String filename = inputFilenames[i];
+         Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> atomicFields = interpretFFS(uri, filename);
+         Log.d(TAG, "doWork: " + atomicFields.first.size());
+         resultFields.addAll(atomicFields.first);
+         resultFields.addAll(atomicFields.second);
+      }
+      Log.d(TAG, "storeAtomicFields: " + resultFields.get(resultFields.size() - 1));
+   }
+
    private String[] prepareOutput(List<AtomicField> result){
+      Log.d(TAG, "prepareOutput: start");
       String[] dataArray = new String[result.size()];
       int i = 0;
       for(AtomicField md : result){
@@ -83,6 +90,8 @@ public class InterpretFFSWorker extends Worker {
             Log.d(TAG, "prepareOutput: Something went wrong...Skipping meta data object");
          }
       }
+      Log.d(TAG, "prepareOutput: " + dataArray[dataArray.length - 1]);
+      Log.d(TAG, "prepareOutput: finish");
       return dataArray;
    }
 

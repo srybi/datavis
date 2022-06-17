@@ -43,6 +43,7 @@ import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
+import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.FileRequests;
@@ -61,10 +62,11 @@ public class ImportActivity extends BaseActivity{
     Antenna currentAntenna;
     List<String> currentMetaDataType;
     List<MetaData> currentMetaData;
+
     List<AntennaField> currentAntennaFields;
+    List<AtomicField> currentAtomicFields;
 
     ImportView importView;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -154,7 +156,9 @@ public class ImportActivity extends BaseActivity{
             public void confirmImport(){
                 executeRunnable(saveAntenna());
                 setPreferenceID();
-                executeRunnable(saveMetadata());
+                executeRunnable(persistMetadata());
+                executeRunnable(persistAntennaFields());
+                executeRunnable(persistAtomicFields());
                 //Switch back to Landing page
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
@@ -192,14 +196,6 @@ public class ImportActivity extends BaseActivity{
         };
     }
 
-    private Runnable saveMetadata(){
-        return new Runnable() {
-            @Override
-            public void run() {
-                persistMetadata(appDb);
-            }
-        };
-    }
 
     public void executeRunnable(Runnable runnable){
         ExecutorService executorService  = Executors.newSingleThreadExecutor();
@@ -211,20 +207,37 @@ public class ImportActivity extends BaseActivity{
         }
     }
 
+    public Runnable persistAtomicFields(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int antennaId = preferences.getInt("ID", 1);
+        return new Runnable() {
+            @Override
+            public void run() {
+                for(AtomicField atomicField : currentAtomicFields){
+                    atomicField.setAntennaId(antennaId);
+                    appDb.atomicFieldDao().insert(atomicField);
+                }
+            }
+        };
+    }
+
     /**
      * Uses MetadataInterpreter to run through a .csv
      * then adds antennaID
      * then persists it
      */
-    public void persistMetadata(AppDatabase appDb){
+    public Runnable persistMetadata(){
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             int antennaId = preferences.getInt("ID", 1);
-
-            for(MetaData e : currentMetaData){
-                e.setAntennaID(antennaId);
-                appDb.metadataDao().insert(e);
-            }
-
+            return new Runnable() {
+                @Override
+                public void run() {
+                    for(MetaData e : currentMetaData){
+                        e.setAntennaID(antennaId);
+                        appDb.metadataDao().insert(e);
+                    }
+                }
+            };
     }
 
     public void setMetaDataTypes(String[] metaDataUris) {
@@ -237,6 +250,20 @@ public class ImportActivity extends BaseActivity{
             Log.d(TAG, "setMetaDataUris: storing metadatatypes in var");
         }
         Log.d(TAG, "setMetaDataUris: finished"  );
+    }
+
+    private Runnable persistAntennaFields(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int antennaId = preferences.getInt("ID", 1);
+        return new Runnable() {
+            @Override
+            public void run() {
+                for(AntennaField antennaField : currentAntennaFields){
+                    antennaField.antennaId = antennaId;
+                    appDb.antennaFieldDao().insert(antennaField);
+                }
+            }
+        };
     }
 
     public void setAntennaFields(String[] antennaFieldsUri){
@@ -260,16 +287,6 @@ public class ImportActivity extends BaseActivity{
         this.currentAntenna = data.get(data.size() - 1);
     }
 
-    //This needs to be changed. LiveData causes site effects
-    public void loadAntennaFieldsByAntennaId(int antennaId){
-        List<AntennaField> antennaFields = new ArrayList<>();
-        executeRunnable(new Runnable() {
-            @Override
-            public void run() {
-                currentAntennaFields = appDb.antennaFieldDao().findByAntennaId_BackGround(antennaId);
-            }
-        });
-    }
 
     /**
      *  ==================================
@@ -359,7 +376,6 @@ public class ImportActivity extends BaseActivity{
 
 
     private void handleFFSImportWork(String key, String[] values){
-
         // Build InputData
         Data.Builder builder = new Data.Builder();
         builder.putStringArray(key, values);
@@ -368,7 +384,7 @@ public class ImportActivity extends BaseActivity{
 
         // Create WorkRequest
         OneTimeWorkRequest workRequest = WorkerRequestUtil.getOneTimeRequest(InterpretFFSWorker.class, input);
-        workManager.enqueue( workRequest);
+        workManager.enqueue(workRequest);
         workManager.getWorkInfoByIdLiveData(workRequest.getId()).observe(this, new Observer<WorkInfo>() {
             @Override
             public void onChanged(WorkInfo workInfo) {
@@ -377,12 +393,11 @@ public class ImportActivity extends BaseActivity{
 
                     if (workInfo.getState() == WorkInfo.State.FAILED
                             || workInfo.getState() == WorkInfo.State.CANCELLED){
-                        // Work Problem
-
                         return;
                     }
-                    // Work success
-                    loadAntennaFieldsByAntennaId(currentAntenna.id);
+
+                    String[] output = workInfo.getOutputData().getStringArray("result");
+                    handleFFSOutput(output);
                     initImportView();
                 }
             }
@@ -398,10 +413,24 @@ public class ImportActivity extends BaseActivity{
         return result;
     }
 
+    private void handleFFSOutput(String[] data){
+        Log.d(TAG, "handleFFSOutput: handling output");
+        ObjectMapper objectMapper = new ObjectMapper();
+        if(currentAtomicFields == null){
+            currentAtomicFields = new LinkedList<>();
+        }
+        for(String s : data){
+            try{
+                currentAtomicFields.add(objectMapper.readValue(s, AtomicField.class));
+            }catch(Exception e) {
+                Log.e(TAG, "handleFFSOutput: Converting into json went wrong! " + e.getMessage());
+            }
+        }
+    }
+
     /** Handle Folder Work
      */
     private void handleMetaDataImportWork(String key, String[] values){
-
         // Build InputData
         Data.Builder builder = new Data.Builder();
         builder.putStringArray(key, values);
@@ -409,7 +438,7 @@ public class ImportActivity extends BaseActivity{
 
         // Create WorkRequest
         OneTimeWorkRequest workRequest = WorkerRequestUtil.getOneTimeRequest(InterpretMetaDataWorker.class, input);
-        workManager.enqueue( workRequest);
+        workManager.enqueue(workRequest);
         workManager.getWorkInfoByIdLiveData(workRequest.getId()).observe(this, new Observer<WorkInfo>() {
             @Override
             public void onChanged(WorkInfo workInfo) {
@@ -422,6 +451,7 @@ public class ImportActivity extends BaseActivity{
                         return;
                     }
 
+
                     handleMetaDataOutput(workInfo.getOutputData().getStringArray("result"));
 
                     initImportView();
@@ -429,9 +459,7 @@ public class ImportActivity extends BaseActivity{
                 }
             }
         });
-
     }
-
     private void handleMetaDataOutput(String[] output){
         ObjectMapper objectMapper = new ObjectMapper();
         if(currentMetaData == null){
@@ -446,7 +474,6 @@ public class ImportActivity extends BaseActivity{
             }
         }
     }
-
 
     /**
      * Utility method to call Toasts in UI Thread
