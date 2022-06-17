@@ -10,7 +10,7 @@ public interface IImportOptions {
 
     void addDefaultAntenna();
 
-    void addMetaDataFolder();
+    void addFolder();
 
     void confirmImport();
 

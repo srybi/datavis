@@ -7,11 +7,7 @@ import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
-import androidx.room.util.StringUtil;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -48,7 +44,7 @@ public class FileHandler {
                 return checkExtension(resolver, uri, new String[]{".ffs"});
             case FileRequests.REQUEST_CODE_METADATA:
                 return checkMime(resolver, uri, new String[]{"text/comma-separated-values", "text/csv"});
-            case FileRequests.REQUEST_CODE_METADATAFOLDER:
+            case FileRequests.REQUEST_CODE_FOLDER:
                 return true;
             default: throw new RuntimeException();
         }

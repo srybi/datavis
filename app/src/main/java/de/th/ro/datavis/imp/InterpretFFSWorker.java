@@ -24,7 +24,7 @@ import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
-public class ImportWorker extends Worker {
+public class InterpretFFSWorker extends Worker {
 
 
    private final String TAG = "ImportWorker";
@@ -34,7 +34,7 @@ public class ImportWorker extends Worker {
    String fileName;
    FFSService ffsService;
 
-   public ImportWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+   public InterpretFFSWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
       super(context, workerParams);
    }
 

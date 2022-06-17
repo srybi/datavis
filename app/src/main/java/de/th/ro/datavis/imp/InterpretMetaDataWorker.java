@@ -26,7 +26,7 @@ import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 
-public class ImportFolderWorker extends Worker {
+public class InterpretMetaDataWorker extends Worker {
 
 
    private final String TAG = "ImportFolderWorker";
@@ -36,7 +36,7 @@ public class ImportFolderWorker extends Worker {
    String[] ffsList;
    MetadataInterpreter metaInt;
 
-   public ImportFolderWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+   public InterpretMetaDataWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
       super(context, workerParams);
    }
 

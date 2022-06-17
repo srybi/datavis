@@ -1,6 +1,5 @@
 package de.th.ro.datavis.imp;
 
-import android.net.Uri;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -92,7 +91,7 @@ public abstract class ImportView implements IImportOptions {
         configName.addTextChangedListener(descriptionChanged());
         btnAddImportAntenna.setOnClickListener(v -> { addImportAntenna(); });
         btnAddDefaultAntenna.setOnClickListener(v -> {addDefaultAntenna();});
-        btnAddMetaDataFolder.setOnClickListener( v -> { addMetaDataFolder(); });
+        btnAddMetaDataFolder.setOnClickListener( v -> { addFolder(); });
         btnConfirm.setOnClickListener(v -> {confirmImport(); });
     }
 

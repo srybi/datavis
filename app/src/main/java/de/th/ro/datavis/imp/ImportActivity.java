@@ -132,7 +132,6 @@ public class ImportActivity extends BaseActivity{
             }
 
 
-
             @Override
             public void addImportAntenna() {
                 openFileDialog(FileRequests.REQUEST_CODE_ANTENNA);
@@ -145,8 +144,8 @@ public class ImportActivity extends BaseActivity{
             }
 
             @Override
-            public void addMetaDataFolder() {
-                openFolderDialog(FileRequests.REQUEST_CODE_METADATAFOLDER);
+            public void addFolder() {
+                openFolderDialog(FileRequests.REQUEST_CODE_FOLDER);
             }
 
             @Override
@@ -190,7 +189,7 @@ public class ImportActivity extends BaseActivity{
                                 showToast(getString(R.string.toastInvalidAntenna));
                             }
                             break;
-                        case FileRequests.REQUEST_CODE_METADATAFOLDER:
+                        case FileRequests.REQUEST_CODE_FOLDER:
                             Log.d(TAG, "run: Importing Metaddatafolder");
                             //Currently does not return whether any files from the Folder were imported
                             setMetaDataUris(uri);
@@ -378,6 +377,7 @@ public class ImportActivity extends BaseActivity{
             Uri uri = data.getData();
 
             // Handle FFS separately since its Work
+            /*
             if (requestCode == FileRequests.REQUEST_CODE_FFS){
                 String ffsName = FileHandler.queryName( getContentResolver(), uri);
                 if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
@@ -385,9 +385,13 @@ public class ImportActivity extends BaseActivity{
                 } else {
                     showToast(getString(R.string.toastInvalidFFS));
                 }
-            } else if(requestCode == FileRequests.REQUEST_CODE_METADATAFOLDER){
+
+
+            }
+            */
+            if(requestCode == FileRequests.REQUEST_CODE_FOLDER){
                 //Currently does not return whether any files from the Folder were imported
-                handleFolderImportWork(uri);
+                handleFolderImport(uri);
                 showToast(getString(R.string.toastFolderImport));
             } else{
                 // Antenna, Metadata, ...
@@ -400,22 +404,22 @@ public class ImportActivity extends BaseActivity{
 
     }
 
+    private void handleFolderImport(Uri uri){
+        Map<Integer, String[]> pairURI = FileHandler.traverseDirectoryEntries(uri, getContentResolver());
+        handleFFSImportWork("URIFFS", pairURI.get(1));
+        handleMetaDataImportWork("URICSV", pairURI.get(0));
+    }
 
-    /**
-     * Handle Import Result of FFD Data.
-     * Queue Work to an Non blocking Thread
-     * @param uri Uri to the FFS file
-     */
-    private void handleFFSImportWork(Uri uri, String fileName){
+
+    private void handleFFSImportWork(String key, String[] values){
 
         // Build InputData
         Data.Builder builder = new Data.Builder();
-        builder.putString("URI", uri.toString());
-        builder.putString("FILENAME", fileName);
+        builder.putStringArray(key, values);
         Data input = builder.build();
 
         // Create WorkRequest
-        OneTimeWorkRequest workRequest = WorkerRequestUtil.getOneTimeRequest(ImportWorker.class, input);
+        OneTimeWorkRequest workRequest = WorkerRequestUtil.getOneTimeRequest(InterpretFFSWorker.class, input);
         workManager.enqueue( workRequest);
         workManager.getWorkInfoByIdLiveData(workRequest.getId()).observe(this, new Observer<WorkInfo>() {
             @Override
@@ -443,17 +447,15 @@ public class ImportActivity extends BaseActivity{
 
     /** Handle Folder Work
      */
-    private void handleFolderImportWork(Uri uri){
+    private void handleMetaDataImportWork(String key, String[] values){
 
         // Build InputData
         Data.Builder builder = new Data.Builder();
-        Map<Integer, String[]> pairURI = FileHandler.traverseDirectoryEntries(uri, getContentResolver());
-        builder.putStringArray("URICSV", pairURI.get(0));
-        builder.putStringArray("URIFFS", pairURI.get(1));
+        builder.putStringArray(key, values);
         Data input = builder.build();
 
         // Create WorkRequest
-        OneTimeWorkRequest workRequest = WorkerRequestUtil.getOneTimeRequest(ImportFolderWorker.class, input);
+        OneTimeWorkRequest workRequest = WorkerRequestUtil.getOneTimeRequest(InterpretMetaDataWorker.class, input);
         workManager.enqueue( workRequest);
         workManager.getWorkInfoByIdLiveData(workRequest.getId()).observe(this, new Observer<WorkInfo>() {
             @Override
