@@ -1,10 +1,13 @@
 package de.th.ro.datavis.imp;
 
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.core.view.ViewCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentActivity;
 
 import java.util.List;
@@ -20,7 +23,8 @@ import de.th.ro.datavis.ui.progressBar.ProgressbarHolder;
 public abstract class ImportView implements IImportOptions {
 
 
-    private ListView listViewAntennaFields;
+    private ListView ffsList;
+    private NestedScrollView ffsScrollable;
 
     private ProgressbarHolder progressBar;
 
@@ -44,23 +48,24 @@ public abstract class ImportView implements IImportOptions {
         initButtons(fa);
         initConfigName(fa, antenna);
         initAntennaHeadLine(fa, antenna);
-        initListView(fa, fieldList);
+        initFFSScrollable(fa, fieldList);
         initProgressBar(fa);
     }
 
-    private void initListView(FragmentActivity fa, List<AntennaField> antennaFieldList){
-
-        listViewAntennaFields = fa.findViewById(R.id.lv_import_antenna_fields);
+    private void initFFSScrollable(FragmentActivity fa, List<AntennaField> antennaFieldList){
+        ffsList = fa.findViewById(R.id.lv_import_antenna_fields);
+        Log.d("ImportActivity", "initFFSScrollable: " + ffsList);
 
         if (antennaFieldList == null || antennaFieldList.isEmpty()){
-            listViewAntennaFields.setAdapter(null);
+            ffsList.setAdapter(null);
             return;
         }
 
         AntennaFieldAdapter adapter = new AntennaFieldAdapter(fa, antennaFieldList);
-        listViewAntennaFields.setAdapter(adapter);
-
+        ffsList.setAdapter(adapter);
+        ViewCompat.setNestedScrollingEnabled(ffsList, true);
     }
+
     private void initButtons(FragmentActivity fa){
 
         configName = fa.findViewById(R.id.configName);
@@ -110,7 +115,7 @@ public abstract class ImportView implements IImportOptions {
 
     public void updateData(FragmentActivity fa, Antenna antenna, List<AntennaField> antennaFieldList, MetaData metaData){
         initAntennaHeadLine(fa, antenna);
-        initListView(fa, antennaFieldList);
+        initFFSScrollable(fa, antennaFieldList);
     }
 
 
