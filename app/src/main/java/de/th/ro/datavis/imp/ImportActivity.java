@@ -159,9 +159,6 @@ public class ImportActivity extends BaseActivity{
                 executeRunnable(persistMetadata());
                 executeRunnable(persistAntennaFields());
                 handleFFSImportWork("URIFFS", ffsUris);
-                //Switch back to Landing page
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
             }
 
             private void setPreferenceID(){
@@ -363,10 +360,16 @@ public class ImportActivity extends BaseActivity{
 
     private void handleFFSImportWork(String key, String[] values){
         // Build InputData
+        if(values == null){
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+            return;
+        }
         Data.Builder builder = new Data.Builder();
         builder.putStringArray(key, values);
         builder.putStringArray("FILENAMEFFS", getFilenames(values));
         Data input = builder.build();
+        importView.showProgressBar();
 
         // Create WorkRequest
         OneTimeWorkRequest workRequest = WorkerRequestUtil.getOneTimeRequest(InterpretFFSWorker.class, input);
@@ -382,7 +385,8 @@ public class ImportActivity extends BaseActivity{
                         return;
                     }
 
-                    initImportView();
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
                 }
             }
         });
