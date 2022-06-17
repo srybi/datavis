@@ -1,18 +1,26 @@
 package de.th.ro.datavis.ui.adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import de.th.ro.datavis.R;
+import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.models.Antenna;
 
 public class AntennaAdapter extends ArrayAdapter<Antenna> {
@@ -31,6 +39,49 @@ public class AntennaAdapter extends ArrayAdapter<Antenna> {
          TextView tvName = (TextView) convertView.findViewById(R.id.field_name);
          tvName.setText(antenna.description);
 
+        ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.button_config_delete);
+        View finalConvertView = convertView;
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                //Do your Yes progress
+                                deleteAntenna(antenna);
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //Do your No progress
+                                break;
+                        }
+                    }
+                };
+                AlertDialog.Builder ab = new AlertDialog.Builder(finalConvertView.getContext());
+                ab.setMessage(getContext().getString(R.string.clear_one_confirm) + " " + antenna.description + " ?").setPositiveButton(R.string.yes, dialogClickListener)
+                        .setNegativeButton(R.string.no, dialogClickListener).show();
+
+            }
+        });
+
          return convertView;
+    }
+
+    private void deleteAntenna(Antenna antenna){
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future future = executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                AppDatabase.getInstance(getContext()).antennaDao().delete(antenna);
+            }
+        });
+        try {
+            future.get();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        notifyDataSetChanged();
     }
 }
