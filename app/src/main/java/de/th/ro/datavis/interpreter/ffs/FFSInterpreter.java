@@ -13,7 +13,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,7 +29,7 @@ import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 public class FFSInterpreter implements IInterpreter {
 
-    private static final String TAG = "Interpretation";
+    private static final String LOG_TAG = "Interpretation";
     private double maxItensity = -1;
 
     private static final int MAX_HAMMING_DISTANCE = 10;
@@ -39,20 +38,20 @@ public class FFSInterpreter implements IInterpreter {
 
 
     @Override
-    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(InputStream stream, double scalingFactor, double tiltValue) throws FFSInterpretException {
-            InputStreamReader reader = new InputStreamReader(stream);
-            BufferedReader bufferedReader = new BufferedReader(reader);
+    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(InputStream stream, double scalingFactor, double tiltValue, int antennaId) throws FFSInterpretException {
+        InputStreamReader reader = new InputStreamReader(stream);
+        BufferedReader bufferedReader = new BufferedReader(reader);
 
-            return interpretData(bufferedReader, scalingFactor, tiltValue);
+        return interpretData(bufferedReader, scalingFactor, tiltValue, antennaId);
     }
 
     @Override
-    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(File file, double scalingFactor, double tiltValue) throws FFSInterpretException {
+    public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(File file, double scalingFactor, double tiltValue, int antennaId) throws FFSInterpretException {
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-            return interpretData(bufferedReader, scalingFactor, tiltValue);
+            return interpretData(bufferedReader, scalingFactor, tiltValue, antennaId);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return Result.error("File Not Found.");
@@ -60,10 +59,10 @@ public class FFSInterpreter implements IInterpreter {
     }
 
 
-    private Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(BufferedReader reader, double scalingFactor, double tiltValue) throws FFSInterpretException {
+    private Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(BufferedReader reader, double scalingFactor, double tiltValue, int antennaId) throws FFSInterpretException {
         AtomicField atomicField;
         maxItensity = -1;
-        Log.d(TAG, "Start Interpretation...");
+        Log.d(LOG_TAG, "Start Interpretation...");
         List<Sphere> coordinates;
         int frequencies = -1;
         int samples = -1;
@@ -91,7 +90,7 @@ public class FFSInterpreter implements IInterpreter {
                 }
                 if(Calc.calcLevenstheinDistance(line.trim(),(FFSConstants.RADACCSTMFREQ_HEADER.trim())) < MAX_HAMMING_DISTANCE){
                     try{
-                    frequencyValues = extractFrequencyValues(reader, frequencies);}
+                        frequencyValues = extractFrequencyValues(reader, frequencies);}
                     catch(Exception e){
                         e.printStackTrace();
                         return Result.error("Could not extract frequency values.");
@@ -113,9 +112,9 @@ public class FFSInterpreter implements IInterpreter {
                     findNextAtomicField(reader);
             }
 
-            ArrayList<AtomicField> atomicFieldsLog = interpretValues(values,frequencyValues, tiltValue, scalingFactor, InterpretationMode.Logarithmic);
-            ArrayList<AtomicField> atomicFieldsLin = interpretValues(values,frequencyValues, tiltValue, scalingFactor, InterpretationMode.Linear);
-            Log.d(TAG, "Interpretation finished");
+            ArrayList<AtomicField> atomicFieldsLog = interpretValues(values,frequencyValues, tiltValue, scalingFactor, InterpretationMode.Logarithmic, antennaId);
+            ArrayList<AtomicField> atomicFieldsLin = interpretValues(values,frequencyValues, tiltValue, scalingFactor, InterpretationMode.Linear, antennaId);
+            Log.d(LOG_TAG, "Interpretation finished");
             return Result.success(Pair.create(atomicFieldsLog, atomicFieldsLin));
 
         } catch (Exception e) {
@@ -139,7 +138,7 @@ public class FFSInterpreter implements IInterpreter {
         return frequencyValues;
     }
 
-    private ArrayList<AtomicField> interpretValues(ArrayList<ArrayList<String>> values, ArrayList<Double> frequencies, double tilt, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
+    private ArrayList<AtomicField> interpretValues(ArrayList<ArrayList<String>> values, ArrayList<Double> frequencies, double tilt, double scalingFactor, InterpretationMode mode, int antennaId) throws FFSInterpretException {
         ArrayList<AtomicField> atomicFields = new ArrayList<>();
         for(Pair<ArrayList<String>, Double> pair : Helper.zip(values, frequencies)){
             Result<AtomicField> atomicField = interpretValue(pair.first, scalingFactor, mode);
@@ -151,6 +150,7 @@ public class FFSInterpreter implements IInterpreter {
             double frequency = pair.second/1000000000;
             field.setFrequency(frequency);
             field.setTilt(tilt);
+            field.setAntennaId(antennaId);
             atomicFields.add(field);
         }
         return atomicFields;
@@ -190,7 +190,6 @@ public class FFSInterpreter implements IInterpreter {
     @Override
     public Result<AtomicField> interpretDataAsStream(Stream<String> stream, double scalingFactor, InterpretationMode mode) throws FFSInterpretException {
         maxItensity = -1;
-        Log.d(TAG, "interpretDataAsStream: IM HERE");
         AtomicField atomicField = new AtomicField(2,1,mode, new ArrayList<>(),maxItensity , 1, 1);
         List<Sphere> coordinates;
         AtomicBoolean error = new AtomicBoolean(false);
@@ -202,7 +201,7 @@ public class FFSInterpreter implements IInterpreter {
                         double[] dVals = Arrays.stream(vals).mapToDouble(Double::parseDouble).toArray();
 
                         line = new FFSLine(dVals[0], dVals[1], dVals[2], dVals[3], dVals[4], dVals[5]);
-                       }
+                    }
                     catch (Exception e){
                         e.printStackTrace();
                         error.set(true);
@@ -231,7 +230,6 @@ public class FFSInterpreter implements IInterpreter {
         }).collect(Collectors.toList());
 
         atomicField.setSpheres(coordinates);
-        Log.d(TAG, "interpretDataAsStream: I DID IT");
         return Result.success(atomicField);
     }
 }

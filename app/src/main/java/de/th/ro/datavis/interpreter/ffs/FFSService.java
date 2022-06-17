@@ -44,7 +44,7 @@ public class FFSService {
         this.context = context;
     }
 
-    public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretData(InputStream stream, double scalingFactor, String filename) throws FFSInterpretException{
+    public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretData(InputStream stream, double scalingFactor, int antennaId, String filename) throws FFSInterpretException{
         double floatingPoint = 1;
         int start = filename.indexOf("_T") + 2, end = start + 2;
         if (filename.charAt(start+1)=='.') {
@@ -53,7 +53,7 @@ public class FFSService {
             if (filename.charAt(end+1)=='-')
                 floatingPoint = Math.pow(10, -1 * Double.parseDouble(filename.substring(end+2, end+4)));
         }
-        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPoint);
+        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPoint, antennaId);
         if(fields.isSuccess()){
             return fields.getData();
         }else{
@@ -62,7 +62,7 @@ public class FFSService {
 
     }
 
-    public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretData(File file, double scalingFactor) throws FFSInterpretException{
+    public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretData(File file, double scalingFactor, int antennaId) throws FFSInterpretException{
         double floatingPiont = 1;
         String filename = file.getName();
         int start = filename.indexOf("_T") + 2, end = start + 2;
@@ -70,13 +70,40 @@ public class FFSService {
             end = filename.indexOf("e+");
             floatingPiont = Math.pow(10, Double.parseDouble(filename.substring(end+2, end+4)));
         }
-        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(file, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPiont);
+        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(file, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPiont, antennaId);
         if(fields.isSuccess()){
             return fields.getData();
         }else{
             throw new FFSInterpretException(fields.getMessage());
         }
     }
+
+    private void saveSpheresIfNotExist(ArrayList<AtomicField> fieldsLog, ArrayList<AtomicField> fieldsLin) {
+        boolean success = true;
+        //Save all logarithmic spheres
+        for (AtomicField field : fieldsLog) {
+            try {
+                db.atomicFieldDao().insert(field);
+            }catch (SQLiteConstraintException e){
+                e.printStackTrace();
+                Log.d("FFSService", "SQL Error: " + e.getMessage());
+                success = false;
+            }
+        }
+        //Save all linear spheres
+        for (AtomicField field : fieldsLin) {
+            try {
+                db.atomicFieldDao().insert(field);
+            }catch (SQLiteConstraintException e){
+                e.printStackTrace();
+                Log.d("FFSService", "SQL Error: " + e.getMessage());
+                success = false;
+            }
+        }
+        if(!success)
+            Toast.makeText(context, "Error saving data", Toast.LENGTH_SHORT).show();
+    }
+
 
     public AtomicField getSpheresByPrimaryKey(int antennaId, double frequency, double tilt, InterpretationMode mode) {
 
