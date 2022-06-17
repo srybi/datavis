@@ -340,6 +340,7 @@ public class ImportActivity extends BaseActivity{
                     showToast(getString(R.string.toastFolderImport));
                     break;
                 case FileRequests.REQUEST_CODE_ANTENNA:
+                    Log.d(TAG, "onActivityResult: Im in the right place");
                     String antennaName = FileHandler.queryName(getContentResolver(), uri);
                     if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
                         currentAntenna.filename = antennaName;
@@ -347,6 +348,8 @@ public class ImportActivity extends BaseActivity{
                     } else {
                         showToast(getString(R.string.toastInvalidAntenna));
                     }
+                    initImportView();
+                    break;
             }
         }
     }
