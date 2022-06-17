@@ -26,7 +26,6 @@ import androidx.work.WorkManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +48,6 @@ import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.FileRequests;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 import de.th.ro.datavis.util.worker.WorkerRequestUtil;
-import kotlin.jvm.internal.TypeReference;
 
 public class ImportActivity extends BaseActivity{
 
@@ -61,10 +59,9 @@ public class ImportActivity extends BaseActivity{
     WorkManager workManager;
 
     Antenna currentAntenna;
-    String[] currentMetaDataUris;
     List<String> currentMetaDataType;
     List<MetaData> currentMetaData;
-    List<AntennaField> currentAntenaFields;
+    List<AntennaField> currentAntennaFields;
 
     ImportView importView;
 
@@ -111,9 +108,9 @@ public class ImportActivity extends BaseActivity{
 
 
     private void initImportView(){
-        Log.d(TAG, "initImportView: Initializing ... " + currentAntenna +", "+ currentAntenaFields +", "+ currentMetaDataType);
+        Log.d(TAG, "initImportView: Initializing ... " + currentAntenna +", "+ currentAntennaFields +", "+ currentMetaDataType);
 
-        importView = new ImportView(this, currentAntenna, currentAntenaFields, currentMetaDataType) {
+        importView = new ImportView(this, currentAntenna, currentAntennaFields, currentMetaDataType) {
 
             public TextWatcher descriptionChanged(){
                 return new TextWatcher() {
@@ -230,18 +227,25 @@ public class ImportActivity extends BaseActivity{
 
     }
 
-    public void setMetaDataUris(String[] metaDataUris) {
+    public void setMetaDataTypes(String[] metaDataUris) {
         Log.d(TAG, "setMetaDataUris: storing uris in var"  );
-        currentMetaDataUris = metaDataUris;
-        if(currentMetaDataUris.length != 0 && currentMetaDataType == null){
-            currentMetaDataType = new LinkedList<>();
-        }
-        for(String metaData : currentMetaDataUris){
+        currentMetaDataType = new LinkedList<>();
+
+        for(String metaData : metaDataUris){
             Uri u = Uri.parse(metaData);
             currentMetaDataType.add(FileHandler.queryName(getContentResolver(), u));
             Log.d(TAG, "setMetaDataUris: storing metadatatypes in var");
         }
         Log.d(TAG, "setMetaDataUris: finished"  );
+    }
+
+    public void setAntennaFields(String[] antennaFieldsUri){
+        currentAntennaFields = new LinkedList<>();
+        for(String antennaField : antennaFieldsUri){
+            Uri u = Uri.parse(antennaField);
+            String filename = FileHandler.queryName(getContentResolver(), u);
+            currentAntennaFields.add(new AntennaField(u, filename));
+        }
     }
 
     /**
@@ -262,7 +266,7 @@ public class ImportActivity extends BaseActivity{
         executeRunnable(new Runnable() {
             @Override
             public void run() {
-                currentAntenaFields = appDb.antennaFieldDao().findByAntennaId_BackGround(antennaId);
+                currentAntennaFields = appDb.antennaFieldDao().findByAntennaId_BackGround(antennaId);
             }
         });
     }
@@ -347,9 +351,10 @@ public class ImportActivity extends BaseActivity{
         Log.d(TAG, "handleFolderImport: Im here");
         Map<Integer, String[]> pairURI = FileHandler.traverseDirectoryEntries(uri, getContentResolver());
         Log.d(TAG, "handleFolderImport: " + pairURI.get(0).length);
-        setMetaDataUris(pairURI.get(0));
+        setMetaDataTypes(pairURI.get(0));
         handleMetaDataImportWork("URICSV", pairURI.get(0));
-        //handleFFSImportWork("URIFFS", pairURI.get(1));
+        setAntennaFields(pairURI.get(1));
+        handleFFSImportWork("URIFFS", pairURI.get(1));
     }
 
 
@@ -358,6 +363,7 @@ public class ImportActivity extends BaseActivity{
         // Build InputData
         Data.Builder builder = new Data.Builder();
         builder.putStringArray(key, values);
+        builder.putStringArray("FILENAMEFFS", getFilenames(values));
         Data input = builder.build();
 
         // Create WorkRequest
@@ -382,6 +388,14 @@ public class ImportActivity extends BaseActivity{
             }
         });
 
+    }
+
+    private String[] getFilenames(String[] uris){
+        String[] result = new String[uris.length];
+        for(int i = 0; i < uris.length; i++){
+            result[i] = FileHandler.queryName(getContentResolver(), Uri.parse(uris[i]));
+        }
+        return result;
     }
 
     /** Handle Folder Work

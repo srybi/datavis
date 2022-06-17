@@ -13,8 +13,10 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import de.th.ro.datavis.db.database.AppDatabase;
@@ -22,16 +24,17 @@ import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.AtomicField;
+import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
+import de.th.ro.datavis.util.filehandling.FileHandler;
 
 public class InterpretFFSWorker extends Worker {
 
 
    private final String TAG = "ImportWorker";
 
-   int antennaId;
-   Uri uri;
-   String fileName;
+   String[] inputURIs;
+   String[] inputFilenames;
    FFSService ffsService;
 
    public InterpretFFSWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
@@ -44,26 +47,31 @@ public class InterpretFFSWorker extends Worker {
 
       handleInputData();
       ffsService = new FFSService(new FFSInterpreter(), getApplicationContext());
-      AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
 
-      AntennaField antennaField = new AntennaField(uri, fileName, antennaId);
-      Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> atomicFields = interpretFFS(appDb, uri);
+      for(int i = 0; i < inputURIs.length; i++){
+         Uri uri = Uri.parse(inputURIs[i]);
+         String filename = inputFilenames[i];
+         Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> atomicFields = interpretFFS(uri, filename);
+      }
+
+
 
       return Result.success();
+   }
+
+   private String[] prepareOutput(List<MetaData> result){
+      String[] dataArray = new String[result.size()];
+      return dataArray;
    }
 
 
 
    private void handleInputData(){
-
-      String inpURI = getInputData().getString("URI");
-      uri = Uri.parse(inpURI);
-      fileName = getInputData().getString("FILENAME");
-      SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-      antennaId = preferences.getInt("ID", 1);
+      inputURIs = getInputData().getStringArray("URIFFS");
+      inputFilenames = getInputData().getStringArray("FILENAMEFFS");
    }
 
-   public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretFFS(AppDatabase appDb, Uri uri){
+   public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretFFS(Uri uri, String fileName){
 
       Log.d(TAG, "interpretFFS");
       InputStream in = null;
@@ -75,7 +83,7 @@ public class InterpretFFSWorker extends Worker {
       Log.d(TAG, "got InputStream");
 
       try {
-         return ffsService.interpretData(in,0.4, antennaId, fileName);
+         return ffsService.interpretData(in,0.4, fileName);
       } catch (FFSInterpretException e) {
          e.printStackTrace();
          Log.d(TAG, "FFSInterpretException " + e.getMessage());

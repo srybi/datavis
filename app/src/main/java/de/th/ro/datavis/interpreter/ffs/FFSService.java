@@ -44,7 +44,7 @@ public class FFSService {
         this.context = context;
     }
 
-    public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretData(InputStream stream, double scalingFactor, int antennaId, String filename) throws FFSInterpretException{
+    public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretData(InputStream stream, double scalingFactor, String filename) throws FFSInterpretException{
         double floatingPoint = 1;
         int start = filename.indexOf("_T") + 2, end = start + 2;
         if (filename.charAt(start+1)=='.') {
@@ -53,7 +53,7 @@ public class FFSService {
             if (filename.charAt(end+1)=='-')
                 floatingPoint = Math.pow(10, -1 * Double.parseDouble(filename.substring(end+2, end+4)));
         }
-        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPoint, antennaId);
+        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPoint);
         if(fields.isSuccess()){
             return fields.getData();
         }else{
@@ -62,7 +62,7 @@ public class FFSService {
 
     }
 
-    public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretData(File file, double scalingFactor, int antennaId) throws FFSInterpretException{
+    public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretData(File file, double scalingFactor) throws FFSInterpretException{
         double floatingPiont = 1;
         String filename = file.getName();
         int start = filename.indexOf("_T") + 2, end = start + 2;
@@ -70,7 +70,7 @@ public class FFSService {
             end = filename.indexOf("e+");
             floatingPiont = Math.pow(10, Double.parseDouble(filename.substring(end+2, end+4)));
         }
-        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(file, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPiont, antennaId);
+        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(file, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPiont);
         if(fields.isSuccess()){
             return fields.getData();
         }else{
