@@ -1,4 +1,4 @@
-package de.th.ro.datavis.main;
+package de.th.ro.datavis.imp.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;

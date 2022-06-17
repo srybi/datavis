@@ -1,5 +1,6 @@
 package de.th.ro.datavis.imp;
 
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -7,15 +8,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.core.view.ViewCompat;
-import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentActivity;
 
 import java.util.List;
 
 import de.th.ro.datavis.R;
-import de.th.ro.datavis.db.database.AppDatabase;
+import de.th.ro.datavis.imp.adapter.AntennaFieldAdapter;
+import de.th.ro.datavis.imp.adapter.MetaDataAdapter;
 import de.th.ro.datavis.interfaces.IImportOptions;
-import de.th.ro.datavis.main.AntennaFieldAdapter;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.MetaData;
@@ -43,13 +43,14 @@ public abstract class ImportView implements IImportOptions {
     FragmentActivity fragmentActivity;
 
 
-    public ImportView(FragmentActivity fa, Antenna antenna, List<AntennaField> fieldList, MetaData metaData) {
+    public ImportView(FragmentActivity fa, Antenna antenna, List<AntennaField> fieldList, List<String> metaData) {
 
         fragmentActivity = fa;
         initButtons(fa);
         initConfigName(fa, antenna);
         initAntennaHeadLine(fa, antenna);
         initFFSScrollable(fa, fieldList);
+        initMetaDataScrollable(fa, metaData);
         initProgressBar(fa);
     }
 
@@ -67,16 +68,16 @@ public abstract class ImportView implements IImportOptions {
         ViewCompat.setNestedScrollingEnabled(ffsList, true);
     }
 
-    private void initMetaDataScrollable(FragmentActivity fa, List<AntennaField> antennaFieldList){
-        ffsList = fa.findViewById(R.id.lv_import_antenna_fields);
+    private void initMetaDataScrollable(FragmentActivity fa, List<String> metaDataList){
+        ffsList = fa.findViewById(R.id.lv_import_meta_data);
         Log.d("ImportActivity", "initFFSScrollable: " + ffsList);
 
-        if (antennaFieldList == null || antennaFieldList.isEmpty()){
+        if (metaDataList == null || metaDataList.isEmpty()){
             ffsList.setAdapter(null);
             return;
         }
 
-        AntennaFieldAdapter adapter = new AntennaFieldAdapter(fa, antennaFieldList);
+        MetaDataAdapter adapter = new MetaDataAdapter(fa, metaDataList);
         ffsList.setAdapter(adapter);
         ViewCompat.setNestedScrollingEnabled(ffsList, true);
     }

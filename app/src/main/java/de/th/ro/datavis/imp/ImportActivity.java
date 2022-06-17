@@ -25,6 +25,7 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,20 +52,15 @@ public class ImportActivity extends BaseActivity{
 
     AppDatabase appDb;
     FFSService ffsService;
+    MetadataInterpreter metaInt;
+    WorkManager workManager;
 
     Antenna currentAntenna;
-    MetaData currentMetaData;
-    List<AntennaField> currentAntenaFields;
-    List<Antenna> allAntennas;
     List<Uri> currentMetaDataUris;
+    List<String> currentMetaDataType;
+    List<AntennaField> currentAntenaFields;
 
     ImportView importView;
-
-    MetadataInterpreter metaInt = new MetadataInterpreter();
-
-    static boolean firstRun = true;
-
-    WorkManager workManager;
 
 
     @Override
@@ -82,6 +78,7 @@ public class ImportActivity extends BaseActivity{
 
         appDb  = AppDatabase.getInstance(getApplicationContext());
         ffsService = new FFSService(new FFSInterpreter(), this);
+        metaInt = new MetadataInterpreter();
         workManager = WorkManager.getInstance(this);
 
         executeRunnable(initImport());
@@ -106,16 +103,11 @@ public class ImportActivity extends BaseActivity{
         return true;
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        firstRun=true;
-    }
 
     private void initImportView(){
-        Log.d(TAG, "initImportView: Initializing ... " + currentAntenna +", "+ currentAntenaFields +", "+ currentMetaData);
+        Log.d(TAG, "initImportView: Initializing ... " + currentAntenna +", "+ currentAntenaFields +", "+ currentMetaDataType);
 
-        importView = new ImportView(this, currentAntenna, currentAntenaFields, currentMetaData) {
+        importView = new ImportView(this, currentAntenna, currentAntenaFields, currentMetaDataType) {
 
             public TextWatcher descriptionChanged(){
                 return new TextWatcher() {
@@ -153,19 +145,11 @@ public class ImportActivity extends BaseActivity{
 
             @Override
             public void addMetaDataFolder() {
-                if (currentAntenna == null){
-                    Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();
-                    return;
-                }
                 openFolderDialog(FileRequests.REQUEST_CODE_METADATAFOLDER);
             }
 
             @Override
             public void addFFS() {
-                if (currentAntenna == null){
-                    Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();
-                    return;
-                }
 
                 setPreferenceID();
 
@@ -176,8 +160,8 @@ public class ImportActivity extends BaseActivity{
             public void confirmImport(){
                 executeRunnable(saveAntenna());
                 setPreferenceID();
-                Log.d(TAG, "confirmImport: ANTENNA ID AFTER SAVE" + currentAntenna.id);
                 executeRunnable(saveMetadata());
+                //Switch back to Landing page
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
             }
@@ -258,7 +242,7 @@ public class ImportActivity extends BaseActivity{
         return new Runnable() {
             @Override
             public void run() {
-                persistMetadata(appDb, currentMetaDataUris);
+                persistMetadata(appDb);
             }
         };
     }
@@ -273,16 +257,13 @@ public class ImportActivity extends BaseActivity{
         }
     }
 
-
-
     /**
      * Uses MetadataInterpreter to run through a .csv
      * then adds antennaID
      * then persists it
      */
-    public void persistMetadata(AppDatabase appDb, List<Uri> uri){
-        // Background
-        for(Uri u : uri){
+    public void persistMetadata(AppDatabase appDb){
+        for(Uri u : currentMetaDataUris){
             List<MetaData> list = metaInt.getCSVMetadata(u, this.getContentResolver());
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             int antennaId = preferences.getInt("ID", 1);
@@ -295,13 +276,12 @@ public class ImportActivity extends BaseActivity{
         handleNewlyInsertedMetadata(appDb);
     }
 
-    /**
-     * Calls MetadataInterpreter to iterate through files in a folder
-     * Calls persistMetadata
-     */
     public void setMetaDataUris(Uri rootUri) {
         currentMetaDataUris = metaInt.traverseDirectoryEntries(rootUri, this.getContentResolver());
-        Log.d(TAG, "setMetaDataUris: " + currentMetaDataUris.size());
+        currentMetaDataType = new LinkedList<>();
+        for(Uri u : currentMetaDataUris){
+            currentMetaDataType.add(FileHandler.queryName(getContentResolver(), u));
+        }
     }
 
     /**
