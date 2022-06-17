@@ -35,12 +35,10 @@ public class InterpretFFSWorker extends Worker {
 
 
    private final String TAG = "ImportWorker";
-
+   AppDatabase appDb;
    String[] inputURIs;
    String[] inputFilenames;
    FFSService ffsService;
-   ObjectMapper objectMapper;
-   List<AtomicField> resultFields;
 
    public InterpretFFSWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
       super(context, workerParams);
@@ -51,50 +49,21 @@ public class InterpretFFSWorker extends Worker {
    public Result doWork() {
 
       handleInputData();
+      appDb  = AppDatabase.getInstance(getApplicationContext());
       ffsService = new FFSService(new FFSInterpreter(), getApplicationContext());
-      objectMapper = new ObjectMapper();
-      resultFields = new LinkedList<>();
 
-      Log.d(TAG, "doWork: Stating interpretation....");
       storeAtomicFields();
-      Log.d(TAG, "doWork: Finished interpretation...." + resultFields.size());
 
-      Data.Builder builder = new Data.Builder();
-      builder.putStringArray("result", prepareOutput(resultFields));
-      Data output = builder.build();
-
-      return Result.success(output);
+      return Result.success();
    }
 
    private void storeAtomicFields(){
       for(int i = 0; i < inputURIs.length; i++){
          Uri uri = Uri.parse(inputURIs[i]);
          String filename = inputFilenames[i];
-         Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> atomicFields = interpretFFS(uri, filename);
-         Log.d(TAG, "doWork: " + atomicFields.first.size());
-         resultFields.addAll(atomicFields.first);
-         resultFields.addAll(atomicFields.second);
+         persistFFS(appDb, uri, filename);
       }
-      Log.d(TAG, "storeAtomicFields: " + resultFields.get(resultFields.size() - 1));
    }
-
-   private String[] prepareOutput(List<AtomicField> result){
-      Log.d(TAG, "prepareOutput: start");
-      String[] dataArray = new String[result.size()];
-      int i = 0;
-      for(AtomicField md : result){
-         try {
-            dataArray[i] = objectMapper.writeValueAsString(md);
-            i++;
-         } catch (IOException e) {
-            Log.d(TAG, "prepareOutput: Something went wrong...Skipping meta data object");
-         }
-      }
-      Log.d(TAG, "prepareOutput: " + dataArray[dataArray.length - 1]);
-      Log.d(TAG, "prepareOutput: finish");
-      return dataArray;
-   }
-
 
 
    private void handleInputData(){
@@ -102,9 +71,16 @@ public class InterpretFFSWorker extends Worker {
       inputFilenames = getInputData().getStringArray("FILENAMEFFS");
    }
 
-   public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretFFS(Uri uri, String fileName){
+   public void persistFFS(AppDatabase appDb, Uri uri, String fileName){
 
-      Log.d(TAG, "interpretFFS");
+      Log.d(TAG, "persistFFS");
+
+      // Background
+      SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+      int antennaId = preferences.getInt("ID", 1);
+
+
+
       InputStream in = null;
       try {
          in = getApplicationContext().getContentResolver().openInputStream(uri);
@@ -114,11 +90,19 @@ public class InterpretFFSWorker extends Worker {
       Log.d(TAG, "got InputStream");
 
       try {
-         return ffsService.interpretData(in,0.4, fileName);
+         ffsService.interpretData(in,0.4, antennaId, fileName);
       } catch (FFSInterpretException e) {
          e.printStackTrace();
          Log.d(TAG, "FFSInterpretException " + e.getMessage());
-         return null;
+         return;
       }
+      Log.d(TAG, "interprete Data done");
+      //Save Antenna and file to database
+      AntennaField antennaField = new AntennaField(uri, fileName, antennaId);
+      appDb.antennaFieldDao().insert(antennaField);
+
+
+      Log.d(TAG, "persistFFS done");
    }
+
 }

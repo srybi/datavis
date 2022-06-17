@@ -64,7 +64,7 @@ public class ImportActivity extends BaseActivity{
     List<MetaData> currentMetaData;
 
     List<AntennaField> currentAntennaFields;
-    List<AtomicField> currentAtomicFields;
+    String[] ffsUris;
 
     ImportView importView;
 
@@ -158,7 +158,7 @@ public class ImportActivity extends BaseActivity{
                 setPreferenceID();
                 executeRunnable(persistMetadata());
                 executeRunnable(persistAntennaFields());
-                executeRunnable(persistAtomicFields());
+                handleFFSImportWork("URIFFS", ffsUris);
                 //Switch back to Landing page
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
@@ -205,20 +205,6 @@ public class ImportActivity extends BaseActivity{
         }catch (Exception e){
             Log.d(TAG, "executeRunnable: " + e.getMessage());
         }
-    }
-
-    public Runnable persistAtomicFields(){
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int antennaId = preferences.getInt("ID", 1);
-        return new Runnable() {
-            @Override
-            public void run() {
-                for(AtomicField atomicField : currentAtomicFields){
-                    atomicField.setAntennaId(antennaId);
-                    appDb.atomicFieldDao().insert(atomicField);
-                }
-            }
-        };
     }
 
     /**
@@ -273,6 +259,7 @@ public class ImportActivity extends BaseActivity{
             String filename = FileHandler.queryName(getContentResolver(), u);
             currentAntennaFields.add(new AntennaField(u, filename));
         }
+        ffsUris = antennaFieldsUri;
     }
 
     /**
@@ -365,15 +352,11 @@ public class ImportActivity extends BaseActivity{
     }
 
     private void handleFolderImport(Uri uri){
-        Log.d(TAG, "handleFolderImport: Im here");
         Map<Integer, String[]> pairURI = FileHandler.traverseDirectoryEntries(uri, getContentResolver());
-        Log.d(TAG, "handleFolderImport: " + pairURI.get(0).length);
         setMetaDataTypes(pairURI.get(0));
         handleMetaDataImportWork("URICSV", pairURI.get(0));
         setAntennaFields(pairURI.get(1));
-        handleFFSImportWork("URIFFS", pairURI.get(1));
     }
-
 
     private void handleFFSImportWork(String key, String[] values){
         // Build InputData
@@ -396,8 +379,6 @@ public class ImportActivity extends BaseActivity{
                         return;
                     }
 
-                    String[] output = workInfo.getOutputData().getStringArray("result");
-                    handleFFSOutput(output);
                     initImportView();
                 }
             }
@@ -411,21 +392,6 @@ public class ImportActivity extends BaseActivity{
             result[i] = FileHandler.queryName(getContentResolver(), Uri.parse(uris[i]));
         }
         return result;
-    }
-
-    private void handleFFSOutput(String[] data){
-        Log.d(TAG, "handleFFSOutput: handling output");
-        ObjectMapper objectMapper = new ObjectMapper();
-        if(currentAtomicFields == null){
-            currentAtomicFields = new LinkedList<>();
-        }
-        for(String s : data){
-            try{
-                currentAtomicFields.add(objectMapper.readValue(s, AtomicField.class));
-            }catch(Exception e) {
-                Log.e(TAG, "handleFFSOutput: Converting into json went wrong! " + e.getMessage());
-            }
-        }
     }
 
     /** Handle Folder Work

@@ -44,7 +44,7 @@ public class FFSService {
         this.context = context;
     }
 
-    public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretData(InputStream stream, double scalingFactor, int antennaId, String filename) throws FFSInterpretException{
+    public void interpretData(InputStream stream, double scalingFactor, int antennaId, String filename) throws FFSInterpretException{
         double floatingPoint = 1;
         int start = filename.indexOf("_T") + 2, end = start + 2;
         if (filename.charAt(start+1)=='.') {
@@ -55,14 +55,15 @@ public class FFSService {
         }
         Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPoint, antennaId);
         if(fields.isSuccess()){
-            return fields.getData();
+            Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> pair = fields.getData();
+            saveSpheresIfNotExist(pair.first, pair.second);
         }else{
             throw new FFSInterpretException(fields.getMessage());
         }
 
     }
 
-    public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretData(File file, double scalingFactor, int antennaId) throws FFSInterpretException{
+    public void interpretData(File file, double scalingFactor, int antennaId) throws FFSInterpretException{
         double floatingPiont = 1;
         String filename = file.getName();
         int start = filename.indexOf("_T") + 2, end = start + 2;
@@ -72,7 +73,8 @@ public class FFSService {
         }
         Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(file, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPiont, antennaId);
         if(fields.isSuccess()){
-            return fields.getData();
+            Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> pair = fields.getData();
+            saveSpheresIfNotExist(pair.first, pair.second);
         }else{
             throw new FFSInterpretException(fields.getMessage());
         }
