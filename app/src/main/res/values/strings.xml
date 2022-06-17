@@ -57,6 +57,7 @@
     <string name="btn_add_metaData">Add Metadata</string>
     <string name="btn_add_metaFolder">Add Metadata Folder</string>
     <string name="btn_add_ffs">Add FFS</string>
+    <string name="btn_confirm">Confirm</string>
     <string name="apply_changes">Apply Changes</string>
     <string name="log">Log</string>
     <string name="linear">Linear</string>
