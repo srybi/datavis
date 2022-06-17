@@ -67,6 +67,7 @@
     <string name="toastValidMetadata">Metadata File imported</string>
     <string name="toastValidMetadataFolder">Metadata Folder imported</string>
     <string name="toastRedundantMetadata">Metadata already read!</string>
+    <string name="toastFolderImport">Folder import running!</string>
 
 
     <!-- Instructions -->

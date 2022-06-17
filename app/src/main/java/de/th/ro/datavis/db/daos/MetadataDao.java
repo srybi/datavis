@@ -34,6 +34,9 @@ public interface MetadataDao {
     @Insert
     void insert(MetaData metaData);
 
+    @Insert
+    void insertAll(List<MetaData> metaDataList);
+
     @Update
     void update(MetaData metaData);
 

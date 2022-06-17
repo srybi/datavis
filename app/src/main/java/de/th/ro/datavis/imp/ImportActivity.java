@@ -27,6 +27,7 @@ import androidx.work.WorkManager;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -392,10 +393,15 @@ public class ImportActivity extends BaseActivity{
                 } else {
                     showToast(getString(R.string.toastInvalidFFS));
                 }
-            } else {
+            } else if(requestCode == FileRequests.REQUEST_CODE_METADATAFOLDER){
+                //Currently does not return whether any files from the Folder were imported
+                handleFolderImportWork(uri);
+                showToast(getString(R.string.toastFolderImport));
+            } else{
                 // Antenna, Metadata, ...
                 executeRunnable(getHandelResultRunnable( data, requestCode));
                 initImportView();
+
             }
 
         }
@@ -433,6 +439,42 @@ public class ImportActivity extends BaseActivity{
                     }
 
 
+
+                    // Work success
+                    loadAntennaFieldsByAntennaId(currentAntenna.id);
+                    initImportView();
+                }
+            }
+        });
+
+    }
+
+    /** Handle Folder Work
+     */
+    private void handleFolderImportWork(Uri uri){
+
+        // Build InputData
+        Data.Builder builder = new Data.Builder();
+        Map<Integer, String[]> pairURI = FileHandler.traverseDirectoryEntries(uri, getContentResolver());
+        builder.putStringArray("URICSV", pairURI.get(0));
+        builder.putStringArray("URIFFS", pairURI.get(1));
+        Data input = builder.build();
+
+        // Create WorkRequest
+        OneTimeWorkRequest workRequest = WorkerRequestUtil.getOneTimeRequest(ImportFolderWorker.class, input);
+        workManager.enqueue( workRequest);
+        workManager.getWorkInfoByIdLiveData(workRequest.getId()).observe(this, new Observer<WorkInfo>() {
+            @Override
+            public void onChanged(WorkInfo workInfo) {
+                Log.d(TAG, "WorkState FOLDER " + workInfo.getState());
+                if (workInfo.getState().isFinished()){
+
+                    if (workInfo.getState() == WorkInfo.State.FAILED
+                            || workInfo.getState() == WorkInfo.State.CANCELLED){
+                        // Work Problem
+
+                        return;
+                    }
 
                     // Work success
                     loadAntennaFieldsByAntennaId(currentAntenna.id);
