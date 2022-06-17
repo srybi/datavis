@@ -400,8 +400,6 @@ public class ImportActivity extends BaseActivity{
 
         }
 
-
-
     }
 
 
@@ -433,6 +431,8 @@ public class ImportActivity extends BaseActivity{
 
                         return;
                     }
+
+
 
                     // Work success
                     loadAntennaFieldsByAntennaId(currentAntenna.id);

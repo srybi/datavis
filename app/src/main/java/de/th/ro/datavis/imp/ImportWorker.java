@@ -5,18 +5,23 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
+import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Map;
 
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.AntennaField;
+import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 public class ImportWorker extends Worker {
@@ -24,6 +29,7 @@ public class ImportWorker extends Worker {
 
    private final String TAG = "ImportWorker";
 
+   int antennaId;
    Uri uri;
    String fileName;
    FFSService ffsService;
@@ -40,8 +46,8 @@ public class ImportWorker extends Worker {
       ffsService = new FFSService(new FFSInterpreter(), getApplicationContext());
       AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
 
-      persistFFS(appDb, uri);
-
+      AntennaField antennaField = new AntennaField(uri, fileName, antennaId);
+      Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> atomicFields = interpretFFS(appDb, uri);
 
       return Result.success();
    }
@@ -53,19 +59,13 @@ public class ImportWorker extends Worker {
       String inpURI = getInputData().getString("URI");
       uri = Uri.parse(inpURI);
       fileName = getInputData().getString("FILENAME");
-
+      SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+      antennaId = preferences.getInt("ID", 1);
    }
 
-   public void persistFFS(AppDatabase appDb, Uri uri){
+   public Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> interpretFFS(AppDatabase appDb, Uri uri){
 
-      Log.d(TAG, "persistFFS");
-
-      // Background
-      SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-      int antennaId = preferences.getInt("ID", 1);
-
-
-
+      Log.d(TAG, "interpretFFS");
       InputStream in = null;
       try {
          in = getApplicationContext().getContentResolver().openInputStream(uri);
@@ -75,21 +75,11 @@ public class ImportWorker extends Worker {
       Log.d(TAG, "got InputStream");
 
       try {
-         ffsService.interpretData(in,0.4, antennaId, fileName);
+         return ffsService.interpretData(in,0.4, antennaId, fileName);
       } catch (FFSInterpretException e) {
          e.printStackTrace();
          Log.d(TAG, "FFSInterpretException " + e.getMessage());
-         return;
+         return null;
       }
-      Log.d(TAG, "interprete Data done");
-      //Save Antenna and file to database
-      AntennaField antennaField = new AntennaField(uri, fileName, antennaId);
-      appDb.antennaFieldDao().insert(antennaField);
-
-
-      Log.d(TAG, "persistFFS done");
    }
-
-
-
 }
