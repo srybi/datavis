@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.BlockingDeque;
 
 import de.th.ro.datavis.interpreter.csv.MetadataInterpreter;
 import de.th.ro.datavis.models.MetaData;
@@ -23,7 +24,7 @@ import de.th.ro.datavis.models.MetaData;
 public class InterpretMetaDataWorker extends Worker {
 
 
-   private final String TAG = "ImportFolderWorker";
+   private final String TAG = "ImportMetaDataWorker";
 
    String[] csvList;
    MetadataInterpreter metaInt;
@@ -61,6 +62,7 @@ public class InterpretMetaDataWorker extends Worker {
       for(MetaData md : result){
          try {
             dataArray[i] = objectMapper.writeValueAsString(md);
+            i++;
          } catch (IOException e) {
             Log.d(TAG, "prepareOutput: Something went wrong...Skipping meta data object");
          }

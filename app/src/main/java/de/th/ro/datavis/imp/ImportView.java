@@ -85,7 +85,7 @@ public abstract class ImportView implements IImportOptions {
         configName = fa.findViewById(R.id.configName);
         btnAddImportAntenna = fa.findViewById(R.id.btn_import_antenna);
         btnAddDefaultAntenna = fa.findViewById(R.id.btn_add_default);
-        btnAddMetaDataFolder = fa.findViewById(R.id.btn_import_add_metadataFolder);
+        btnAddMetaDataFolder = fa.findViewById(R.id.btn_import_Folder);
         btnConfirm = fa.findViewById(R.id.btn_confirm);
 
         configName.addTextChangedListener(descriptionChanged());

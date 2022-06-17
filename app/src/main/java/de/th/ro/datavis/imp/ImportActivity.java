@@ -24,6 +24,9 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +49,7 @@ import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.FileRequests;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 import de.th.ro.datavis.util.worker.WorkerRequestUtil;
+import kotlin.jvm.internal.TypeReference;
 
 public class ImportActivity extends BaseActivity{
 
@@ -57,8 +61,9 @@ public class ImportActivity extends BaseActivity{
     WorkManager workManager;
 
     Antenna currentAntenna;
-    List<Uri> currentMetaDataUris;
+    String[] currentMetaDataUris;
     List<String> currentMetaDataType;
+    List<MetaData> currentMetaData;
     List<AntennaField> currentAntenaFields;
 
     ImportView importView;
@@ -215,25 +220,28 @@ public class ImportActivity extends BaseActivity{
      * then persists it
      */
     public void persistMetadata(AppDatabase appDb){
-        for(Uri u : currentMetaDataUris){
-            List<MetaData> list = metaInt.getCSVMetadata(u, this.getContentResolver());
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             int antennaId = preferences.getInt("ID", 1);
 
-            for(MetaData e : list){
+            for(MetaData e : currentMetaData){
                 e.setAntennaID(antennaId);
                 appDb.metadataDao().insert(e);
             }
-        }
-        handleNewlyInsertedMetadata(appDb);
+
     }
 
-    public void setMetaDataUris(Uri rootUri) {
-        currentMetaDataUris = metaInt.traverseDirectoryEntries(rootUri, this.getContentResolver());
-        currentMetaDataType = new LinkedList<>();
-        for(Uri u : currentMetaDataUris){
-            currentMetaDataType.add(FileHandler.queryName(getContentResolver(), u));
+    public void setMetaDataUris(String[] metaDataUris) {
+        Log.d(TAG, "setMetaDataUris: storing uris in var"  );
+        currentMetaDataUris = metaDataUris;
+        if(currentMetaDataUris.length != 0 && currentMetaDataType == null){
+            currentMetaDataType = new LinkedList<>();
         }
+        for(String metaData : currentMetaDataUris){
+            Uri u = Uri.parse(metaData);
+            currentMetaDataType.add(FileHandler.queryName(getContentResolver(), u));
+            Log.d(TAG, "setMetaDataUris: storing metadatatypes in var");
+        }
+        Log.d(TAG, "setMetaDataUris: finished"  );
     }
 
     /**
@@ -246,18 +254,6 @@ public class ImportActivity extends BaseActivity{
         data = appDb.antennaDao().getAll_Background();
         // Last Antenna
         this.currentAntenna = data.get(data.size() - 1);
-    }
-
-    private void handleNewlyInsertedMetadata(AppDatabase appDb){
-        /*
-        // Background
-        List<MetaData> data =new ArrayList<>();
-        data = appDb.metadataDao().getAll_Background();
-        int size2 = data.size();
-        // Last Antenna
-        MetaData meta = data.get(size2 -1);
-        this.currentMetaData = meta;
-         */
     }
 
     //This needs to be changed. LiveData causes site effects
@@ -327,10 +323,9 @@ public class ImportActivity extends BaseActivity{
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         importView.showProgressBar();
-
+        Uri uri = data.getData();
         Log.d(TAG, "Activity result");
         if(resultCode == Activity.RESULT_OK){
-            Uri uri = data.getData();
             switch(requestCode){
                 case FileRequests.REQUEST_CODE_FOLDER:
                     handleFolderImport(uri);
@@ -346,13 +341,15 @@ public class ImportActivity extends BaseActivity{
                     }
             }
         }
-
     }
 
     private void handleFolderImport(Uri uri){
+        Log.d(TAG, "handleFolderImport: Im here");
         Map<Integer, String[]> pairURI = FileHandler.traverseDirectoryEntries(uri, getContentResolver());
-        handleFFSImportWork("URIFFS", pairURI.get(1));
+        Log.d(TAG, "handleFolderImport: " + pairURI.get(0).length);
+        setMetaDataUris(pairURI.get(0));
         handleMetaDataImportWork("URICSV", pairURI.get(0));
+        //handleFFSImportWork("URIFFS", pairURI.get(1));
     }
 
 
@@ -407,19 +404,33 @@ public class ImportActivity extends BaseActivity{
 
                     if (workInfo.getState() == WorkInfo.State.FAILED
                             || workInfo.getState() == WorkInfo.State.CANCELLED){
-                        // Work Problem
 
                         return;
                     }
 
-                    // Work success
-                    loadAntennaFieldsByAntennaId(currentAntenna.id);
+                    handleMetaDataOutput(workInfo.getOutputData().getStringArray("result"));
+
                     initImportView();
                     showToast(getString(R.string.toastFolderImportDone));
                 }
             }
         });
 
+    }
+
+    private void handleMetaDataOutput(String[] output){
+        ObjectMapper objectMapper = new ObjectMapper();
+        if(currentMetaData == null){
+            currentMetaData = new LinkedList<>();
+        }
+        for(String s : output){
+            try{
+                Log.d(TAG, "handleMetaDataOutput: " + s);
+                currentMetaData.add(objectMapper.readValue(s, MetaData.class));
+            }catch(Exception e) {
+                Log.e(TAG, "handleMetaDataOutput: Converting json went wrong" + e.getMessage());
+            }
+        }
     }
 
 
