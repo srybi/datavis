@@ -110,7 +110,7 @@ public class FileHandler {
      */
 
     public static Map<Integer, String[]> traverseDirectoryEntries(Uri rootUri, ContentResolver cr) {
-
+        Log.d(TAG, "IM HERE: ");
         Map<Integer, String[]> pairURI = new HashMap<>();
         ArrayList<Uri> listCSV = new ArrayList<>();
         ArrayList<Uri> listFFS = new ArrayList<>();
@@ -136,13 +136,14 @@ public class FileHandler {
                     final String docId = c.getString(0);
                     String name = c.getString(1);
                     if(name.contains(".")) name=name.substring(0, name.lastIndexOf('.'));
+                    String fullName = c.getString(1);
                     final String mime = c.getString(2);
                     //Log.d(TAG, "docId: " + docId + ", name: " + name + ", mime: " + mime);
-                    if (getFileExtension(docId).equals(".csv")
+                    if (getFileExtension(fullName).equals(".csv")
                             && isMetaDataImportable(name)) {
                         final Uri newNode = DocumentsContract.buildDocumentUriUsingTree(rootUri, docId);
                         listCSV.add(newNode);
-                    } else if (getFileExtension(docId).equals(".ffs")){
+                    } else if (getFileExtension(fullName).equals(".ffs")){
                         final Uri newNode = DocumentsContract.buildDocumentUriUsingTree(rootUri, docId);
                         listFFS.add(newNode);
                     }
