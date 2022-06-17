@@ -117,55 +117,6 @@ public class MetadataInterpreter {
 
         return lines;
     }
-
-    /**
-     * Takes the directory URI, iterates through the files and builds a list of all .csv
-     * @param rootUri Directory URI
-     * @return List of URIs of .csv files
-     */
-    public ArrayList<Uri> traverseDirectoryEntries(Uri rootUri, ContentResolver cr) {
-        ArrayList<Uri> listUri = new ArrayList<>();
-        Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(rootUri,
-                DocumentsContract.getTreeDocumentId(rootUri));
-        // Keep track of our directory hierarchy
-        List<Uri> dirNodes = new LinkedList<>();
-        dirNodes.add(childrenUri);
-
-        while(!dirNodes.isEmpty()) {
-            childrenUri = dirNodes.remove(0); // get the item from top
-            Log.d(LOG_TAG, "node uri: " + childrenUri);
-            Cursor c = cr.query(childrenUri, new String[]{
-                            DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-                            DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-                            DocumentsContract.Document.COLUMN_MIME_TYPE},
-                    null, null, null);
-            try {
-
-                while (c.moveToNext()) {
-                    final String docId = c.getString(0);
-                    String name = c.getString(1);
-                    if(name.contains(".")) name=name.substring(0, name.lastIndexOf('.'));
-                    final String mime = c.getString(2);
-                    Log.d(LOG_TAG, "docId: " + docId + ", name: " + name + ", mime: " + mime);
-                    if (//name.contains(".csv")&&
-                            isCSV(mime)&&isMetaDataImportable(name)) {
-                        final Uri newNode = DocumentsContract.buildDocumentUriUsingTree(rootUri, docId);
-                        listUri.add(newNode);
-                    }
-                }
-
-            } finally {
-                try {
-                    c.close();
-                } catch(RuntimeException re) {
-                    re.printStackTrace();
-                    Log.d(LOG_TAG, "cursor in directory did not close");
-                }
-            }
-        }
-        Log.d(LOG_TAG, "gathered URIs");
-        return listUri;
-    }
     /*
      * Utility to check MIME type
      */
