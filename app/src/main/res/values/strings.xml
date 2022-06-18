@@ -31,8 +31,7 @@
     <string name="settings_icon">Settings</string>
     <string name="logView">Log View</string>
     <string name="linearView">Linear View</string>
-    <string name="ar_hint">Tap on Surface to Place Antenna</string>
-    <string name="ar_hint">Move your phone until a surface is detected\nThen tap on surface to place antenna</string>
+    <string name="ar_hint">Move your phone until a surface is detected\nThen tap on the surface\nto place your selected antenna</string>
 
     <!-- BottomSheet -->
     <string name="label_frequency">Frequency:</string>
