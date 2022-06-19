@@ -39,10 +39,10 @@ public class FFSInterpreter implements IInterpreter {
 
     @Override
     public Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> interpretData(InputStream stream, double scalingFactor, double tiltValue, int antennaId) throws FFSInterpretException {
-            InputStreamReader reader = new InputStreamReader(stream);
-            BufferedReader bufferedReader = new BufferedReader(reader);
+        InputStreamReader reader = new InputStreamReader(stream);
+        BufferedReader bufferedReader = new BufferedReader(reader);
 
-            return interpretData(bufferedReader, scalingFactor, tiltValue, antennaId);
+        return interpretData(bufferedReader, scalingFactor, tiltValue, antennaId);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class FFSInterpreter implements IInterpreter {
                 }
                 if(Calc.calcLevenstheinDistance(line.trim(),(FFSConstants.RADACCSTMFREQ_HEADER.trim())) < MAX_HAMMING_DISTANCE){
                     try{
-                    frequencyValues = extractFrequencyValues(reader, frequencies);}
+                        frequencyValues = extractFrequencyValues(reader, frequencies);}
                     catch(Exception e){
                         e.printStackTrace();
                         return Result.error("Could not extract frequency values.");
@@ -201,7 +201,7 @@ public class FFSInterpreter implements IInterpreter {
                         double[] dVals = Arrays.stream(vals).mapToDouble(Double::parseDouble).toArray();
 
                         line = new FFSLine(dVals[0], dVals[1], dVals[2], dVals[3], dVals[4], dVals[5]);
-                       }
+                    }
                     catch (Exception e){
                         e.printStackTrace();
                         error.set(true);

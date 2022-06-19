@@ -89,11 +89,10 @@
                 />
 
 
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
         </RelativeLayout>
-
-        <!--->android:background="@color/black_50"
-android:textColor="@color/white"-->
-
 
         <pl.droidsonroids.gif.GifImageView
             android:id="@+id/visualCueBottomSheet"
@@ -108,6 +107,18 @@ android:textColor="@color/white"-->
             tools:src="@drawable/arrow_up">
 
         </pl.droidsonroids.gif.GifImageView>
+
+        <TextView
+            android:id="@+id/visualCue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/textview_background"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:text="@string/ar_hint"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="150dp"/>
+
     </RelativeLayout>
 
 

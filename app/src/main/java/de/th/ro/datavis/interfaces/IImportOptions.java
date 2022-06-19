@@ -6,18 +6,12 @@ public interface IImportOptions {
 
     TextWatcher descriptionChanged();
 
-    void insertNewConfig();
-
-    void chooseExistingConfig();
-
     void addImportAntenna();
 
     void addDefaultAntenna();
 
-    void addMetaData();
+    void addFolder();
 
-    void addMetaDataFolder();
-
-    void addFFS();
+    void confirmImport();
 
 }

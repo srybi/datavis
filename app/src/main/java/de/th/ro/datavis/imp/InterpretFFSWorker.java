@@ -5,30 +5,42 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
+import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.AntennaField;
+import de.th.ro.datavis.models.AtomicField;
+import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
+import de.th.ro.datavis.util.filehandling.FileHandler;
 
-public class ImportWorker extends Worker {
+public class InterpretFFSWorker extends Worker {
 
 
    private final String TAG = "ImportWorker";
-
-   Uri uri;
-   String fileName;
+   AppDatabase appDb;
+   String[] inputURIs;
+   String[] inputFilenames;
    FFSService ffsService;
 
-   public ImportWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+   public InterpretFFSWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
       super(context, workerParams);
    }
 
@@ -37,26 +49,29 @@ public class ImportWorker extends Worker {
    public Result doWork() {
 
       handleInputData();
+      appDb  = AppDatabase.getInstance(getApplicationContext());
       ffsService = new FFSService(new FFSInterpreter(), getApplicationContext());
-      AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
 
-      persistFFS(appDb, uri);
-
+      storeAtomicFields();
 
       return Result.success();
    }
 
+   private void storeAtomicFields(){
+      for(int i = 0; i < inputURIs.length; i++){
+         Uri uri = Uri.parse(inputURIs[i]);
+         String filename = inputFilenames[i];
+         persistFFS(appDb, uri, filename);
+      }
+   }
 
 
    private void handleInputData(){
-
-      String inpURI = getInputData().getString("URI");
-      uri = Uri.parse(inpURI);
-      fileName = getInputData().getString("FILENAME");
-
+      inputURIs = getInputData().getStringArray("URIFFS");
+      inputFilenames = getInputData().getStringArray("FILENAMEFFS");
    }
 
-   public void persistFFS(AppDatabase appDb, Uri uri){
+   public void persistFFS(AppDatabase appDb, Uri uri, String fileName){
 
       Log.d(TAG, "persistFFS");
 
@@ -89,7 +104,5 @@ public class ImportWorker extends Worker {
 
       Log.d(TAG, "persistFFS done");
    }
-
-
 
 }

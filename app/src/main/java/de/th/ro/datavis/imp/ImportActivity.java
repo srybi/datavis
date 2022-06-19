@@ -5,7 +5,6 @@ import static android.os.Build.VERSION.SDK_INT;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteConstraintException;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,14 +24,17 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import de.th.ro.datavis.MainActivity;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.instructions.ImportInstructionsActivity;
@@ -41,12 +43,10 @@ import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
+import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.FileRequests;
-import de.th.ro.datavis.util.constants.IntentConst;
-import de.th.ro.datavis.util.dialog.DialogExistingAntenna;
-import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 import de.th.ro.datavis.util.worker.WorkerRequestUtil;
 
@@ -56,21 +56,17 @@ public class ImportActivity extends BaseActivity{
 
     AppDatabase appDb;
     FFSService ffsService;
-
-    Antenna currentAntenna;
-    int givenAntennaId;
-    MetaData currentMetaData;
-    List<AntennaField> currentAntenaFields;
-    List<Antenna> allAntennas;
-
-    ImportView importView;
-
-    MetadataInterpreter metaInt = new MetadataInterpreter();
-
-    static boolean firstRun = true;
-
+    MetadataInterpreter metaInt;
     WorkManager workManager;
 
+    Antenna currentAntenna;
+    List<String> currentMetaDataType;
+    List<MetaData> currentMetaData;
+
+    List<AntennaField> currentAntennaFields;
+    String[] ffsUris;
+
+    ImportView importView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,22 +82,12 @@ public class ImportActivity extends BaseActivity{
 
 
         appDb  = AppDatabase.getInstance(getApplicationContext());
-
-
-            try {
-                givenAntennaId = getIntent().getExtras().getInt(IntentConst.INTENT_EXTRA_ANTENNA_ID);
-            }catch (NullPointerException np){
-                Log.d(TAG, "No Antenna given.");
-            }catch (Exception e){
-                e.printStackTrace();
-                Log.d(TAG, "Given Antenna could no be found.");
-            }
-
-
         ffsService = new FFSService(new FFSInterpreter(), this);
+        metaInt = new MetadataInterpreter();
         workManager = WorkManager.getInstance(this);
 
-        setDefaultAntennaData();
+        executeRunnable(initImport());
+        initImportView();
     }
 
     @Override
@@ -122,16 +108,11 @@ public class ImportActivity extends BaseActivity{
         return true;
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        firstRun=true;
-    }
 
     private void initImportView(){
-        Log.d(TAG, "initImportView: Initializing ... " + currentAntenna +", "+ currentAntenaFields +", "+ currentMetaData);
+        Log.d(TAG, "initImportView: Initializing ... " + currentAntenna +", "+ currentAntennaFields +", "+ currentMetaDataType);
 
-        importView = new ImportView(this, currentAntenna, currentAntenaFields, currentMetaData) {
+        importView = new ImportView(this, currentAntenna, currentAntennaFields, currentMetaDataType) {
 
             public TextWatcher descriptionChanged(){
                 return new TextWatcher() {
@@ -142,7 +123,6 @@ public class ImportActivity extends BaseActivity{
                             @Override
                             public void run() {
                                 currentAntenna.setDescription(editable.toString());
-                                appDb.antennaDao().update(currentAntenna);
                             }
                         });
                     }
@@ -155,18 +135,6 @@ public class ImportActivity extends BaseActivity{
                 };
             }
 
-            @Override
-            public void insertNewConfig(){
-                Log.d(TAG, "insertNewConfig: new Config");
-                handleNewConfigInsert();
-            }
-
-            @Override
-            public void chooseExistingConfig() {
-                // Antennen zeigen
-                executeRunnable(getAllAntennas());
-                displayChooseAntennaDialog(allAntennas);
-            }
 
             @Override
             public void addImportAntenna() {
@@ -174,141 +142,57 @@ public class ImportActivity extends BaseActivity{
             }
 
             public void addDefaultAntenna(){
-                executeRunnable(getSetDefaultAntennaRunnable());
+                currentAntenna.filename = "datavis_default";
+                currentAntenna.uri = "models/datavis_antenna_asm.glb";
                 initImportView();
             }
 
             @Override
-            public void addMetaData() {
-                if (currentAntenna == null){
-                    Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                setPreferenceID();
-
-                openFileDialog(FileRequests.REQUEST_CODE_METADATA);
+            public void addFolder() {
+                openFolderDialog(FileRequests.REQUEST_CODE_FOLDER);
             }
 
             @Override
-            public void addMetaDataFolder() {
-                if (currentAntenna == null){
-                    Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();
-                    return;
-                }
+            public void confirmImport(){
+                executeRunnable(saveAntenna());
                 setPreferenceID();
-
-                openFolderDialog(FileRequests.REQUEST_CODE_METADATAFOLDER);
-            }
-
-            @Override
-            public void addFFS() {
-                if (currentAntenna == null){
-                    Toast.makeText(getFragmentActivity(), "No Antenna ", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                setPreferenceID();
-
-                openFileDialog(FileRequests.REQUEST_CODE_FFS);
+                executeRunnable(persistMetadata());
+                executeRunnable(persistAntennaFields());
+                handleFFSImportWork("URIFFS", ffsUris);
             }
 
             private void setPreferenceID(){
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFragmentActivity());
                 preferences.edit().putInt("ID", currentAntenna.id).apply();
             }
+
         };
     }
 
-    /**
-     * Handles a chosen file and stores it (using a background thread)
-     * Uses the requestCode to find the correct Method to parse the data
-     * FileHandler checks the file for validity
-     * @return
-     */
-    public Runnable getHandelResultRunnable(Intent data, int requestCode){
-        return new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Uri uri = data.getData();
-                    AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
-                    switch (requestCode) {
-                        case FileRequests.REQUEST_CODE_ANTENNA:
-                            String antennaName = FileHandler.queryName(getContentResolver(), uri);
-                            if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
-                                updateAntenna(appDb, uri, antennaName);
-                            } else {
-                                showToast(getString(R.string.toastInvalidAntenna));
-                            }
-                            break;
-                        case FileRequests.REQUEST_CODE_METADATA:
-                            if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
-                                //If Metadata with the same Primary Key are read, it runs into a System.err and is caught here
-                                try{
-                                    persistMetadata(appDb, uri);
-                                    showToast(getString(R.string.toastValidMetadata));
-                                } catch (Exception e) {
-                                    Log.e(TAG, "Metadata already inserted - PK Error: " + e.getMessage());
-                                    showToast(getString(R.string.toastRedundantMetadata));
-                                }
-                            } else {
-                                showToast(getString(R.string.toastInvalidMetadata));
-                            }
-                            break;
-                        case FileRequests.REQUEST_CODE_METADATAFOLDER:
-                            //Currently does not return whether any files from the Folder were imported
-                            persistMetadataFolder(appDb, uri);
-                            showToast(getString(R.string.toastValidMetadataFolder));
-                            break;
-                        default: throw new RuntimeException();
-                    }
-                } catch(Exception e){
-                    e.printStackTrace();
-                    Log.e(TAG, "Exception " + e.getMessage());
-                }
-            }
-        };
-    }
-
-
-
-    public Runnable getSetDefaultAntennaRunnable(){
-        return new Runnable() {
-            @Override
-            public void run() {
-                AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
-                Uri uri = Uri.parse("models/datavis_antenna_asm.glb");
-                String filename = "datavis_default";
-                updateAntenna(appDb, uri, filename);
-            }
-        };
-    }
-
-    public Runnable addNewAntennaConfig(Antenna antenna){
+    public Runnable initImport(){
         Log.d(TAG, "addNewAntennaConfig: executing background thread");
         return new Runnable() {
             @Override
             public void run() {
                 AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
-                //changing default antenna name
                 int currentSize = appDb.antennaDao().getAll_Background().size();
-                antenna.description = antenna.description + (currentSize+1);
-                appDb.antennaDao().insert(antenna);
+                currentAntenna = new Antenna("Antenna #" + (currentSize+1));
+            }
+        };
+    }
+
+
+    private Runnable saveAntenna(){
+        return new Runnable() {
+            @Override
+            public void run() {
+                //save antenna
+                appDb.antennaDao().insert(currentAntenna);
                 handleNewlyInsertedAntenna(appDb);
             }
         };
     }
 
-    public Runnable getAllAntennas(){
-        return new Runnable() {
-            @Override
-            public void run() {
-                AppDatabase appDb = AppDatabase.getInstance(getApplicationContext());
-                List<Antenna> antennaList = appDb.antennaDao().getAll_Background();
-                allAntennas = antennaList;
-            }
-        };
-    }
 
     public void executeRunnable(Runnable runnable){
         ExecutorService executorService  = Executors.newSingleThreadExecutor();
@@ -320,103 +204,65 @@ public class ImportActivity extends BaseActivity{
         }
     }
 
-
-    public void updateAntenna(AppDatabase appDb, Uri uri, String filename){
-        // Background
-        currentAntenna.setAntennaFile(uri.toString(), filename);
-        appDb.antennaDao().update(currentAntenna);
-    }
-
-    public void persistFFS(AppDatabase appDb, Uri uri, String name, Intent intent){
-
-        Log.d(TAG, "persistFFS");
-
-        // Background
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int antennaId = preferences.getInt("ID", 1);
-
-
-
-        InputStream in = null;
-        try {
-            in = getContentResolver().openInputStream(intent.getData());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        Log.d(TAG, "got InputStream");
-
-        try {
-            ffsService.interpretData(in,0.4, antennaId, name);
-        } catch (FFSInterpretException e) {
-            e.printStackTrace();
-            Log.d(TAG, "FFSInterpretException " + e.getMessage());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-            return;
-        }
-        Log.d(TAG, "interprete Data done");
-        //Save Antenna and file to database
-        AntennaField antennaField = new AntennaField(uri, name, antennaId);
-        appDb.antennaFieldDao().insert(antennaField);
-
-        handelGetAntennaInBackground(appDb, antennaId);
-        handleNewlyInsertedAntennaField(appDb, antennaId);
-
-        Log.d(TAG, "persistFFS done");
-    }
-
     /**
      * Uses MetadataInterpreter to run through a .csv
      * then adds antennaID
      * then persists it
      */
-    public void persistMetadata(AppDatabase appDb, Uri uri){
-        // Background
-        List<MetaData> list = metaInt.getCSVMetadata(uri, this.getContentResolver());
+    public Runnable persistMetadata(){
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            int antennaId = preferences.getInt("ID", 1);
+            return new Runnable() {
+                @Override
+                public void run() {
+                    for(MetaData e : currentMetaData){
+                        e.setAntennaID(antennaId);
+                        appDb.metadataDao().insert(e);
+                    }
+                }
+            };
+    }
+
+    public void setMetaDataTypes(String[] metaDataUris) {
+        Log.d(TAG, "setMetaDataUris: storing uris in var"  );
+        currentMetaDataType = new LinkedList<>();
+
+        for(String metaData : metaDataUris){
+            Uri u = Uri.parse(metaData);
+            currentMetaDataType.add(FileHandler.queryName(getContentResolver(), u));
+            Log.d(TAG, "setMetaDataUris: storing metadatatypes in var");
+        }
+        Log.d(TAG, "setMetaDataUris: finished"  );
+    }
+
+    private Runnable persistAntennaFields(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         int antennaId = preferences.getInt("ID", 1);
-
-        for(MetaData e : list){
-            e.setAntennaID(antennaId);
-            appDb.metadataDao().insert(e);
-        }
-        handleNewlyInsertedMetadata(appDb);
-    }
-
-    /**
-     * Calls MetadataInterpreter to iterate through files in a folder
-     * Calls persistMetadata
-     */
-    public void persistMetadataFolder(AppDatabase appDb, Uri rootUri) {
-        ArrayList<Uri> listUri = metaInt.traverseDirectoryEntries(rootUri, this.getContentResolver());
-        Log.d(TAG, "directory list length: "+listUri.size());
-        for(Uri u: listUri){
-            Log.d(TAG, "persisting Uri: " +u.toString());
-            try{
-                persistMetadata(appDb, u);
-            } catch (SQLiteConstraintException sq){
-                //If single Metadata was added manually before, RoomDB won't let it added
-                Log.d(TAG, "Metadata already inserted - PK Error: " + sq.getMessage());
+        return new Runnable() {
+            @Override
+            public void run() {
+                for(AntennaField antennaField : currentAntennaFields){
+                    antennaField.antennaId = antennaId;
+                    appDb.antennaFieldDao().insert(antennaField);
+                }
             }
-        }
+        };
     }
 
-
-    private void updateAntennaField(AppDatabase appDb){
-        // Background
-        List<AntennaField> fieldList = new ArrayList<>();
-        fieldList = appDb.antennaFieldDao().findByAntennaId_BackGround(currentAntenna.id); // todo anpassen
-        this.currentAntenaFields = fieldList;
+    public void setAntennaFields(String[] antennaFieldsUri){
+        currentAntennaFields = new LinkedList<>();
+        for(String antennaField : antennaFieldsUri){
+            Uri u = Uri.parse(antennaField);
+            String filename = FileHandler.queryName(getContentResolver(), u);
+            currentAntennaFields.add(new AntennaField(u, filename));
+        }
+        ffsUris = antennaFieldsUri;
     }
 
     /**
      * Gets new Antenna from database and sets it as the current antenna
      */
-    private void handleNewlyInsertedAntenna(AppDatabase appDb){
+    private void handleNewlyInsertedAntenna(AppDatabase appDb) {
         Log.d(TAG, "handleNewlyInsertedAntenna: Setting newly insert antenna as current");
         // Background
         List<Antenna> data = new ArrayList<>();
@@ -425,101 +271,6 @@ public class ImportActivity extends BaseActivity{
         this.currentAntenna = data.get(data.size() - 1);
     }
 
-    private void handleNewlyInsertedAntennaField(AppDatabase appDb, int antennaId){
-        // Background
-        List<AntennaField> data =new ArrayList<>();
-        data = appDb.antennaFieldDao().findByAntennaId_BackGround(antennaId);
-        this.currentAntenaFields = data;
-    }
-
-    private void handleNewlyInsertedMetadata(AppDatabase appDb){
-        // Background
-        List<MetaData> data =new ArrayList<>();
-        data = appDb.metadataDao().getAll_Background();
-        int size2 = data.size();
-        // Last Antenna
-        MetaData meta = data.get(size2 -1);
-        this.currentMetaData = meta;
-    }
-
-    private void handelGetAntennaInBackground(AppDatabase appDb, int antennaId){
-        // Background
-        List<Antenna> data =new ArrayList<>();
-        data = appDb.antennaDao().find_Background(antennaId);
-        this.currentAntenna = data.get(0);
-    }
-
-    private void handleNewConfigInsert(){
-        Log.d(TAG, "handleNewConfigInsert: creating background thread");
-        Antenna insert = new Antenna("Antenna #");
-        //Background
-        executeRunnable(addNewAntennaConfig(insert));
-        //Reset other options
-        currentAntenaFields = null;
-        currentMetaData = null;
-        initImportView();
-    }
-
-    /**
-     * Method is called when the import activity is opened for the first time.
-     * Sets the currentAntenna to the first antenna in the DB. If DB is empty,
-     * the default ImportView will be shown.
-     */
-    private void setDefaultAntennaData(){
-        if (currentAntenna != null || !firstRun){
-            return;
-        }
-        firstRun = false;
-        executeRunnable(getAllAntennas());
-        if(allAntennas.isEmpty()){
-            initImportView();
-            return;
-        }else {
-            if(givenAntennaId == 0) {
-                currentAntenna = allAntennas.get(0);
-            } else{
-                currentAntenna = allAntennas.stream().filter(x -> x.id == givenAntennaId).findFirst().get();
-            }
-
-
-            loadAntennaFieldsByAntennaId(currentAntenna.id);
-            initImportView();
-        }
-    }
-
-    /**
-     * Opens a dialog with all available antennas. If one is selected, the dialog will close and
-     * a new current antenna will be set
-     * @param antennaList - all available antennas from the database
-     */
-    private void displayChooseAntennaDialog( List<Antenna> antennaList){
-        Log.d(TAG, "displayChooseAntennaDialog: Opening...");
-        DialogExistingAntenna dialog = new DialogExistingAntenna(this, "Antenna", R.layout.dialog_import_existing_antenna, antennaList) {
-            @Override
-            public void handelAntennaItemClick(Antenna antenna) {
-
-                Toast.makeText(getApplicationContext(), "Antenna " + antenna.description, Toast.LENGTH_LONG).show();
-                currentAntenna = antenna;
-                loadAntennaFieldsByAntennaId(currentAntenna.id);
-
-
-                initImportView();
-                this.getDialog().dismiss();
-            }
-        };
-        dialog.showDialog();
-    }
-
-    //This needs to be changed. LiveData causes site effects
-    public void loadAntennaFieldsByAntennaId(int antennaId){
-        List<AntennaField> antennaFields = new ArrayList<>();
-        executeRunnable(new Runnable() {
-            @Override
-            public void run() {
-                currentAntenaFields = appDb.antennaFieldDao().findByAntennaId_BackGround(antennaId);
-            }
-        });
-    }
 
     /**
      *  ==================================
@@ -576,53 +327,53 @@ public class ImportActivity extends BaseActivity{
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         importView.showProgressBar();
+        Uri uri = data.getData();
         Log.d(TAG, "Activity result");
         if(resultCode == Activity.RESULT_OK){
-//            Log.d(TAG, "Request Code: "+requestCode);
-//            executeRunnable(getHandelResultRunnable( data, requestCode));
-//            initImportView();
-
-            Uri uri = data.getData();
-
-            // Handle FFS separately since its Work
-            if (requestCode == FileRequests.REQUEST_CODE_FFS){
-                String ffsName = FileHandler.queryName( getContentResolver(), uri);
-                if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
-                    handleFFSImportWork(uri, ffsName);
-                } else {
-                    showToast(getString(R.string.toastInvalidFFS));
-                }
-            } else {
-                // Antenna, Metadata, ...
-                executeRunnable(getHandelResultRunnable( data, requestCode));
-                initImportView();
+            switch(requestCode){
+                case FileRequests.REQUEST_CODE_FOLDER:
+                    handleFolderImport(uri);
+                    showToast(getString(R.string.toastFolderImport));
+                    break;
+                case FileRequests.REQUEST_CODE_ANTENNA:
+                    Log.d(TAG, "onActivityResult: Im in the right place");
+                    String antennaName = FileHandler.queryName(getContentResolver(), uri);
+                    if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
+                        currentAntenna.filename = antennaName;
+                        currentAntenna.uri = uri.toString();
+                    } else {
+                        showToast(getString(R.string.toastInvalidAntenna));
+                    }
+                    initImportView();
+                    break;
             }
-
         }
-
-
-
     }
 
+    private void handleFolderImport(Uri uri){
+        Map<Integer, String[]> pairURI = FileHandler.traverseDirectoryEntries(uri, getContentResolver());
+        setMetaDataTypes(pairURI.get(0));
+        handleMetaDataImportWork("URICSV", pairURI.get(0));
+        setAntennaFields(pairURI.get(1));
+    }
 
-    /**
-     * Handle Import Result of FFD Data.
-     * Queue Work to an Non blocking Thread
-     * @param uri Uri to the FFS file
-     */
-    private void handleFFSImportWork(Uri uri, String fileName){
-
+    private void handleFFSImportWork(String key, String[] values){
         // Build InputData
+        if(values == null){
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+            return;
+        }
         Data.Builder builder = new Data.Builder();
-        builder.putString("URI", uri.toString());
-        builder.putString("FILENAME", fileName);
+        builder.putStringArray(key, values);
+        builder.putStringArray("FILENAMEFFS", getFilenames(values));
         Data input = builder.build();
+        importView.showProgressBar();
 
         // Create WorkRequest
-        OneTimeWorkRequest workRequest = WorkerRequestUtil.getOneTimeRequest(ImportWorker.class, input);
-        workManager.enqueue( workRequest);
+        OneTimeWorkRequest workRequest = WorkerRequestUtil.getOneTimeRequest(InterpretFFSWorker.class, input);
+        workManager.enqueue(workRequest);
         workManager.getWorkInfoByIdLiveData(workRequest.getId()).observe(this, new Observer<WorkInfo>() {
             @Override
             public void onChanged(WorkInfo workInfo) {
@@ -631,20 +382,71 @@ public class ImportActivity extends BaseActivity{
 
                     if (workInfo.getState() == WorkInfo.State.FAILED
                             || workInfo.getState() == WorkInfo.State.CANCELLED){
-                        // Work Problem
-
                         return;
                     }
 
-                    // Work success
-                    loadAntennaFieldsByAntennaId(currentAntenna.id);
-                    initImportView();
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
                 }
             }
         });
 
     }
 
+    private String[] getFilenames(String[] uris){
+        String[] result = new String[uris.length];
+        for(int i = 0; i < uris.length; i++){
+            result[i] = FileHandler.queryName(getContentResolver(), Uri.parse(uris[i]));
+        }
+        return result;
+    }
+
+    /** Handle Folder Work
+     */
+    private void handleMetaDataImportWork(String key, String[] values){
+        // Build InputData
+        Data.Builder builder = new Data.Builder();
+        builder.putStringArray(key, values);
+        Data input = builder.build();
+
+        // Create WorkRequest
+        OneTimeWorkRequest workRequest = WorkerRequestUtil.getOneTimeRequest(InterpretMetaDataWorker.class, input);
+        workManager.enqueue(workRequest);
+        workManager.getWorkInfoByIdLiveData(workRequest.getId()).observe(this, new Observer<WorkInfo>() {
+            @Override
+            public void onChanged(WorkInfo workInfo) {
+                Log.d(TAG, "WorkState FOLDER " + workInfo.getState());
+                if (workInfo.getState().isFinished()){
+
+                    if (workInfo.getState() == WorkInfo.State.FAILED
+                            || workInfo.getState() == WorkInfo.State.CANCELLED){
+
+                        return;
+                    }
+
+
+                    handleMetaDataOutput(workInfo.getOutputData().getStringArray("result"));
+
+                    initImportView();
+                    showToast(getString(R.string.toastFolderImportDone));
+                }
+            }
+        });
+    }
+    private void handleMetaDataOutput(String[] output){
+        ObjectMapper objectMapper = new ObjectMapper();
+        if(currentMetaData == null){
+            currentMetaData = new LinkedList<>();
+        }
+        for(String s : output){
+            try{
+                Log.d(TAG, "handleMetaDataOutput: " + s);
+                currentMetaData.add(objectMapper.readValue(s, MetaData.class));
+            }catch(Exception e) {
+                Log.e(TAG, "handleMetaDataOutput: Converting json went wrong" + e.getMessage());
+            }
+        }
+    }
 
     /**
      * Utility method to call Toasts in UI Thread
@@ -652,7 +454,7 @@ public class ImportActivity extends BaseActivity{
      */
     public void showToast(final String toast)
     {
-        runOnUiThread(() -> Toast.makeText(this, toast, Toast.LENGTH_SHORT).show());
+        runOnUiThread(() -> Toast.makeText(this, toast, Toast.LENGTH_LONG).show());
     }
 
 }

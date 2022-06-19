@@ -14,40 +14,16 @@
 
         <EditText
             android:id="@+id/configName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName"
             style="@style/HeadLine"
             android:text="      " />
 
-        <Button
-            android:id="@+id/btn_choose_config"
-            android:layout_width="67dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="v"
-            android:textColor="@color/white" />
-
-        <Button
-            android:id="@+id/btn_add_config"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="+"
-            android:textColor="@color/white" />
-
 
     </LinearLayout>
 
-
-    <TextView
-        android:id="@+id/tv_import_headLine_antenna"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/antenna"
-        style="@style/HeadLine"
-        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -79,11 +55,11 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/tv_metadataHeadLine"
+        android:id="@+id/tv_import_headLine_antenna"
+        style="@style/HeadLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/metaData"
-        style="@style/HeadLine"/>
+        android:text="@string/antenna" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -93,21 +69,14 @@
         android:layout_marginEnd="10dp">
 
         <Button
-            android:id="@+id/btn_import_add_metadata"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:text="@string/btn_add_metaData"
-            android:textColor="@color/white" />
-
-        <Button
-            android:id="@+id/btn_import_add_metadataFolder"
+            android:id="@+id/btn_import_Folder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/btn_add_metaFolder"
             android:textColor="@color/white"
             />
+
     </LinearLayout>
 
 
@@ -117,23 +86,45 @@
         android:text="@string/farFieldSource"
         style="@style/HeadLine"/>
 
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollable_ffs"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:fillViewport="true">
+
+        <ListView
+            android:id="@+id/lv_import_antenna_fields"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"/>
+    </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/tv_metadataHeadLine"
+        style="@style/HeadLine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/metaData" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollable_meta"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:fillViewport="true">
+
+        <ListView
+            android:id="@+id/lv_import_meta_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"/>
+    </androidx.core.widget.NestedScrollView>
+
     <Button
-        android:id="@+id/btn_import_add_ffs"
-        android:layout_width="wrap_content"
+        android:id="@+id/btn_confirm"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/btn_add_ffs"
+        android:text="@string/btn_confirm"
         android:textColor="@color/white"
-        />
-
-    <ListView
-        android:id="@+id/lv_import_antenna_fields"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp">
-
-    </ListView>
-
+        android:layout_marginHorizontal="100dp"/>
 
 </LinearLayout>

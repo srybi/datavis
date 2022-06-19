@@ -82,29 +82,29 @@ public class FFSService {
 
     private void saveSpheresIfNotExist(ArrayList<AtomicField> fieldsLog, ArrayList<AtomicField> fieldsLin) {
         boolean success = true;
-                //Save all logarithmic spheres
-                for (AtomicField field : fieldsLog) {
-                    try {
-                        db.atomicFieldDao().insert(field);
-                    }catch (SQLiteConstraintException e){
-                        e.printStackTrace();
-                        Log.d("FFSService", "SQL Error: " + e.getMessage());
-                        success = false;
-                    }
-                }
-                //Save all linear spheres
-                for (AtomicField field : fieldsLin) {
-                    try {
-                        db.atomicFieldDao().insert(field);
-                    }catch (SQLiteConstraintException e){
-                        e.printStackTrace();
-                        Log.d("FFSService", "SQL Error: " + e.getMessage());
-                        success = false;
-                    }
-                }
-                if(!success)
-                    Toast.makeText(context, "Error saving data", Toast.LENGTH_SHORT).show();
+        //Save all logarithmic spheres
+        for (AtomicField field : fieldsLog) {
+            try {
+                db.atomicFieldDao().insert(field);
+            }catch (SQLiteConstraintException e){
+                e.printStackTrace();
+                Log.d("FFSService", "SQL Error: " + e.getMessage());
+                success = false;
             }
+        }
+        //Save all linear spheres
+        for (AtomicField field : fieldsLin) {
+            try {
+                db.atomicFieldDao().insert(field);
+            }catch (SQLiteConstraintException e){
+                e.printStackTrace();
+                Log.d("FFSService", "SQL Error: " + e.getMessage());
+                success = false;
+            }
+        }
+        if(!success)
+            Toast.makeText(context, "Error saving data", Toast.LENGTH_SHORT).show();
+    }
 
 
     public AtomicField getSpheresByPrimaryKey(int antennaId, double frequency, double tilt, InterpretationMode mode) {

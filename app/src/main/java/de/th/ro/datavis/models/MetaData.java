@@ -30,6 +30,9 @@ public class MetaData {
         this.value = value;
     }
 
+    //dummy constructor for json converting
+    public MetaData(){}
+
     @Ignore
     public MetaData(int antennaID) {
         this.antennaID = antennaID;
