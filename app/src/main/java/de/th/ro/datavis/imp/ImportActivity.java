@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.work.Data;
@@ -82,7 +83,10 @@ public class ImportActivity extends BaseActivity{
 
         Toolbar toolbar = findViewById(R.id.import_toolbar);
         setSupportActionBar(toolbar);
-
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         appDb  = AppDatabase.getInstance(getApplicationContext());
         ffsService = new FFSService(new FFSInterpreter(), this);
