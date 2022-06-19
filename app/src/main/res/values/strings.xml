@@ -86,8 +86,10 @@
     <string name="about">About</string>
     <string name="datavis">datavis</string>
     <string name="about_text">AR-App for data visualisation\nof antenna signals\n\nProject within the scope of the module\nSoftware Engineering Practice\nin collaboration with Ericsson\n\nBy Tassilo Heinemann, Dominik Kauth, Samuel Kern, Stefan Rybinski, Leopold Straub\n\n</string>
-    <string name="Google_privacy_1">This application runs on &lt;a href="https://play.google.com/store/apps/details?id=com.google.ar.core">Google Play Services for AR &lt;/a> (ARCore), </string>
-    <string name="Google_privacy_2">which is provided by Google and governed by the &lt;a href="https://policies.google.com/privacy">Google Privacy Policy &lt;/a>.</string>
+    <string name="Google_privacy_1">This application runs on Google Play Services for AR (ARCore),</string>
+    <string name="Google_privacy_2">which is provided by Google and governed by the Google Privacy Policy</string>
+    <string name="Google_privacy_links">\nLinks:\nhttps://play.google.com/store/apps/details?id=com.google.ar.core \n\n https://policies.google.com/privacy</string>
+
 
     <!-- Settings -->
     <string name="tab_antenna">Antenna</string>
