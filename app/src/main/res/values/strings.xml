@@ -75,7 +75,7 @@
     <!-- Instructions -->
     <string name="app_instructions_text_1">1) Click on one of the items\n \  \  to start the visualization\n \  \  If there are none, click Import.</string>
     <string name="app_instructions_text_2">2) Press the Settings Icon or swipe up\n \  \  to show the Bottom Sheet</string>
-    <string name="app_instructions_text_3">3) Use the Bottom Sheet to get\n \  \  more information about the\n \  \  field strengt of the antenna\n \  \  and to change frequency and tilt</string>
+    <string name="app_instructions_text_3">3) Use the Bottom Sheet to get\n \  \  more information about the\n \  \  field strength of the antenna\n \  \  and to change frequency and tilt</string>
     <string name="import_instructions_text_1">1) *OPTIONAL*\n \  \  Change the name by clicking on it</string>
     <string name="import_instructions_text_2">2) If you want to use a custom antenna,\n \  \  add one by clicking on\n \  \  \'IMPORT ANTENNA\', otherwise\n \  \  click on \'USE DEFAULT\'</string>
     <string name="import_instructions_text_3">3) Click on \'IMPORT FOLDER\'\n \  \  to add Metadata and .ffs files</string>
@@ -86,7 +86,8 @@
     <string name="about">About</string>
     <string name="datavis">datavis</string>
     <string name="about_text">AR-App for data visualisation\nof antenna signals\n\nProject within the scope of the module\nSoftware Engineering Practice\nin collaboration with Ericsson\n\nBy Tassilo Heinemann, Dominik Kauth, Samuel Kern, Stefan Rybinski, Leopold Straub\n\n</string>
-    <string name="Google_Play_Services_for_AR_user_privacy_requirements">This application runs on <a href="https://play.google.com/store/apps/details?id=com.google.ar.core">Google Play Services for AR </a> (ARCore), which is provided by Google and governed by the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</string>
+    <string name="Google_privacy_1">This application runs on &lt;a href="https://play.google.com/store/apps/details?id=com.google.ar.core">Google Play Services for AR &lt;/a> (ARCore), </string>
+    <string name="Google_privacy_2">which is provided by Google and governed by the &lt;a href="https://policies.google.com/privacy">Google Privacy Policy &lt;/a>.</string>
 
     <!-- Settings -->
     <string name="tab_antenna">Antenna</string>
