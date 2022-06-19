@@ -73,14 +73,14 @@
 
 
     <!-- Instructions -->
-    <string name="app_instructions_text">1) Press the Checkboxes of the antennas you want to display\n\n2) Press the button \'Open In AR\'\n\n3) Use the Bottom Sheet to get more information about the field strength of the antenna and to change frequency and tilt</string>
-    <string name="import_instructions_text">1) Press \'⌄\' to select an existing configuration\nor \'+\' to add a new one\n\n2) *OPTOINAL*\nChange the name by clicking on it\n\n3) If you want to use a custom antenna,\nadd one by clicking on \'ADD ANTENNA\',\notherwise click on \'ADD DEFAULT\'\n\n4) Add Metadata and .ffs files</string>
+    <string name="app_instructions_text">1) Click on one of the items\n \  \  to start the visualization\n \  \  If there are none, click Import.\n\n2) Press the Settings Icon or swipe up\n \  \  to show the Bottom Sheet\n\n3) Use the Bottom Sheet to get\n \  \  more information about the\n \  \  field strengt of the antenna\n \  \  and to change frequency and tilt</string>
+    <string name="import_instructions_text">1) \  \  \  \  \  \  \  \  \  \  \  *OPTOINAL*\n \  \  Change the name by clicking on it\n\n2) If you want to use a custom antenna,\n \  \  add one by clicking on\n \  \  \'IMPORT ANTENNA\', otherwise\n \  \  click on \'USE DEFAULT\'\n\n3) Click on 'IMPORT FOLDER'\n \  \  to add Metadata and .ffs files\n\n4) Click on 'CONFIRM' to confirm</string>
 
     <!-- about -->
     <string name="about">About</string>
     <string name="datavis">datavis</string>
-    <string name="about_text">AR-App for\ndata visualisation\nof antenna signals\n\nProject within the scope\nof the module\nSoftware Engineering Practice\nin collaboration with Ericsson\n\nBy\nTassilo Heinemann\nDominik Kauth\nSamuel Kern\nStefan Rybinski\nLeopold Straub</string>
-
+    <string name="about_text">AR-App for data visualisation\nof antenna signals\n\nProject within the scope of the module\nSoftware Engineering Practice\nin collaboration with Ericsson\n\nBy Tassilo Heinemann, Dominik Kauth, Samuel Kern, Stefan Rybinski, Leopold Straub\n\n</string>
+    <string name="Google_Play_Services_for_AR_user_privacy_requirements">This application runs on <a href="https://play.google.com/store/apps/details?id=com.google.ar.core">Google Play Services for AR </a> (ARCore), which is provided by Google and governed by the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</string>
 
     <!-- Settings -->
     <string name="tab_antenna">Antenna</string>

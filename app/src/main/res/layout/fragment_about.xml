@@ -19,8 +19,16 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
+        android:layout_margin="10dp"
         android:textSize="20sp"
         android:text="@string/about_text"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:textSize="20sp"
+        android:autoLink="web"
+        android:text="@string/Google_Play_Services_for_AR_user_privacy_requirements"
         />
 </LinearLayout>
