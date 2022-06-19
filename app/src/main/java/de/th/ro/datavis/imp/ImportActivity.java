@@ -169,17 +169,12 @@ public class ImportActivity extends BaseActivity{
             public void confirmImport(){
                 if(editMode){
                     executeRunnable(deleteCurrentAntenna());
-                    Log.d(TAG, "confirmImport: Deleted Antenna");
                 }
                 executeRunnable(saveAntenna());
-                Log.d(TAG, "confirmImport: Saved new Antenna");
                 setPreferenceID();
                 executeRunnable(persistMetadata());
-                Log.d(TAG, "confirmImport: Saved new MetaData");
                 executeRunnable(persistAntennaFields());
-                Log.d(TAG, "confirmImport: Saved new AntennaFields");
                 handleFFSImportWork("URIFFS", ffsUris);
-                Log.d(TAG, "confirmImport: Saved new FFS");
             }
 
             private void setPreferenceID(){
@@ -209,7 +204,9 @@ public class ImportActivity extends BaseActivity{
             public void run() {
                 //save antenna
                 appDb.antennaDao().insert(currentAntenna);
-                handleNewlyInsertedAntenna(appDb);
+                if(!editMode){
+                    handleNewlyInsertedAntenna(appDb);
+                }
             }
         };
     }
