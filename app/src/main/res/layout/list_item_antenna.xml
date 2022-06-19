@@ -9,16 +9,17 @@
 
     <TextView
         android:id="@+id/field_name"
+        android:layout_width="186dp"
         android:layout_height="match_parent"
-        android:layout_width="wrap_content"
-        android:textSize="20sp"
-        android:fontFamily="sans-serif-medium"
-        android:layout_weight="1"
-        android:layout_margin="5dp"
-        android:padding="5dp"
-        android:gravity="center"
         android:layout_gravity="fill"
-        />
+        android:layout_margin="5dp"
+        android:layout_weight="1"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="start"
+        android:padding="5dp"
+        android:textAlignment="viewStart"
+        android:maxLines="1"
+        android:textSize="20sp" />
 
     <ImageButton
         android:layout_width="wrap_content"
