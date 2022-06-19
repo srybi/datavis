@@ -53,7 +53,12 @@
         <activity
             android:name=".imp.ImportActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Datavis.NoActionBar"/>
+            android:theme="@style/Theme.Datavis.NoActionBar">
+
+            <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="de.th.ro.datavis.MainActivity" />
+        </activity>
         <activity
             android:name=".about.AboutActivity"
             android:label="@string/app_name"
