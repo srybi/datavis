@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,7 @@ import de.th.ro.datavis.ARActivity;
 import de.th.ro.datavis.MainActivity;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
+import de.th.ro.datavis.imp.ImportActivity;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.util.constants.IntentConst;
 
@@ -51,13 +53,24 @@ public class AntennaAdapter extends ArrayAdapter<Antenna> {
          tvName.setText(antenna.description);
 
          ImageButton showButton = (ImageButton) convertView.findViewById(R.id.button_config_view);
-         showButton.setOnClickListener(new View.OnClickListener() {
+        View finalConvertView1 = convertView;
+        showButton.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View view) {
                  Intent intent = new Intent(getContext().getApplicationContext(), ARActivity.class);
                  intent.putExtra(IntentConst.INTENT_EXTRA_ANTENNA_ID, antenna.id);
                  intent.putExtra(IntentConst.INTENT_EXTRA_ANTENNA_URI, antenna.uri);
                  intent.putExtra(IntentConst.INTENT_EXTRA_ANTENNA_FILENAME, antenna.filename);
+                 context.startActivity(intent);
+             }
+         });
+
+         ImageButton editButton = (ImageButton) convertView.findViewById(R.id.button_config_edit);
+         editButton.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View view) {
+                 Intent intent = new Intent(getContext().getApplicationContext(), ImportActivity.class);
+                 intent.putExtra(IntentConst.INTENT_EXTRA_ANTENNA_ID, antenna.id);
 
                  context.startActivity(intent);
              }

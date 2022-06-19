@@ -1,46 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content"
+    android:weightSum="4"
+    android:layout_margin="1dp">
+
     <TextView
         android:id="@+id/field_name"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
         android:textSize="20sp"
         android:fontFamily="sans-serif-medium"
-        android:gravity="left"
         android:layout_weight="1"
         android:layout_margin="5dp"
         android:padding="5dp"
+        android:gravity="center"
+        android:layout_gravity="fill"
         />
 
     <ImageButton
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/button_config_view"
         android:src="@drawable/ic_baseline_remove_red_eye_24"
-        android:background="@color/white"
+        android:background="?attr/selectableItemBackground"
         android:layout_weight="1"
-        android:layout_gravity="fill"/>
+        android:gravity="center"
+        android:layout_gravity="fill" />
 
     <ImageButton
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/button_config_edit"
         android:src="@drawable/ic_baseline_edit_24"
-        android:background="@color/white"
+        android:background="?attr/selectableItemBackground"
         android:layout_weight="1"
+        android:gravity="center"
         android:layout_gravity="fill"/>
 
     <ImageButton
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/button_config_delete"
         android:src="@android:drawable/ic_delete"
-        android:background="@color/white"
+        android:background="?attr/selectableItemBackground"
         android:layout_weight="1"
+        android:gravity="center"
         android:layout_gravity="fill"/>
 
 </LinearLayout>

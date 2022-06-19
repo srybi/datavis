@@ -44,6 +44,7 @@ import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.FileRequests;
+import de.th.ro.datavis.util.constants.IntentConst;
 import de.th.ro.datavis.util.dialog.DialogExistingAntenna;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 import de.th.ro.datavis.util.filehandling.FileHandler;
@@ -57,6 +58,7 @@ public class ImportActivity extends BaseActivity{
     FFSService ffsService;
 
     Antenna currentAntenna;
+    int givenAntennaId;
     MetaData currentMetaData;
     List<AntennaField> currentAntenaFields;
     List<Antenna> allAntennas;
@@ -84,6 +86,18 @@ public class ImportActivity extends BaseActivity{
 
 
         appDb  = AppDatabase.getInstance(getApplicationContext());
+
+
+            try {
+                givenAntennaId = getIntent().getExtras().getInt(IntentConst.INTENT_EXTRA_ANTENNA_ID);
+            }catch (NullPointerException np){
+                Log.d(TAG, "No Antenna given.");
+            }catch (Exception e){
+                e.printStackTrace();
+                Log.d(TAG, "Given Antenna could no be found.");
+            }
+
+
         ffsService = new FFSService(new FFSInterpreter(), this);
         workManager = WorkManager.getInstance(this);
 
@@ -461,7 +475,13 @@ public class ImportActivity extends BaseActivity{
             initImportView();
             return;
         }else {
-            currentAntenna = allAntennas.get(0);
+            if(givenAntennaId == 0) {
+                currentAntenna = allAntennas.get(0);
+            } else{
+                currentAntenna = allAntennas.stream().filter(x -> x.id == givenAntennaId).findFirst().get();
+            }
+
+
             loadAntennaFieldsByAntennaId(currentAntenna.id);
             initImportView();
         }
