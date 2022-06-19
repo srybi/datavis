@@ -73,8 +73,14 @@
 
 
     <!-- Instructions -->
-    <string name="app_instructions_text">1) Click on one of the items\n \  \  to start the visualization\n \  \  If there are none, click Import.\n\n2) Press the Settings Icon or swipe up\n \  \  to show the Bottom Sheet\n\n3) Use the Bottom Sheet to get\n \  \  more information about the\n \  \  field strengt of the antenna\n \  \  and to change frequency and tilt</string>
-    <string name="import_instructions_text">1) *OPTOINAL*\n \  \  Change the name by clicking on it\n\n2) If you want to use a custom antenna,\n \  \  add one by clicking on\n \  \  \'IMPORT ANTENNA\', otherwise\n \  \  click on \'USE DEFAULT\'\n\n3) Click on 'IMPORT FOLDER'\n \  \  to add Metadata and .ffs files\n\n4) Click on 'CONFIRM' to confirm</string>
+    <string name="app_instructions_text_1">1) Click on one of the items\n \  \  to start the visualization\n \  \  If there are none, click Import.</string>
+    <string name="app_instructions_text_2">2) Press the Settings Icon or swipe up\n \  \  to show the Bottom Sheet</string>
+    <string name="app_instructions_text_3">3) Use the Bottom Sheet to get\n \  \  more information about the\n \  \  field strengt of the antenna\n \  \  and to change frequency and tilt</string>
+    <string name="import_instructions_text_1">1) *OPTIONAL*\n \  \  Change the name by clicking on it</string>
+    <string name="import_instructions_text_2">2) If you want to use a custom antenna,\n \  \  add one by clicking on\n \  \  \'IMPORT ANTENNA\', otherwise\n \  \  click on \'USE DEFAULT\'</string>
+    <string name="import_instructions_text_3">3) Click on \'IMPORT FOLDER\'\n \  \  to add Metadata and .ffs files</string>
+    <string name="import_instructions_text_4">4) Click on \'CONFIRM\' to confirm</string>
+
 
     <!-- about -->
     <string name="about">About</string>
