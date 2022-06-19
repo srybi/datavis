@@ -1,7 +1,12 @@
 package de.th.ro.datavis.ui.adapter;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.media.Image;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
+import android.app.AlertDialog;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -19,14 +24,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import de.th.ro.datavis.ARActivity;
+import de.th.ro.datavis.MainActivity;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.db.database.AppDatabase;
 import de.th.ro.datavis.models.Antenna;
+import de.th.ro.datavis.util.constants.IntentConst;
 
 public class AntennaAdapter extends ArrayAdapter<Antenna> {
 
+    Context context;
+
     public AntennaAdapter(@NonNull Context context, @NonNull List<Antenna> objects) {
         super(context, 0, objects);
+        this.context = context;
     }
 
     @NonNull
@@ -38,6 +49,19 @@ public class AntennaAdapter extends ArrayAdapter<Antenna> {
          }
          TextView tvName = (TextView) convertView.findViewById(R.id.field_name);
          tvName.setText(antenna.description);
+
+         ImageButton showButton = (ImageButton) convertView.findViewById(R.id.button_config_view);
+         showButton.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View view) {
+                 Intent intent = new Intent(getContext().getApplicationContext(), ARActivity.class);
+                 intent.putExtra(IntentConst.INTENT_EXTRA_ANTENNA_ID, antenna.id);
+                 intent.putExtra(IntentConst.INTENT_EXTRA_ANTENNA_URI, antenna.uri);
+                 intent.putExtra(IntentConst.INTENT_EXTRA_ANTENNA_FILENAME, antenna.filename);
+
+                 context.startActivity(intent);
+             }
+         });
 
         ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.button_config_delete);
         View finalConvertView = convertView;
@@ -59,7 +83,7 @@ public class AntennaAdapter extends ArrayAdapter<Antenna> {
                         }
                     }
                 };
-                AlertDialog.Builder ab = new AlertDialog.Builder(finalConvertView.getContext());
+                AlertDialog.Builder ab = new AlertDialog.Builder(context);
                 ab.setMessage(getContext().getString(R.string.clear_one_confirm) + " " + antenna.description + " ?").setPositiveButton(R.string.yes, dialogClickListener)
                         .setNegativeButton(R.string.no, dialogClickListener).show();
 
