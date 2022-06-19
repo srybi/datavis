@@ -89,14 +89,14 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollable_ffs"
         android:layout_width="match_parent"
-        android:layout_height="130dp"
+        android:layout_height="90dp"
         android:fillViewport="true">
 
         <ListView
             android:id="@+id/lv_import_antenna_fields"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp" />
     </androidx.core.widget.NestedScrollView>
 
     <TextView
@@ -109,22 +109,22 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollable_meta"
         android:layout_width="match_parent"
-        android:layout_height="130dp"
+        android:layout_height="90dp"
         android:fillViewport="true">
 
         <ListView
             android:id="@+id/lv_import_meta_data"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp" />
     </androidx.core.widget.NestedScrollView>
 
     <Button
         android:id="@+id/btn_confirm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="100dp"
         android:text="@string/btn_confirm"
-        android:textColor="@color/white"
-        android:layout_marginHorizontal="100dp"/>
+        android:textColor="@color/white" />
 
 </LinearLayout>
