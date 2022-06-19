@@ -43,10 +43,10 @@ import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
-import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.FileRequests;
+import de.th.ro.datavis.util.constants.IntentConst;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 import de.th.ro.datavis.util.worker.WorkerRequestUtil;
 
@@ -68,6 +68,9 @@ public class ImportActivity extends BaseActivity{
 
     ImportView importView;
 
+    int givenAntennaId;
+    boolean editMode= false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +89,17 @@ public class ImportActivity extends BaseActivity{
         metaInt = new MetadataInterpreter();
         workManager = WorkManager.getInstance(this);
 
-        executeRunnable(initImport());
+        try {
+            givenAntennaId = getIntent().getExtras().getInt(IntentConst.INTENT_EXTRA_ANTENNA_ID);
+            editMode = true;
+        }catch (Exception e){
+            Log.d(TAG, "No Antenna given");
+        }
+        if(editMode){
+            executeRunnable(initEditMode());
+        }else{
+            executeRunnable(initImport());
+        }
         initImportView();
     }
 
@@ -154,6 +167,9 @@ public class ImportActivity extends BaseActivity{
 
             @Override
             public void confirmImport(){
+                if(editMode){
+                    executeRunnable(deleteCurrentAntenna());
+                }
                 executeRunnable(saveAntenna());
                 setPreferenceID();
                 executeRunnable(persistMetadata());
@@ -188,7 +204,32 @@ public class ImportActivity extends BaseActivity{
             public void run() {
                 //save antenna
                 appDb.antennaDao().insert(currentAntenna);
-                handleNewlyInsertedAntenna(appDb);
+                if(!editMode){
+                    handleNewlyInsertedAntenna(appDb);
+                }
+            }
+        };
+    }
+
+    private Runnable deleteCurrentAntenna(){
+        return new Runnable() {
+            @Override
+            public void run() {
+                appDb.antennaDao().delete(currentAntenna);
+            }
+        };
+    }
+
+    private Runnable initEditMode(){
+        return new Runnable() {
+            @Override
+            public void run() {
+                //load Antenna
+                currentAntenna = appDb.antennaDao().find_Background(givenAntennaId).get(0);
+                Log.d(TAG, "initEditMode: " + currentAntenna.toString());
+                currentAntennaFields = appDb.antennaFieldDao().findByAntennaId_BackGround(givenAntennaId);
+                currentMetaDataType = appDb.metadataDao().findDistinctTypesByAntennaId_Background(givenAntennaId);
+                currentMetaData = appDb.metadataDao().findAllByAntennaId_Background(givenAntennaId);
             }
         };
     }
@@ -212,6 +253,7 @@ public class ImportActivity extends BaseActivity{
     public Runnable persistMetadata(){
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             int antennaId = preferences.getInt("ID", 1);
+        Log.d(TAG, "persistMetadata:  antennaID:" + antennaId);
             return new Runnable() {
                 @Override
                 public void run() {
@@ -269,6 +311,7 @@ public class ImportActivity extends BaseActivity{
         data = appDb.antennaDao().getAll_Background();
         // Last Antenna
         this.currentAntenna = data.get(data.size() - 1);
+        Log.d(TAG, "handleNewlyInsertedAntenna: " + currentAntenna.toString());
     }
 
 

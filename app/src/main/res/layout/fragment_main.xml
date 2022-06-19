@@ -3,13 +3,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-<RelativeLayout
-
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    android:fillViewport="true">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".main.MainFragment">
+
+    <include
+        android:id="@+id/progressbar"
+        layout="@layout/progressbar" />
 
     <ImageView
         android:id="@+id/datavis_logo"
@@ -78,7 +81,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp">
+            android:layout_marginBottom="20dp"
+            >
 
         </ListView>
 

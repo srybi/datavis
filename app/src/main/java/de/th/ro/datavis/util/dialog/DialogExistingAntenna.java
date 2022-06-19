@@ -11,6 +11,7 @@ import java.util.List;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.ui.adapter.AntennaAdapter;
+import de.th.ro.datavis.ui.adapter.BasicAntennaAdapter;
 
 public abstract class DialogExistingAntenna extends BaseDialog{
 
@@ -29,7 +30,7 @@ public abstract class DialogExistingAntenna extends BaseDialog{
 
     private void attachAdapter(FragmentActivity fragmentActivity, List<Antenna> antennaList){
 
-        AntennaAdapter adapter = new AntennaAdapter(fragmentActivity, antennaList);
+        BasicAntennaAdapter adapter = new BasicAntennaAdapter(fragmentActivity, antennaList);
         listView.setAdapter(adapter);
 
 

@@ -30,6 +30,10 @@ public interface MetadataDao {
 
     @Query("SELECT * FROM MetaData WHERE antennaID = :antennaID AND freq = :freq AND tilt = :tilt")
     LiveData<List<MetaData>> findAll_Background(int antennaID, double freq, double tilt);
+    @Query("SELECT DISTINCT type FROM MetaData WHERE antennaID = :givenAntennaId")
+    List<String> findDistinctTypesByAntennaId_Background(int givenAntennaId);
+    @Query("SELECT *  FROM MetaData WHERE antennaID = :givenAntennaId")
+    List<MetaData> findAllByAntennaId_Background(int givenAntennaId);
 
     @Insert
     void insert(MetaData metaData);
@@ -42,4 +46,5 @@ public interface MetadataDao {
 
     @Delete
     void delete(MetaData metaData);
+
 }

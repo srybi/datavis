@@ -128,7 +128,7 @@ public class MainFragment extends BaseFragment {
         findListView();
 
         antennas.observe(getActivity(), list -> {
-            AntennaAdapter adapter = new AntennaAdapter(context.getApplicationContext(), list);
+            AntennaAdapter adapter = new AntennaAdapter(getActivity(), list);
             listView.setAdapter(adapter);
         });
 
