@@ -106,8 +106,18 @@ android:textColor="@color/white"-->
             android:src="@drawable/arrow_up"
             android:visibility="gone"
             tools:src="@drawable/arrow_up">
-
         </pl.droidsonroids.gif.GifImageView>
+
+        <TextView
+            android:id="@+id/visualCue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/textview_background"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:text="@string/ar_hint"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"/>
     </RelativeLayout>
 
 
