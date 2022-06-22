@@ -141,7 +141,7 @@
             android:id="@+id/label_Frequency"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/label_frequency" />
+            android:text="@string/frequency" />
         <TextView
             android:id="@+id/value_Frequency"
             android:paddingStart="6dp"
@@ -173,7 +173,7 @@
             android:id="@+id/label_Tilt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/label_tilt" />
+            android:text="@string/tilt" />
         <TextView
             android:id="@+id/value_Tilt"
             android:paddingStart="6dp"

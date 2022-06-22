@@ -46,8 +46,6 @@ public class BottomSheet implements ISubject{
     private Slider frequencySlider;
     private Slider tiltSlider;
     private Button applyButton;
-    private TextView tvFreq;
-    private TextView tvTilt;
 
     private ProgressbarHolder progressbar;
 
@@ -131,8 +129,8 @@ public class BottomSheet implements ISubject{
         tiltSlider = bottomSheetDialog.findViewById(R.id.sliderTilt);
         applyButton = bottomSheetDialog.findViewById(R.id.apply);
         //Show Freq & Tilt
-        tvFreq = bottomSheetDialog.findViewById(R.id.value_Frequency);
-        tvTilt = bottomSheetDialog.findViewById(R.id.value_Tilt);
+        TextView tvFreq = bottomSheetDialog.findViewById(R.id.value_Frequency);
+        TextView tvTilt = bottomSheetDialog.findViewById(R.id.value_Tilt);
         tvFreq.setText(Double.toString(frequency));
         tvTilt.setText(Double.toString(tilt));
 
@@ -296,7 +294,7 @@ public class BottomSheet implements ISubject{
     }
 
     private void createMetaDataObserver(BottomSheetDialog bsd){
-        Observer<List<MetaData>> sqlMetadataObs = changeMetaData -> { updateMetadata(bsd, changeMetaData);};
+        Observer<List<MetaData>> sqlMetadataObs = changeMetaData -> updateMetadata(bsd, changeMetaData);
         sqlQueryMetadata.observe((AppCompatActivity)context, sqlMetadataObs);
     }
 
@@ -306,26 +304,45 @@ public class BottomSheet implements ISubject{
             int resID = context.getResources().getIdentifier(("field_" + m.getType()), "id", context.getPackageName());
             try {
                 TextView textView = bsd.findViewById(resID);
+                assert textView != null;
                 textView.setVisibility(View.VISIBLE);
 
-                if(m.getType().equals("Nullfill_dB"))
-                {
-                    textView.setText(context.getString(R.string.Nullfill_dB)+" "+ m.getValue()+"dB");
-                } else if(m.getType().equals("Squint_deg")){
-                    textView.setText(context.getString(R.string.Squint_deg)+" "+ m.getValue()+"°");
-                } else if(m.getType().equals("Tilt_deg")){
-                    textView.setText(context.getString(R.string.Tilt_deg)+" "+ m.getValue()+"°");
-                }else if(m.getType().equals("TiltDeviation_deg")){
-                    textView.setText(context.getString(R.string.TiltDeviation_deg)+" "+ m.getValue()+"°");
-                }else if(m.getType().equals("Phi_max")){
-                    textView.setText(context.getString(R.string.Phi_max)+" "+ m.getValue()+"°");
-                }else if(m.getType().equals("Theta_max")){
-                    textView.setText(context.getString(R.string.Theta_max)+" "+ m.getValue()+"°");
-                }else if(m.getType().equals("Total_power_30deg")){
-                    textView.setText(context.getString(R.string.Total_power_30deg)+" "+ m.getValue());
-                }else textView.setText(m.getValue());
-                Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
+                switch (m.getType()) {
+                    case "Nullfill_dB":
+                        String nullfill= context.getString(R.string.Nullfill_dB,m.getValue());
+                        textView.setText(nullfill);
+                        break;
+                    case "Squint_deg":
+                        String squint= context.getString(R.string.Squint_deg,m.getValue());
+                        textView.setText(squint);
+                        break;
+                    case "Tilt_deg":
+                        String tiltdeg= context.getString(R.string.Tilt_deg,m.getValue());
+                        textView.setText(tiltdeg);
+                        break;
+                    case "TiltDeviation_deg":
+                        String tiltdev= context.getString(R.string.TiltDeviation_deg,m.getValue());
+                        textView.setText(tiltdev);
+                        break;
+                    case "Phi_max":
+                        String phi= context.getString(R.string.Phi_max,m.getValue());
+                        textView.setText(phi);
+                        break;
+                    case "Theta_max":
+                        String theta= context.getString(R.string.Theta_max,m.getValue());
+                        textView.setText(theta);
+                        break;
+                    case "Total_power_30deg":
+                        String fbr= context.getString(R.string.Total_power_30deg,m.getValue());
+                        textView.setText(fbr);
+                        break;
+                    default:
+                        textView.setText(m.getValue());
+                        break;
+                }
+                Log.d(TAG, "TextView " + textView + " updated to: " + m.getValue());
             } catch (Exception e) {
+                Log.d(TAG,"Failed to write Textviews"+e.getMessage());
             }
         }
     }

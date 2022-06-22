@@ -491,7 +491,7 @@ public class ARActivity extends BaseActivity implements
     }
 
     private void createMetaDataObserver(){
-        sqlMetadataObs  = changeMetaData -> { updateMetadata(changeMetaData);};
+        sqlMetadataObs  = this::updateMetadata;
         try {
             sqlQueryMetadata.observe(this, sqlMetadataObs);
         } catch (NullPointerException e) {
@@ -509,17 +509,27 @@ public class ARActivity extends BaseActivity implements
             try {
                 TextView textView = findViewById(resID);
                 textView.setVisibility(View.VISIBLE);
-                if(m.getType().equals("HHPBW_deg"))
-                {
-                    textView.setText(getResources().getString(R.string.HHPBW_deg)+" "+ m.getValue()+"°");
-                } else if(m.getType().equals("VHPBW_deg")) {
-                    textView.setText(getResources().getString(R.string.VHPBW_deg) + " " + m.getValue() + "°");
-                } else if(m.getType().equals("Directivity_dBi")){
-                    textView.setText(getResources().getString(R.string.Directivity_dBi) + " " + m.getValue() + "dBi");
-                } else textView.setText(m.getValue());
+                switch (m.getType()) {
+                    case "HHPBW_deg":
+                        String hhpbw=  getResources().getString(R.string.HHPBW_deg,m.getValue());
+                        textView.setText(hhpbw);
+                        break;
+                    case "VHPBW_deg":
+                        String vhpbw =  getResources().getString(R.string.VHPBW_deg,m.getValue());
+                        textView.setText(vhpbw);
+                        break;
+                    case "Directivity_dBi":
+                        String directivity =  getResources().getString(R.string.Directivity_dBi,m.getValue());
+                        textView.setText(directivity);
+                        break;
+                    default:
+                        textView.setText(m.getValue());
+                        break;
+                }
 
-                Log.d(TAG, "TextView " + textView.toString() + " updated to: " + m.getValue());
+                Log.d(TAG, "TextView " + textView + " updated to: " + m.getValue());
             } catch (Exception e) {
+                Log.d(TAG,"Could not populated Metadata: "+e.getMessage());
             }
         }
     }
@@ -533,8 +543,12 @@ public class ARActivity extends BaseActivity implements
         TextView tvTilt = findViewById(R.id.field_Tilt);
         TextView tvViewMode = findViewById(R.id.field_ViewMode);
 
-        tvFreq.setText(getResources().getString(R.string.label_frequency)+" "+bottomSheet.getFrequency()+" GHz");
-        tvTilt.setText(getResources().getString(R.string.label_tilt)+" "+bottomSheet.getTilt()+"°");
+        String freqString = getString(R.string.label_frequency, bottomSheet.getFrequency());
+        tvFreq.setText(freqString);
+
+        String tiltString = getString(R.string.label_tilt, bottomSheet.getTilt());
+        tvTilt.setText(tiltString);
+
         if(bottomSheet.getMode().name().equals("Linear")){
             tvViewMode.setText(getResources().getString(R.string.linearView));
         } else tvViewMode.setText(getResources().getString(R.string.logView));

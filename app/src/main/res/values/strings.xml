@@ -24,9 +24,11 @@
     <string name="delete_btn">Manage</string>
 
     <!-- AR Activity -->
-    <string name="HHPBW_deg">HPBW:</string>
-    <string name="VHPBW_deg">VHPBW:</string>
-    <string name="Directivity_dBi">Directivity:</string>
+    <string name="HHPBW_deg">HPBW: %1$s °</string>
+    <string name="VHPBW_deg">VHPBW: %1$s ° </string>
+    <string name="Directivity_dBi">Directivity: %1$s dBi</string>
+    <string name="label_frequency">Frequency: %.2f GHz</string>
+    <string name="label_tilt">Tilt: %.2f °</string>
     <string name="back_arrow">Back</string>
     <string name="settings_icon">Settings</string>
     <string name="logView">Log View</string>
@@ -41,16 +43,16 @@
     <string name="toastCorruptAntenna">Corrupt .glb file found - using default Antenna</string>
 
     <!-- BottomSheet -->
-    <string name="label_frequency">Frequency:</string>
-    <string name="label_tilt">Tilt:</string>
+    <string name="frequency">Frequency:</string>
+    <string name="tilt">Tilt:</string>
     <string name="meta_NF">[NF]</string>
-    <string name="Nullfill_dB">Nullfill:</string>
-    <string name="Squint_deg">Squint:</string>
-    <string name="Tilt_deg">Tilt Real:</string>
-    <string name="TiltDeviation_deg">Tilt Deviation:</string>
-    <string name="Phi_max">Phi_max:</string>
-    <string name="Theta_max">Theta_max:</string>
-    <string name="Total_power_30deg">F/B Ratio 30°:</string>
+    <string name="Nullfill_dB">Nullfill: %1$s dB</string>
+    <string name="Squint_deg">Squint: %1$s°</string>
+    <string name="Tilt_deg">Tilt Real: %1$s°</string>
+    <string name="TiltDeviation_deg">Tilt Deviation: %1$s°</string>
+    <string name="Phi_max">Phi_max: %1$s°</string>
+    <string name="Theta_max">Theta_max: %1$s°</string>
+    <string name="Total_power_30deg">F/B Ratio 30°: %1$s</string>
 
     <!-- MainMenu -->
     <string name="instructions">Instructions</string>
