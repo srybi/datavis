@@ -530,8 +530,8 @@ public class ARActivity extends BaseActivity implements
         TextView tvTilt = findViewById(R.id.field_Tilt);
         TextView tvViewMode = findViewById(R.id.field_ViewMode);
 
-        tvFreq.setText(getResources().getString(R.string.label_frequency)+" "+bottomSheet.getFrequency());
-        tvTilt.setText(getResources().getString(R.string.label_tilt)+" "+bottomSheet.getTilt());
+        tvFreq.setText(getResources().getString(R.string.label_frequency)+" "+bottomSheet.getFrequency()+" GHz");
+        tvTilt.setText(getResources().getString(R.string.label_tilt)+" "+bottomSheet.getTilt()+"°");
         if(bottomSheet.getMode().name().equals("Linear")){
             tvViewMode.setText(getResources().getString(R.string.linearView));
         } else tvViewMode.setText(getResources().getString(R.string.logView));
