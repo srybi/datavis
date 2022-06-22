@@ -119,7 +119,9 @@ public class BottomSheet implements ISubject{
         //fetches Metadata
         try {
             readMetaDataFromDB();
-        } catch (Exception e) { e.printStackTrace();}
+        } catch (Exception e) { e.printStackTrace();
+            Log.d(TAG,e.getMessage()+" COULD NOT READ METADATA");
+        }
 
         //Create Observer for Metadata
         createMetaDataObserver(bottomSheetDialog);
@@ -289,7 +291,6 @@ public class BottomSheet implements ISubject{
      *      this is done by String matching the [Metadata type] to the [TextView ID]
      */
     private void readMetaDataFromDB(){
-        //TODO: Antenna Hardcoded
         sqlQueryMetadata = db.metadataDao().findAll_Background(antennaID,frequency,tilt);
         Log.d(TAG, "sqlQueryMetadata built "+sqlQueryMetadata.toString());
     }

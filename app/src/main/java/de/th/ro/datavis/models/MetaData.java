@@ -64,7 +64,7 @@ public class MetaData {
         return tilt;
     }
 
-    public void setTilt(int tilt) {
+    public void setTilt(double tilt) {
         this.tilt = tilt;
     }
 
