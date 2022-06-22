@@ -7,6 +7,7 @@ import android.provider.DocumentsContract;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,11 +23,11 @@ import de.th.ro.datavis.util.filehandling.FileHandler;
 
 public class MetadataInterpreter {
 
-    private static final String LOG_TAG = "MetaIntrp";
+    private static final String LOG_TAG = "MetaInterpreter";
 
     public MetadataInterpreter() {}
 
-    /*
+    /**
      * Checks if uris null and handles exceptions
      * Calls getMetadataFromLines() and interpretCSV()
      * Sets antenna Type based on filename
@@ -39,7 +40,22 @@ public class MetadataInterpreter {
                 m.add(new MetaData(0,0,"N/A"));
             }else{
                 InputStream in = c.openInputStream(uri);
-                m = getMetadataFromLines(interpretCSV(in));
+                try {
+                    m = getMetadataFromLines(interpretCSV(in));
+                } catch (FileNotFoundException f){
+                    Log.d(LOG_TAG, "Couldnt open input stream (File not found): "+f.getMessage());
+                }
+                finally {
+                    if (in != null) {
+                        try {
+                            in.close();
+                        }
+                        catch(IOException ioex) {
+                            Log.d(LOG_TAG, "Input stream failed to close "+ioex.getMessage());
+                        }
+                    }
+                }
+
                 //Set Type
                 String name = FileHandler.queryName(c, uri);
                 if(name.contains(".")) name=name.substring(0, name.lastIndexOf('.'));
@@ -77,7 +93,8 @@ public class MetadataInterpreter {
     }
 
     /**
-     *
+     * Reads .csv from Input stream and returns a matrix from the string
+     * matrix in form of a table
      * @param in InputStream from file
      * @return  Matrix of .csv Data
      */
@@ -92,7 +109,9 @@ public class MetadataInterpreter {
                 rowList.add(lineItems);
             }
         }
-        catch(IOException e){}
+        catch(IOException e){
+            Log.d(LOG_TAG,"Failed to generate .csv Matrix: " +e.getMessage());
+        }
 
         String[][] matrix = new String[rowList.size()][];
         for (int i = 0; i < rowList.size(); i++) {
@@ -102,22 +121,24 @@ public class MetadataInterpreter {
         return matrix;
     }
 
-    /**
+    /*
      * Obsolete
      */
     public List<String> interpretMetaData(InputStream in) throws IOException {
         InputStreamReader reader = new InputStreamReader(in);
         List<String> lines = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
-            String line = br.readLine();
+            String line;
             while ((line = br.readLine()) != null) {
                 lines.add(line);
             }
-        } catch (IOException e){}
+        } catch (IOException e){
+            Log.d(LOG_TAG,"failed to interpret input stream: " +e.getMessage());
+        }
 
         return lines;
     }
-    /*
+    /**
      * Utility to check MIME type
      */
     private static boolean isCSV(String mimeType) {

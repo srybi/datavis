@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.th.ro.datavis.util.constants.FileRequests;
 import de.th.ro.datavis.util.constants.MetadataType;
@@ -110,7 +111,7 @@ public class FileHandler {
      */
 
     public static Map<Integer, String[]> traverseDirectoryEntries(Uri rootUri, ContentResolver cr) {
-        Log.d(TAG, "IM HERE: ");
+        Log.d(TAG, "Traversing Directory entries for: "+rootUri.toString());
         Map<Integer, String[]> pairURI = new HashMap<>();
         ArrayList<Uri> listCSV = new ArrayList<>();
         ArrayList<Uri> listFFS = new ArrayList<>();
@@ -154,17 +155,17 @@ public class FileHandler {
                     c.close();
                 } catch(RuntimeException re) {
                     re.printStackTrace();
-                    Log.d(TAG, "cursor in directory did not close");
+                    Log.d(TAG, "Cursor in directory did not close");
                 }
             }
         }
         Log.d(TAG, "gathered URIs");
 
-        pairURI.put(0, listCSV.stream().map(x->x.toString()).toArray(String[]::new));
-        pairURI.put(1, listFFS.stream().map(x->x.toString()).toArray(String[]::new));
+        pairURI.put(0, listCSV.stream().map(Uri::toString).toArray(String[]::new));
+        pairURI.put(1, listFFS.stream().map(Uri::toString).toArray(String[]::new));
 
-        Log.d(TAG, "Number of csv in directory: "+pairURI.get(0).length);
-        Log.d(TAG, "Number of ffs in directory: "+pairURI.get(1).length);
+        Log.d(TAG, "Number of csv in directory: "+ Objects.requireNonNull(pairURI.get(0)).length);
+        Log.d(TAG, "Number of ffs in directory: "+ Objects.requireNonNull(pairURI.get(1)).length);
         return pairURI;
     }
 
@@ -176,8 +177,8 @@ public class FileHandler {
         return filename.substring(lastIndexOf);
     }
 
-    /*
-     * Only read Metadata that we want
+    /**
+     * Checks in MetaDataTypeList to only read Metadata from the Folder that is necessary
      */
     private static boolean isMetaDataImportable(String type) {
         return(MetadataType.MetaDataTypeList.contains(type));

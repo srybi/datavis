@@ -71,7 +71,7 @@ public class InterpretFFSWorker extends Worker {
       inputFilenames = getInputData().getStringArray("FILENAMEFFS");
    }
 
-   public void persistFFS(AppDatabase appDb, Uri uri, String fileName){
+   public void persistFFS(AppDatabase appDb, Uri uri, String fileName) {
 
       Log.d(TAG, "persistFFS");
 
@@ -94,9 +94,15 @@ public class InterpretFFSWorker extends Worker {
       } catch (FFSInterpretException e) {
          e.printStackTrace();
          Log.d(TAG, "FFSInterpretException " + e.getMessage());
-         return;
+      } finally {
+         if (in != null)
+            try {
+               in.close();
+            } catch (IOException ioex) {
+               Log.e(TAG, "Input Stream failed to close: " + ioex.getMessage());
+            }
       }
-      Log.d(TAG, "interprete Data done");
+      Log.d(TAG, "interpret Data done");
       //Save Antenna and file to database
       AntennaField antennaField = new AntennaField(uri, fileName, antennaId);
       appDb.antennaFieldDao().insert(antennaField);
