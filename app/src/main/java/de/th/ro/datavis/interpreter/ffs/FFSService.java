@@ -46,12 +46,13 @@ public class FFSService {
 
     public void interpretData(InputStream stream, double scalingFactor, int antennaId, String filename) throws FFSInterpretException{
         double floatingPoint = 1;
-        int start = filename.indexOf("_T") + 2, end = start + 2;
+        int start = filename.indexOf("_T") + 2;
+        int end = start + 2;
+
         if (filename.charAt(start+1)=='.') {
-            end = filename.indexOf("0e"+1);
-            floatingPoint = Math.pow(10, Double.parseDouble(filename.substring(end+2, end+4)));
-            if (filename.charAt(end+1)=='-')
-                floatingPoint = Math.pow(10, -1 * Double.parseDouble(filename.substring(end+2, end+4)));
+            end = filename.indexOf("0e") + 1;
+            String subString = filename.substring(end+1, end+4);
+            floatingPoint = Math.pow(10, Double.parseDouble(subString));
         }
         Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPoint, antennaId);
         if(fields.isSuccess()){
