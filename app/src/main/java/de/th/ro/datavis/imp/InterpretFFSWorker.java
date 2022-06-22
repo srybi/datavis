@@ -94,6 +94,7 @@ public class InterpretFFSWorker extends Worker {
       } catch (FFSInterpretException e) {
          e.printStackTrace();
          Log.d(TAG, "FFSInterpretException " + e.getMessage());
+         return;
       } finally {
          if (in != null)
             try {
