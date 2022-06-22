@@ -46,6 +46,8 @@ public class BottomSheet implements ISubject{
     private Slider frequencySlider;
     private Slider tiltSlider;
     private Button applyButton;
+    private TextView tvFreq;
+    private TextView tvTilt;
 
     private ProgressbarHolder progressbar;
 
@@ -129,8 +131,8 @@ public class BottomSheet implements ISubject{
         tiltSlider = bottomSheetDialog.findViewById(R.id.sliderTilt);
         applyButton = bottomSheetDialog.findViewById(R.id.apply);
         //Show Freq & Tilt
-        TextView tvFreq = bottomSheetDialog.findViewById(R.id.value_Frequency);
-        TextView tvTilt = bottomSheetDialog.findViewById(R.id.value_Tilt);
+        tvFreq = bottomSheetDialog.findViewById(R.id.value_Frequency);
+        tvTilt = bottomSheetDialog.findViewById(R.id.value_Tilt);
         tvFreq.setText(Double.toString(frequency));
         tvTilt.setText(Double.toString(tilt));
 
@@ -294,7 +296,7 @@ public class BottomSheet implements ISubject{
     }
 
     private void createMetaDataObserver(BottomSheetDialog bsd){
-        Observer<List<MetaData>> sqlMetadataObs = changeMetaData -> updateMetadata(bsd, changeMetaData);
+        Observer<List<MetaData>> sqlMetadataObs = changeMetaData -> { updateMetadata(bsd, changeMetaData);};
         sqlQueryMetadata.observe((AppCompatActivity)context, sqlMetadataObs);
     }
 
@@ -304,7 +306,6 @@ public class BottomSheet implements ISubject{
             int resID = context.getResources().getIdentifier(("field_" + m.getType()), "id", context.getPackageName());
             try {
                 TextView textView = bsd.findViewById(resID);
-                assert textView != null;
                 textView.setVisibility(View.VISIBLE);
 
                 switch (m.getType()) {
@@ -337,7 +338,7 @@ public class BottomSheet implements ISubject{
                         textView.setText(fbr);
                         break;
                     default:
-                        textView.setText(m.getValue());
+                        textView.setText("");
                         break;
                 }
                 Log.d(TAG, "TextView " + textView + " updated to: " + m.getValue());
