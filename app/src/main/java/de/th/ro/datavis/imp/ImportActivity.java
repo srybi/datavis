@@ -381,7 +381,7 @@ public class ImportActivity extends BaseActivity{
             switch(requestCode){
                 case FileRequests.REQUEST_CODE_FOLDER:
                     handleFolderImport(uri);
-                    showToast(getString(R.string.toastFolderImport));
+                    //showToast(getString(R.string.toastFolderImport));
                     break;
                 case FileRequests.REQUEST_CODE_ANTENNA:
                     Log.d(TAG, "onActivityResult: Im in the right place");
@@ -475,7 +475,7 @@ public class ImportActivity extends BaseActivity{
                     handleMetaDataOutput(workInfo.getOutputData().getStringArray("result"));
 
                     initImportView();
-                    showToast(getString(R.string.toastFolderImportDone));
+                    //showToast(getString(R.string.toastFolderImportDone));
                 }
             }
         });

@@ -2,6 +2,7 @@ package de.th.ro.datavis;
 
 
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -152,7 +153,7 @@ public class ARActivity extends BaseActivity implements
 
         }else{
             Toast.makeText(
-                    this, "No ffs data to display!", Toast.LENGTH_LONG).show();
+                    this, getString(R.string.toastFFSempty), Toast.LENGTH_LONG).show();
         }
 
 
@@ -227,7 +228,7 @@ public class ARActivity extends BaseActivity implements
         Uri antennaUri = FileProviderDatavis.getURIForAntenna(getApplicationContext(), antennaFileName);
         if (antennaUri == null){
 
-            Toast.makeText(this,  "File not Found: " + antennaFileName + " -> Building Default Antenna", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,  getString(R.string.toast404Antenna) + antennaFileName + getString(R.string.toastDefaultAntenna), Toast.LENGTH_LONG).show();
             Log.d(TAG, "Antenna URI: File not Found: " + antennaFileName);
             buildDefaultModel();
             return;
@@ -294,7 +295,7 @@ public class ARActivity extends BaseActivity implements
 
         } catch(Exception e){
             Log.e(TAG, "loadCoordinates: " + e.getMessage() );
-            Toast.makeText(this, "Unable to load the coordinates from the database.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast404Coordinates), Toast.LENGTH_SHORT).show();
             return new ArrayList<Sphere>();
         }
 
@@ -337,7 +338,7 @@ public class ARActivity extends BaseActivity implements
         if(list != null)
             processRenderList(anchorNode, renderableList, list);
         else
-            Toast.makeText(this, "No Spheres found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast404Field), Toast.LENGTH_SHORT).show();
 
 
         if(ffsAvailable){
@@ -371,7 +372,7 @@ public class ARActivity extends BaseActivity implements
         int i = 0;
 
         if (coords == null){
-            Toast.makeText(this, "Keine Coordinaten für diese Kombination von Frequenz und Tilt vorhanden" , Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.toastFreqTiltMismatch) , Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -393,7 +394,7 @@ public class ARActivity extends BaseActivity implements
                     .animate(true).start();
         }catch(Exception e ){
             Log.e(TAG, "attachAntennaToAnchorNode: failed because of corrupt glb file");
-            Toast.makeText(this, "Found corrupt .glb file! Displaying default antenna", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.toastCorruptAntenna), Toast.LENGTH_LONG).show();
             anchorNode.removeChild(model);
             renderableList.put("antenne", renderable);
             buildDefaultModel();
@@ -493,7 +494,9 @@ public class ARActivity extends BaseActivity implements
         sqlMetadataObs  = changeMetaData -> { updateMetadata(changeMetaData);};
         try {
             sqlQueryMetadata.observe(this, sqlMetadataObs);
-        } catch (NullPointerException e) {}
+        } catch (NullPointerException e) {
+            Log.d(TAG, "Couldn't create observer:" + e.getMessage());
+        }
     }
 
     /**

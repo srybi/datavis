@@ -32,6 +32,13 @@
     <string name="logView">Log View</string>
     <string name="linearView">Linear View</string>
     <string name="ar_hint">Move your phone until a surface is detected\nThen tap on the surface\nto place your selected antenna</string>
+    <string name="toastFFSempty">No ffs data to display!</string>
+    <string name="toast404Antenna">File not found</string>
+    <string name="toastDefaultAntenna"> -> Using default Antenna</string>
+    <string name="toast404Coordinates">Unable to load the coordinates from the database.</string>
+    <string name="toast404Field">Antenna field not found</string>
+    <string name="toastFreqTiltMismatch">No data for this frequency/tilt combination found</string>
+    <string name="toastCorruptAntenna">Corrupt .glb file found - using default Antenna</string>
 
     <!-- BottomSheet -->
     <string name="label_frequency">Frequency:</string>
