@@ -24,11 +24,11 @@
     <string name="delete_btn">Manage</string>
 
     <!-- AR Activity -->
-    <string name="HHPBW_deg">HPBW: %1$s °</string>
-    <string name="VHPBW_deg">VHPBW: %1$s ° </string>
+    <string name="HHPBW_deg">HPBW: %1$s°</string>
+    <string name="VHPBW_deg">VHPBW: %1$s° </string>
     <string name="Directivity_dBi">Directivity: %1$s dBi</string>
     <string name="label_frequency">Frequency: %.2f GHz</string>
-    <string name="label_tilt">Tilt: %.2f °</string>
+    <string name="label_tilt">Tilt: %.2f°</string>
     <string name="back_arrow">Back</string>
     <string name="settings_icon">Settings</string>
     <string name="logView">Log View</string>
