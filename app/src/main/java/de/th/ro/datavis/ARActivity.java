@@ -2,7 +2,6 @@ package de.th.ro.datavis;
 
 
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -57,7 +56,6 @@ import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
 import de.th.ro.datavis.util.FileProviderDatavis;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.IntentConst;
-import de.th.ro.datavis.util.constants.MetadataType;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 import androidx.appcompat.widget.Toolbar;
 
@@ -355,11 +353,10 @@ public class ARActivity extends BaseActivity implements
 
     private void processRenderList(AnchorNode anchorNode, Map<String, Renderable> list, List<Sphere> coords){
         Log.d(TAG, "Start processing RenderList");
-        attachAntennaToAnchorNode(anchorNode, list.get("antenne"));
-
         middleNode = new TransformableNode(arFragment.getTransformationSystem());
         middleNode.setParent(anchorNode);
 
+        attachAntennaToAnchorNode(middleNode, list.get("antenne"));
         if(ffsAvailable){
             proccessCoordList(middleNode, list, coords);
         }
@@ -383,11 +380,11 @@ public class ARActivity extends BaseActivity implements
         }
     }
 
-    private void attachAntennaToAnchorNode(AnchorNode anchorNode, Renderable renderable) {
+    private void attachAntennaToAnchorNode(TransformableNode middle, Renderable renderable) {
         TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
         model.getScaleController().setMaxScale(0.20f);
         model.getScaleController().setMinScale(0.15f);
-        model.setParent(anchorNode);
+        model.setParent(middle);
 
         try{
             model.setRenderable(renderable)
@@ -395,7 +392,7 @@ public class ARActivity extends BaseActivity implements
         }catch(Exception e ){
             Log.e(TAG, "attachAntennaToAnchorNode: failed because of corrupt glb file");
             Toast.makeText(this, getString(R.string.toastCorruptAntenna), Toast.LENGTH_LONG).show();
-            anchorNode.removeChild(model);
+            middle.removeChild(model);
             renderableList.put("antenne", renderable);
             buildDefaultModel();
 
@@ -446,7 +443,7 @@ public class ARActivity extends BaseActivity implements
     @Override
     public void update() {
         Log.d(TAG, "update: the bottomsheet called an update");
-        deleteAllSpheres();
+        removeEverything();
         updateFFSCreatingData();
 
         //Metadaten werden neu geladen
@@ -457,7 +454,7 @@ public class ARActivity extends BaseActivity implements
         processRenderList(anchorNode, renderableList, loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt()));
     }
 
-    private void deleteAllSpheres(){
+    private void removeEverything(){
         anchorNode.removeChild(middleNode);
     }
 
