@@ -374,17 +374,17 @@ public class ImportActivity extends BaseActivity{
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        importView.showProgressBar();
-        Uri uri = data.getData();
-        Log.d(TAG, "Activity result");
-        if(resultCode == Activity.RESULT_OK){
+
+        Log.d(TAG, "Activity result initiated. Data was selected: "+(data!=null));
+        if(resultCode == Activity.RESULT_OK && data!=null){
+            Uri uri = data.getData();
+            importView.showProgressBar();
             switch(requestCode){
                 case FileRequests.REQUEST_CODE_FOLDER:
                     handleFolderImport(uri);
                     //showToast(getString(R.string.toastFolderImport));
                     break;
                 case FileRequests.REQUEST_CODE_ANTENNA:
-                    Log.d(TAG, "onActivityResult: Im in the right place");
                     String antennaName = FileHandler.queryName(getContentResolver(), uri);
                     if(FileHandler.fileCheck(getContentResolver(), uri, requestCode)){
                         currentAntenna.filename = antennaName;
@@ -487,7 +487,7 @@ public class ImportActivity extends BaseActivity{
         }
         for(String s : output){
             try{
-                Log.d(TAG, "handleMetaDataOutput: " + s);
+                //Log.d(TAG, "handleMetaDataOutput: " + s);
                 currentMetaData.add(objectMapper.readValue(s, MetaData.class));
             }catch(Exception e) {
                 Log.e(TAG, "handleMetaDataOutput: Converting json went wrong" + e.getMessage());
