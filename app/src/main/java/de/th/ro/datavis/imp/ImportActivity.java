@@ -66,6 +66,7 @@ public class ImportActivity extends BaseActivity{
 
     List<AntennaField> currentAntennaFields;
     String[] ffsUris;
+    String[] metaDataUris;
 
     ImportView importView;
 
@@ -175,15 +176,19 @@ public class ImportActivity extends BaseActivity{
                     executeRunnable(deleteCurrentAntenna());
                 }
                 executeRunnable(saveAntenna());
-                setPreferenceID();
-                executeRunnable(persistMetadata());
+
+                int currentAntennaID = currentAntenna.id;
+
+                storeAntennaIDinPreferences(currentAntennaID);
+                handleMetaDataImportWork(currentAntennaID);
+
                 executeRunnable(persistAntennaFields());
                 handleFFSImportWork("URIFFS", ffsUris);
             }
 
-            private void setPreferenceID(){
+            private void storeAntennaIDinPreferences(int currentAntennaID){
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getFragmentActivity());
-                preferences.edit().putInt("ID", currentAntenna.id).apply();
+                preferences.edit().putInt("ID", currentAntennaID).apply();
             }
 
         };
@@ -255,18 +260,18 @@ public class ImportActivity extends BaseActivity{
      * then persists it
      */
     public Runnable persistMetadata(){
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            int antennaId = preferences.getInt("ID", 1);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int antennaId = preferences.getInt("ID", 1);
         Log.d(TAG, "persistMetadata:  antennaID:" + antennaId);
-            return new Runnable() {
-                @Override
-                public void run() {
-                    for(MetaData e : currentMetaData){
-                        e.setAntennaID(antennaId);
-                        appDb.metadataDao().insert(e);
-                    }
+        return new Runnable() {
+            @Override
+            public void run() {
+                for(MetaData e : currentMetaData){
+                    e.setAntennaID(antennaId);
+                    appDb.metadataDao().insert(e);
                 }
-            };
+            }
+        };
     }
 
     public void setMetaDataTypes(String[] metaDataUris) {
@@ -383,6 +388,7 @@ public class ImportActivity extends BaseActivity{
                 case FileRequests.REQUEST_CODE_FOLDER:
                     handleFolderImport(uri);
                     //showToast(getString(R.string.toastFolderImport));
+                    initImportView();
                     break;
                 case FileRequests.REQUEST_CODE_ANTENNA:
                     String antennaName = FileHandler.queryName(getContentResolver(), uri);
@@ -401,7 +407,10 @@ public class ImportActivity extends BaseActivity{
     private void handleFolderImport(Uri uri){
         Map<Integer, String[]> pairURI = FileHandler.traverseDirectoryEntries(uri, getContentResolver());
         setMetaDataTypes(pairURI.get(0));
-        handleMetaDataImportWork("URICSV", pairURI.get(0));
+
+        // Cache Metadata URIs for Worker
+        metaDataUris = pairURI.get(0);
+
         setAntennaFields(pairURI.get(1));
     }
 
@@ -450,10 +459,15 @@ public class ImportActivity extends BaseActivity{
 
     /** Handle Folder Work
      */
-    private void handleMetaDataImportWork(String key, String[] values){
+    private void handleMetaDataImportWork(int currentAntennaID){
+
+        String key = "URICSV";
+        String[] values = metaDataUris;
+
         // Build InputData
         Data.Builder builder = new Data.Builder();
         builder.putStringArray(key, values);
+        builder.putInt(IntentConst.INTENT_EXTRA_ANTENNA_ID, currentAntennaID);
         Data input = builder.build();
 
         // Create WorkRequest
@@ -464,17 +478,13 @@ public class ImportActivity extends BaseActivity{
             public void onChanged(WorkInfo workInfo) {
                 Log.d(TAG, "WorkState FOLDER " + workInfo.getState());
                 if (workInfo.getState().isFinished()){
-
                     if (workInfo.getState() == WorkInfo.State.FAILED
                             || workInfo.getState() == WorkInfo.State.CANCELLED){
 
                         return;
                     }
 
-
-                    handleMetaDataOutput(workInfo.getOutputData().getStringArray("result"));
-
-                    initImportView();
+                    metaDataUris = null;
                     //showToast(getString(R.string.toastFolderImportDone));
                 }
             }
