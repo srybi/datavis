@@ -1,7 +1,6 @@
 package de.th.ro.datavis;
 
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -30,33 +29,30 @@ import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.Sceneform;
 import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.MaterialFactory;
-import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
-import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import de.th.ro.datavis.db.database.AppDatabase;
-import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
+import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheet;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
-import de.th.ro.datavis.util.FileProviderDatavis;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.IntentConst;
 import de.th.ro.datavis.util.enums.InterpretationMode;
+import de.th.ro.datavis.util.renderable.RenderableBuilder;
+
 import androidx.appcompat.widget.Toolbar;
 
 
@@ -66,31 +62,33 @@ public class ARActivity extends BaseActivity implements
         BaseArFragment.OnSessionConfigurationListener,
         ArFragment.OnViewCreatedListener,
         IObserver {
-
+    private final String TAG = "ARActivity";
 
     private ArFragment arFragment;
-    private Map<String, Renderable> renderableList = new HashMap<>();
+    private Map<String, Renderable> renderableList;
 
-    private IInterpreter ffsInterpreter;
     private FFSService ffsService;
+    private double maxIntensity = -1;
+    private float scalingFactor = 1;
+    private boolean ffsAvailable;
 
     private BottomSheet bottomSheet;
     private BottomSheetHandler bottomSheetHandler;
     private GestureDetector gestureDetector;
+
+    private RenderableBuilder renderableBuilder;
     private AnchorNode anchorNode;
     private TransformableNode middleNode;
+
     private int antennaId;
     private String antennaURI;
     private String antennaFileName;
-    private String TAG = "ARActivity";
-    private boolean ffsAvailable;
+
     private AppDatabase db;
 
     private LiveData<List<MetaData>> sqlQueryMetadata;
     private Observer<List<MetaData>> sqlMetadataObs;
 
-    private double maxIntensity = -1;
-    private float scalingFactor = 1;
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -128,24 +126,22 @@ public class ARActivity extends BaseActivity implements
         antennaId = savedInstanceState.getInt("antennaId");
         antennaURI = savedInstanceState.getString("antennaURI");
         antennaFileName = savedInstanceState.getString(IntentConst.INTENT_EXTRA_ANTENNA_FILENAME);
-        initalSetup(antennaId, antennaURI, antennaFileName);
+        initalSetup();
     }
 
 
 
-    private void initalSetup(int internalAntennaId, String internalAntennaURI, String internalAntennaFileName) {
+    private void initalSetup() {
 
-        ffsService = new FFSService(ffsInterpreter, this);
+        ffsService = new FFSService(new FFSInterpreter(), this);
 
-
-
-        List<Double> frequencies = ffsService.FrequenciesForAntenna(internalAntennaId, ffsService.TiltForAntenna(internalAntennaId), InterpretationMode.Logarithmic);
+        List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, ffsService.TiltForAntenna(antennaId), InterpretationMode.Logarithmic);
         List<Double> tilts;
         ffsAvailable = frequencies.size() != 0;
         //only initialize bottom sheet, if there is a ffs data to manipulate
         if(ffsAvailable){
-            tilts = ffsService.TiltsForAntenna(internalAntennaId, frequencies.get(0), InterpretationMode.Logarithmic);
-            bottomSheet = new BottomSheet(this, frequencies, tilts, internalAntennaId);
+            tilts = ffsService.TiltsForAntenna(antennaId, frequencies.get(0), InterpretationMode.Logarithmic);
+            bottomSheet = new BottomSheet(this, frequencies, tilts, antennaId);
             bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
             gestureDetector = new GestureDetector(this, bottomSheetHandler);
 
@@ -154,10 +150,7 @@ public class ARActivity extends BaseActivity implements
                     this, getString(R.string.toastFFSempty), Toast.LENGTH_LONG).show();
         }
 
-
-        buildAntennaModel();
-        buildSpheres();
-        Log.d(TAG, "onCreate: " + renderableList.size());
+        renderableBuilder = new RenderableBuilder(getApplicationContext(), antennaURI, antennaFileName);
     }
 
     @Override
@@ -214,74 +207,8 @@ public class ARActivity extends BaseActivity implements
         arSceneView.setFrameRateFactor(SceneView.FrameRate.FULL);
     }
 
-    private void buildAntennaModel(){
-        Log.d(TAG, "buildAntennaModel: "+ antennaURI);
-
-        if (antennaFileName == null || antennaFileName.equals("datavis_default")){
-            // antennaFileName == null -> No Antenna chosen -> Use Default Antenna
-            buildDefaultModel();
-            return;
-        }
-
-        Uri antennaUri = FileProviderDatavis.getURIForAntenna(getApplicationContext(), antennaFileName);
-        if (antennaUri == null){
-
-            Toast.makeText(this,  getString(R.string.toast404Antenna) + antennaFileName + getString(R.string.toastDefaultAntenna), Toast.LENGTH_LONG).show();
-            Log.d(TAG, "Antenna URI: File not Found: " + antennaFileName);
-            buildDefaultModel();
-            return;
-        }
-
-            Log.d(TAG, "buildAntennaModel: "+ antennaURI);
-            ModelRenderable.builder()
-                    .setSource(this, antennaUri)
-                    .setIsFilamentGltf(true)
-                    .setAsyncLoadEnabled(true)
-                    .build()
-                    .thenAccept(model -> {
-                        renderableList.put("antenne", model);
-                        Log.d(TAG, "Antenna model done");
-                    })
-                    .exceptionally(throwable -> {
-                        throwable.printStackTrace();
-                        Log.d(TAG, "buildAntennaModel: Failed to build antenna model" + throwable.getMessage());
-                        buildDefaultModel();
-                        return null;
-                    });
-    }
-
-    private void buildDefaultModel(){
-            Log.d(TAG, "building default model");
-            ModelRenderable.builder()
-                    .setSource(this, Uri.parse("models/datavis_antenna_asm.glb"))
-                    .setIsFilamentGltf(true)
-                    .setAsyncLoadEnabled(true)
-                    .build()
-                    .thenAccept(model -> {
-                        renderableList.put("antenne", model);
-                        handleCorruptGLB(model);
-                        Log.d(TAG, "Antenna model done");
-                    }).exceptionally(throwable -> {
-                         throwable.printStackTrace();
-                         Log.d(TAG, "buildAntennaModel: Failed to build default model" + throwable.getMessage());
-                        return null;
-            });
-    }
-
-    private void buildSpheres(){
-        for(FFSIntensityColor intensityColor : FFSIntensityColor.values()){
-            MaterialFactory.makeTransparentWithColor(this, intensityColor.getColor())
-                    .thenAccept(
-                            material -> {
-                                ModelRenderable sphere = ShapeFactory.makeSphere(0.0065f, new Vector3(), material);
-                                renderableList.put(intensityColor.getName() + "Sphere", sphere);
-                            });
-        }
-        Log.d(TAG, "buildSpheres: done");
-    }
-
     private List<Sphere> loadCoordinates(InterpretationMode mode, double frequency, double tilt){
-        List<Sphere> coordinates = null;
+        List<Sphere> coordinates;
         Log.d(TAG, "Start coordinate Loading...");
 
         try {
@@ -294,7 +221,7 @@ public class ARActivity extends BaseActivity implements
         } catch(Exception e){
             Log.e(TAG, "loadCoordinates: " + e.getMessage() );
             Toast.makeText(this, getString(R.string.toast404Coordinates), Toast.LENGTH_SHORT).show();
-            return new ArrayList<Sphere>();
+            return new ArrayList<>();
         }
 
         Log.d(TAG, "Coordinate Loading done");
@@ -303,16 +230,9 @@ public class ARActivity extends BaseActivity implements
     }
 
 
-    private List<Renderable> getRenderList(){
-        return new ArrayList<Renderable>();
-    }
-
-
-
     @Override
     public void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
         Log.d(TAG, "Plane Tab");
-
         findViewById(R.id.visualCue).setVisibility(View.GONE);
 
         if (anchorNode != null){
@@ -326,17 +246,8 @@ public class ARActivity extends BaseActivity implements
         //saving the anchorNode for removing later
         this.anchorNode = anchorNode;
         anchorNode.setParent(arFragment.getArSceneView().getScene());
-        List<Sphere> list = new ArrayList<>();
 
-        if(ffsAvailable){
-            list = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
-        }
-
-        //If List is null -> No corresponding atomic field was found
-        if(list != null)
-            processRenderList(anchorNode, renderableList, list);
-        else
-            Toast.makeText(this, getString(R.string.toast404Field), Toast.LENGTH_SHORT).show();
+        processRenderList(false);
 
 
         if(ffsAvailable){
@@ -351,13 +262,18 @@ public class ARActivity extends BaseActivity implements
 
     }
 
-    private void processRenderList(AnchorNode anchorNode, Map<String, Renderable> list, List<Sphere> coords){
+    private void processRenderList(boolean forceDefault){
         Log.d(TAG, "Start processing RenderList");
-        middleNode = new TransformableNode(arFragment.getTransformationSystem());
-        middleNode.setParent(anchorNode);
+        if(!forceDefault){
+            middleNode = new TransformableNode(arFragment.getTransformationSystem());
+            middleNode.setParent(anchorNode);
+        }
 
+        Map<String, Renderable> list = renderableBuilder.getRenderables(forceDefault);
         attachAntennaToAnchorNode(middleNode, list.get("antenne"));
+
         if(ffsAvailable){
+            List<Sphere> coords = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
             proccessCoordList(middleNode, list, coords);
         }
         Log.d(TAG, "Processing RenderList Done");
@@ -389,26 +305,12 @@ public class ARActivity extends BaseActivity implements
         try{
             model.setRenderable(renderable)
                     .animate(true).start();
-        }catch(Exception e ){
+        }catch(Exception e) {
             Log.e(TAG, "attachAntennaToAnchorNode: failed because of corrupt glb file");
             Toast.makeText(this, getString(R.string.toastCorruptAntenna), Toast.LENGTH_LONG).show();
-            middle.removeChild(model);
-            renderableList.put("antenne", renderable);
-            buildDefaultModel();
-
-        }finally {
-            model.select();
+            //middle.removeChild(model);
+            processRenderList(true);
         }
-    }
-
-    private void handleCorruptGLB(Renderable renderable){
-        TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
-        model.getScaleController().setMaxScale(0.1f);
-        model.getScaleController().setMinScale(0.05f);
-        model.setParent(anchorNode);
-        model.setRenderable(renderable)
-                .animate(true).start();
-                model.select();
     }
 
 
@@ -434,9 +336,7 @@ public class ARActivity extends BaseActivity implements
         }
 
         float target = 0.5f;
-        float factor = (float) (target / maxIntensity);
-
-        return factor;
+        return (float) (target / maxIntensity);
     }
 
     //Observer Pattern
@@ -451,7 +351,7 @@ public class ARActivity extends BaseActivity implements
         sqlQueryMetadata.removeObservers(this);
         createMetaDataObserver();
 
-        processRenderList(anchorNode, renderableList, loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt()));
+        processRenderList(false);
     }
 
     private void removeEverything(){
@@ -475,6 +375,8 @@ public class ARActivity extends BaseActivity implements
         return super.dispatchTouchEvent(event);
     }
 
+
+    //NEED TO BE REFACTOR
     /**
      * Methods to display and update Metadata:
      * readMetaDataFromDB() fetches a List of all available Metadata for a certain AntennaID, frequency and tilt
@@ -487,6 +389,7 @@ public class ARActivity extends BaseActivity implements
         Log.d(TAG, "sqlQueryMetadata built "+sqlQueryMetadata.toString());
     }
 
+    //NEED TO BE REFACTOR
     private void createMetaDataObserver(){
         sqlMetadataObs  = this::updateMetadata;
         try {
@@ -500,6 +403,7 @@ public class ARActivity extends BaseActivity implements
      *  TOP LEFT Updates Metadata
      */
 
+    //NEED TO BE REFACTOR
     private void updateMetadata(List<MetaData> changeMetaData){
         for(MetaData m: changeMetaData) {
             int resID = this.getResources().getIdentifier(("field_" + m.getType()), "id", this.getPackageName());
@@ -535,6 +439,7 @@ public class ARActivity extends BaseActivity implements
      *  TOP RIGHT: Updates Frequency, Tilt and ViewMode textviews
      */
 
+    //NEED TO BE REFACTOR
     private void updateFFSCreatingData(){
         TextView tvFreq = findViewById(R.id.field_Frequency);
         TextView tvTilt = findViewById(R.id.field_Tilt);
