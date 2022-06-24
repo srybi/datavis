@@ -128,7 +128,12 @@ public class ARActivity extends BaseActivity implements
         initSetup();
     }
 
-
+    /**
+     * initSetup does the following:
+     *      - Get All frequencies and tilts of the given antenna (if existent)
+     *      - (Initialize the BottomSheet and its handling)
+     *      - Build all needed Renderables
+     */
     private void initSetup() {
 
         ffsService = new FFSService(new FFSInterpreter(), this);
@@ -204,6 +209,13 @@ public class ARActivity extends BaseActivity implements
         arSceneView.setFrameRateFactor(SceneView.FrameRate.FULL);
     }
 
+    /**
+     * Loads all Spheres from the database, using the natural primary key
+     * @param mode - Interpretation mode
+     * @param frequency - Frequency
+     * @param tilt - Tilt
+     * @return List of all Spheres with the given natural primary key
+     */
     private List<Sphere> loadCoordinates(InterpretationMode mode, double frequency, double tilt){
         List<Sphere> coordinates;
         Log.d(TAG, "Start coordinate Loading...");
@@ -259,8 +271,15 @@ public class ARActivity extends BaseActivity implements
 
     }
 
+    /**
+     * Gets all the renderables from the builder and starts the displaying process
+     * @param forceDefault - boolean value, if the default antenna model should be use
+     */
     private void processRenderList(boolean forceDefault){
         Log.d(TAG, "Start processing RenderList");
+
+        //forceDefault = true, is only used if the first try of rendering failed.
+        //After the first try the middleNode is already existing.
         if(!forceDefault){
             middleNode = new TransformableNode(arFragment.getTransformationSystem());
             middleNode.setParent(anchorNode);
@@ -276,21 +295,32 @@ public class ARActivity extends BaseActivity implements
         Log.d(TAG, "Processing RenderList Done");
     }
 
-    private void processCordList(TransformableNode middle, Map<String, Renderable> list, List<Sphere> coords){
+    /**
+     * This method assigns a colored sphere for every coordinate point, depending on its intensity
+     * @param middle - Node where all spheres get attached to
+     * @param list - List of all colour sphere renderables
+     * @param cords - List of all found coordinates
+     */
+    private void processCordList(TransformableNode middle, Map<String, Renderable> list, List<Sphere> cords){
         scalingFactor = calcScalingFactor(maxIntensity);
         Log.d(TAG, "ScalingFactor " + scalingFactor);
 
-        if (coords == null){
+        if (cords == null){
             Toast.makeText(this, getString(R.string.toastFreqTiltMismatch) , Toast.LENGTH_LONG).show();
             return;
         }
 
-        for(Sphere s : coords){
+        for(Sphere s : cords){
             FFSIntensityColor intensityColor = ffsService.mapToColor(s.getIntensity(), maxIntensity);
             attachSphereToAnchorNode(middle, list.get(intensityColor.getName()+"Sphere"), s, scalingFactor);
         }
     }
 
+    /**
+     * Displays antenna model in AR
+     * @param middle - Node where the antenna is attached to
+     * @param renderable - antenna model
+     */
     private void attachAntennaToAnchorNode(TransformableNode middle, Renderable renderable) {
         TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
         model.getScaleController().setMaxScale(0.20f);
@@ -303,12 +333,18 @@ public class ARActivity extends BaseActivity implements
         }catch(Exception e) {
             Log.e(TAG, "attachAntennaToAnchorNode: failed because of corrupt glb file");
             Toast.makeText(this, getString(R.string.toastCorruptAntenna), Toast.LENGTH_LONG).show();
-            //middle.removeChild(model);
+            middle.removeChild(model);
             processRenderList(true);
         }
     }
 
-
+    /**
+     * Displays a single Sphere in AR
+     * @param middleNode - Node where sphere is attached to
+     * @param renderable - Sphere
+     * @param sphere - Coordinates of the Sphere
+     * @param scalingFactor - scalingFactor
+     */
     private void attachSphereToAnchorNode(TransformableNode middleNode, Renderable renderable, Sphere sphere, float scalingFactor){
         float yOffset = 0.1f;
         TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
@@ -334,7 +370,9 @@ public class ARActivity extends BaseActivity implements
         return (float) (target / maxIntensity);
     }
 
-    //Observer Pattern
+    /**
+     * Method of the interface IObserver. Used if the BottomSheet has changed
+     */
     @Override
     public void update() {
         Log.d(TAG, "update: the bottomsheet called an update");
