@@ -65,7 +65,6 @@ public class ARActivity extends BaseActivity implements
     private final String TAG = "ARActivity";
 
     private ArFragment arFragment;
-    private Map<String, Renderable> renderableList;
 
     private FFSService ffsService;
     private double maxIntensity = -1;
@@ -126,12 +125,11 @@ public class ARActivity extends BaseActivity implements
         antennaId = savedInstanceState.getInt("antennaId");
         antennaURI = savedInstanceState.getString("antennaURI");
         antennaFileName = savedInstanceState.getString(IntentConst.INTENT_EXTRA_ANTENNA_FILENAME);
-        initalSetup();
+        initSetup();
     }
 
 
-
-    private void initalSetup() {
+    private void initSetup() {
 
         ffsService = new FFSService(new FFSInterpreter(), this);
 
@@ -183,7 +181,6 @@ public class ARActivity extends BaseActivity implements
     @Override
     public void onAttachFragment(@NonNull FragmentManager fragmentManager, @NonNull Fragment fragment) {
         if (fragment.getId() == R.id.arFragment) {
-
             arFragment = (ArFragment) fragment;
             arFragment.setOnSessionConfigurationListener(this);
             arFragment.setOnViewCreatedListener(this);
@@ -273,16 +270,15 @@ public class ARActivity extends BaseActivity implements
         attachAntennaToAnchorNode(middleNode, list.get("antenne"));
 
         if(ffsAvailable){
-            List<Sphere> coords = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
-            proccessCoordList(middleNode, list, coords);
+            List<Sphere> cords = loadCoordinates(bottomSheet.getMode(), bottomSheet.getFrequency(), bottomSheet.getTilt());
+            processCordList(middleNode, list, cords);
         }
         Log.d(TAG, "Processing RenderList Done");
     }
 
-    private void proccessCoordList(TransformableNode middle,  Map<String, Renderable> list, List<Sphere> coords){
+    private void processCordList(TransformableNode middle, Map<String, Renderable> list, List<Sphere> coords){
         scalingFactor = calcScalingFactor(maxIntensity);
         Log.d(TAG, "ScalingFactor " + scalingFactor);
-        int i = 0;
 
         if (coords == null){
             Toast.makeText(this, getString(R.string.toastFreqTiltMismatch) , Toast.LENGTH_LONG).show();
@@ -292,7 +288,6 @@ public class ARActivity extends BaseActivity implements
         for(Sphere s : coords){
             FFSIntensityColor intensityColor = ffsService.mapToColor(s.getIntensity(), maxIntensity);
             attachSphereToAnchorNode(middle, list.get(intensityColor.getName()+"Sphere"), s, scalingFactor);
-            i++;
         }
     }
 
