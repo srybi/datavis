@@ -139,16 +139,15 @@ public class ARActivity extends BaseActivity implements
 
         ffsService = new FFSService(new FFSInterpreter(), this);
 
-        List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId, ffsService.TiltForAntenna(antennaId), InterpretationMode.Logarithmic);
+        List<Double> frequencies = ffsService.FrequenciesForAntenna(antennaId);
         List<Double> tilts;
         ffsAvailable = frequencies.size() != 0;
         //only initialize bottom sheet, if there is a ffs data to manipulate
         if(ffsAvailable){
-            tilts = ffsService.TiltsForAntenna(antennaId, frequencies.get(0), InterpretationMode.Logarithmic);
+            tilts = ffsService.TiltsForAntenna(antennaId);
             bottomSheet = new BottomSheet(this, frequencies, tilts, antennaId);
             bottomSheetHandler = new BottomSheetHandler(bottomSheet, findViewById(R.id.visualCueBottomSheet));
             gestureDetector = new GestureDetector(this, bottomSheetHandler);
-
         }else{
             Toast.makeText(
                     this, getString(R.string.toastFFSempty), Toast.LENGTH_LONG).show();

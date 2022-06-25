@@ -61,7 +61,6 @@ public class FFSService {
         }else{
             throw new FFSInterpretException(fields.getMessage());
         }
-
     }
 
     public void interpretData(File file, double scalingFactor, int antennaId) throws FFSInterpretException{
@@ -127,13 +126,12 @@ public class FFSService {
         return null;
     }
 
-    public List<Double> FrequenciesForAntenna(int antennaId, double tilt, InterpretationMode mode) {
+    public List<Double> FrequenciesForAntenna(int antennaId) {
 
         Future future = executor.submit(new Runnable(){
             @Override
             public void run() {
-                int modeInt = mode.ordinal();
-                frequencies = db.atomicFieldDao().getFrequencies_Background(antennaId, tilt, modeInt);
+                frequencies = db.atomicFieldDao().getFrequenciesForAntenna_Background(antennaId);
             }
         });
 
@@ -146,13 +144,12 @@ public class FFSService {
         return new ArrayList<>();
     }
 
-    public List<Double> TiltsForAntenna(int antennaId, double frequency, InterpretationMode mode) {
+    public List<Double> TiltsForAntenna(int antennaId) {
 
         Future future = executor.submit(new Runnable(){
             @Override
             public void run() {
-                int modeInt = mode.ordinal();
-                tilts = db.atomicFieldDao().getTilts_Background(antennaId, frequency, modeInt);
+                tilts = db.atomicFieldDao().getTiltsForAntenna_Background(antennaId);
             }
         });
 

@@ -52,4 +52,10 @@ public interface AtomicFieldDao {
 
     @Query("SELECT * from atomic_field ORDER BY antennaId DESC LIMIT 1")
     AtomicField getLastAtomicField();
+
+    @Query("SELECT DISTINCT frequency from atomic_field WHERE antennaId = :antennaId")
+    List<Double> getFrequenciesForAntenna_Background(int antennaId);
+
+    @Query("SELECT DISTINCT tilt from atomic_field WHERE antennaId = :antennaId")
+    List<Double> getTiltsForAntenna_Background(int antennaId);
 }

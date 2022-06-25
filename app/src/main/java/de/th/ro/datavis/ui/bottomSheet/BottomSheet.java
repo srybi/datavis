@@ -163,6 +163,12 @@ public class BottomSheet implements ISubject{
             tiltSlider.setValueFrom(from);
             tiltSlider.setValueTo(to);
             tiltSlider.setStepSize(1);
+            tiltSlider.setLabelFormatter(new LabelFormatter() {
+                @Override
+                public String getFormattedValue(float value) {
+                    return tilts.get((int)value).toString();
+                }
+            });
 
         }else{
             tiltSlider.setEnabled(false);
