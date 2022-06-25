@@ -254,26 +254,6 @@ public class ImportActivity extends BaseActivity{
         }
     }
 
-    /**
-     * Uses MetadataInterpreter to run through a .csv
-     * then adds antennaID
-     * then persists it
-     */
-    public Runnable persistMetadata(){
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int antennaId = preferences.getInt("ID", 1);
-        Log.d(TAG, "persistMetadata:  antennaID:" + antennaId);
-        return new Runnable() {
-            @Override
-            public void run() {
-                for(MetaData e : currentMetaData){
-                    e.setAntennaID(antennaId);
-                    appDb.metadataDao().insert(e);
-                }
-            }
-        };
-    }
-
     public void setMetaDataTypes(String[] metaDataUris) {
         Log.d(TAG, "setMetaDataUris: storing uris in var"  );
         currentMetaDataType = new LinkedList<>();
@@ -489,20 +469,6 @@ public class ImportActivity extends BaseActivity{
                 }
             }
         });
-    }
-    private void handleMetaDataOutput(String[] output){
-        ObjectMapper objectMapper = new ObjectMapper();
-        if(currentMetaData == null){
-            currentMetaData = new LinkedList<>();
-        }
-        for(String s : output){
-            try{
-                //Log.d(TAG, "handleMetaDataOutput: " + s);
-                currentMetaData.add(objectMapper.readValue(s, MetaData.class));
-            }catch(Exception e) {
-                Log.e(TAG, "handleMetaDataOutput: Converting json went wrong" + e.getMessage());
-            }
-        }
     }
 
     /**
