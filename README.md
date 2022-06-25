@@ -12,24 +12,33 @@ Datavis ist ein Projekt im Rahmen der **Software Engineering Praxis (WIF)** Vera
     │   |   ├── main
     │   |   |   ├── java
     │   |   |   |   └── de.th.re.datavis
-    │   |   |   |       |── db                  # Database
+    │   |   |   |       |── about
+    │   |   |   |       |── ar             
+    │   |   |   |       |── database                  
     │   |   |   |       |   |── daos
+    │   |   |   |       |   |── converter
     │   |   |   |       |   └── database
+    │   |   |   |       |── filehandling
+    │   |   |   |       |── imp                 # Import
+    │   |   |   |       |   |── adapter         # Used to display files
+    │   |   |   |       |   └── worker          # Used to outsource heavy duty into background thread
+    │   |   |   |       |── instructions
     │   |   |   |       |── interpreter         # Data Interpretation
-    │   |   |   |       |   |── cals
+    │   |   |   |       |   |── calc
+    │   |   |   |       |   |── csv
+    │   |   |   |       |   └── ffs
+    │   |   |   |       |── main                # Landing Page   
+    │   |   |   |       |── models              # Data Models 
+    │   |   |   |       |── settings            # Database view inside the application
+    │   |   |   |       |   |── antenna
     │   |   |   |       |   |── ffs
-    │   |   |   |       |   └── step
-    │   |   |   |       |── util                # Utility
-    │   |   |   |       |   |── activity
-    │   |   |   |       |   |── fragment
-    │   |   |   |       |   |── enum
-    │   |   |   |       |   |── exeptions
-    │   |   |   |       |   |── filehandling
-    │   |   |   |       |   └── renderable
-    │   |   |   |       |── main
-    │   |   |   |       |── interfaces    
-    │   |   |   |       |── models
-    │   |   |   |       └── ui                  # User Interface
+    │   |   |   |       |   └── metadata
+    │   |   |   |       |── ui      
+    │   |   |   |       |   |── bottomSheet         
+    │   |   |   |       |   └── progressBar  
+    │   |   |   |       └── util                # Utility
+    │   |   |   |           |── constants
+    │   |   |   |           └── exeptions
     │   |   |   ├── assets           
     │   |   |   |   └── models                  # Demo 3D-Model files           
     │   |   |   ├── res                         # Resource and Layout Files
