@@ -314,15 +314,17 @@ public class ImportActivity extends BaseActivity{
      *  ==================================
      */
     public void openFileDialog(int requestCode){
+        String action;
         if (SDK_INT >= Build.VERSION_CODES.Q) {
-            openFileDialog_Android11(requestCode);
+            action = Intent.ACTION_GET_CONTENT;
         } else {
-            openFileDialog_Android9(requestCode);
+            action = Intent.ACTION_OPEN_DOCUMENT_TREE;
         }
+        openFileDialog(requestCode, action);
     }
 
-    private void openFileDialog_Android9(int requestCode){
-        Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+    private void openFileDialog(int requestCode, String action){
+        Intent chooseFile = new Intent(action);
         chooseFile.setType("*/*");
         chooseFile.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
                 | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
@@ -341,16 +343,6 @@ public class ImportActivity extends BaseActivity{
                         | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         );
         startActivityForResult(browseIntent, requestCode);
-    }
-
-    private void openFileDialog_Android11(int requestCode){
-        Intent data = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        data.setType("*/*");
-        data.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
-                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-        data = Intent.createChooser(data, "Choose a file");
-        startActivityForResult(data, requestCode);
     }
 
     /**
