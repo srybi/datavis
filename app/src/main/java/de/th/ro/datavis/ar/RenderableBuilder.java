@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.th.ro.datavis.util.constants.FFSIntensityColor;
-import de.th.ro.datavis.util.FileProviderDatavis;
+import de.th.ro.datavis.filehandling.FileProviderDatavis;
 
 public class RenderableBuilder {
 
