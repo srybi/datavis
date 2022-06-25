@@ -40,7 +40,6 @@ import java.util.Map;
 
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.database.AppDatabase;
-import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.util.constants.FFSIntensityColor;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSService;

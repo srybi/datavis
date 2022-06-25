@@ -1,4 +1,4 @@
-package de.th.ro.datavis.interfaces;
+package de.th.ro.datavis.interpreter;
 
 import android.util.Pair;
 

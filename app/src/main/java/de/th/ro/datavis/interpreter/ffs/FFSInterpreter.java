@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import de.th.ro.datavis.interfaces.IInterpreter;
+import de.th.ro.datavis.interpreter.IInterpreter;
 import de.th.ro.datavis.interpreter.calc.Calc;
 import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.FFSLine;

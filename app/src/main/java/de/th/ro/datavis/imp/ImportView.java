@@ -14,7 +14,6 @@ import java.util.List;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.imp.adapter.AntennaFieldAdapter;
 import de.th.ro.datavis.imp.adapter.MetaDataAdapter;
-import de.th.ro.datavis.interfaces.IImportOptions;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.ui.progressBar.ProgressbarHolder;
