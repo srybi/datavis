@@ -22,13 +22,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.th.ro.datavis.R;
-import de.th.ro.datavis.db.database.AppDatabase;
+import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interfaces.ISubject;
 import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.ui.progressBar.ProgressbarHolder;
 import de.th.ro.datavis.util.Helper;
-import de.th.ro.datavis.util.constants.MetadataType;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 
 /**

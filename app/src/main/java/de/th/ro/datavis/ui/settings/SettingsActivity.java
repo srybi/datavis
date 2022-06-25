@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.appcompat.app.AlertDialog;
@@ -12,7 +11,6 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
-import android.widget.Toast;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -21,7 +19,7 @@ import java.util.concurrent.Future;
 
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.databinding.ActivitySettingsBinding;
-import de.th.ro.datavis.db.database.AppDatabase;
+import de.th.ro.datavis.database.AppDatabase;
 
 public class SettingsActivity extends AppCompatActivity {
 

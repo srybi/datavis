@@ -1,4 +1,4 @@
-package de.th.ro.datavis.db.database;
+package de.th.ro.datavis.database;
 
 import android.content.Context;
 
@@ -7,11 +7,11 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
-import de.th.ro.datavis.db.Converters.Converter;
-import de.th.ro.datavis.db.daos.AntennaDao;
-import de.th.ro.datavis.db.daos.AntennaFieldDao;
-import de.th.ro.datavis.db.daos.AtomicFieldDao;
-import de.th.ro.datavis.db.daos.MetadataDao;
+import de.th.ro.datavis.database.converter.Converter;
+import de.th.ro.datavis.database.daos.AntennaDao;
+import de.th.ro.datavis.database.daos.AntennaFieldDao;
+import de.th.ro.datavis.database.daos.AtomicFieldDao;
+import de.th.ro.datavis.database.daos.MetadataDao;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.AtomicField;

@@ -1,4 +1,4 @@
-package de.th.ro.datavis.db.Converters;
+package de.th.ro.datavis.database.converter;
 
 
 import androidx.room.TypeConverter;

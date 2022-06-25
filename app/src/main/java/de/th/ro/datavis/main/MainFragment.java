@@ -36,12 +36,11 @@ import java.util.concurrent.Executors;
 
 import de.th.ro.datavis.ARActivity;
 import de.th.ro.datavis.R;
-import de.th.ro.datavis.db.database.AppDatabase;
+import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.imp.ImportActivity;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.ui.adapter.AntennaAdapter;
-import de.th.ro.datavis.ui.settings.SettingsActivity;
 import de.th.ro.datavis.util.constants.IntentConst;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 import de.th.ro.datavis.util.fragment.BaseFragment;

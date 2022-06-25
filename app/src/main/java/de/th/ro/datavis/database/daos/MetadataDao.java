@@ -1,4 +1,4 @@
-package de.th.ro.datavis.db.daos;
+package de.th.ro.datavis.database.daos;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -9,8 +9,6 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import de.th.ro.datavis.models.Antenna;
-import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.MetaData;
 
 @Dao

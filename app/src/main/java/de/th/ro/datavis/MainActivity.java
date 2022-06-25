@@ -17,10 +17,8 @@ import androidx.appcompat.widget.Toolbar;
 import java.util.concurrent.Executors;
 
 import de.th.ro.datavis.about.AboutActivity;
-import de.th.ro.datavis.db.database.AppDatabase;
-import de.th.ro.datavis.imp.ImportActivity;
+import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.instructions.AppInstructionsActivity;
-import de.th.ro.datavis.instructions.ImportInstructionsActivity;
 import de.th.ro.datavis.main.MainFragment;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.ui.settings.SettingsActivity;

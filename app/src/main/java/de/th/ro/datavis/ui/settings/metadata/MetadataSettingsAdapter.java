@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import de.th.ro.datavis.R;
-import de.th.ro.datavis.db.database.AppDatabase;
+import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.models.MetaData;
 
 public class MetadataSettingsAdapter extends ArrayAdapter<MetaData> {

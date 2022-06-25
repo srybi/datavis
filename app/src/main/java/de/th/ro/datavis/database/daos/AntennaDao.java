@@ -1,4 +1,4 @@
-package de.th.ro.datavis.db.daos;
+package de.th.ro.datavis.database.daos;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;

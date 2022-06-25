@@ -38,8 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import de.th.ro.datavis.db.database.AppDatabase;
-import de.th.ro.datavis.imp.ImportActivity;
+import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;

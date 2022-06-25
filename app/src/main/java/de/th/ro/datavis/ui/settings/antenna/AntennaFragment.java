@@ -14,7 +14,7 @@ import android.widget.ListView;
 import java.util.List;
 
 import de.th.ro.datavis.R;
-import de.th.ro.datavis.db.database.AppDatabase;
+import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.models.Antenna;
 
 /**

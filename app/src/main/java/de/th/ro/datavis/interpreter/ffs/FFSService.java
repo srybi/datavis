@@ -15,9 +15,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import de.th.ro.datavis.db.database.AppDatabase;
+import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IInterpreter;
-import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.Result;
 import de.th.ro.datavis.util.enums.InterpretationMode;
