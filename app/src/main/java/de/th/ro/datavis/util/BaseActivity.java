@@ -1,4 +1,4 @@
-package de.th.ro.datavis.util.activity;
+package de.th.ro.datavis.util;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;

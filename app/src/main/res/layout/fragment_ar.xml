@@ -4,7 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ARActivity"
+    tools:context=".ar.ARActivity"
     android:orientation="vertical">
 
 

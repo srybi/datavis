@@ -1,4 +1,4 @@
-package de.th.ro.datavis.util;
+package de.th.ro.datavis.filehandling;
 
 import android.content.Context;
 import android.net.Uri;

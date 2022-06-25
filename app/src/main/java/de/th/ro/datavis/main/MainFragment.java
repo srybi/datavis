@@ -34,15 +34,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-import de.th.ro.datavis.ARActivity;
+import de.th.ro.datavis.ar.ARActivity;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.imp.ImportActivity;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.util.constants.IntentConst;
-import de.th.ro.datavis.util.filehandling.FileHandler;
-import de.th.ro.datavis.util.fragment.BaseFragment;
+import de.th.ro.datavis.filehandling.FileHandler;
+import de.th.ro.datavis.util.BaseFragment;
 
 public class MainFragment extends BaseFragment {
 

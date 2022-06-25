@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="de.th.ro.datavis.MainActivity">
+    tools:context="de.th.ro.datavis.main.MainActivity">
     <item
         android:id="@+id/app_settings"
         android:icon="@drawable/ic_baseline_settings_24"

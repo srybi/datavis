@@ -35,7 +35,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import de.th.ro.datavis.MainActivity;
+import de.th.ro.datavis.main.MainActivity;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.imp.worker.InterpretFFSWorker;
@@ -47,10 +47,10 @@ import de.th.ro.datavis.interpreter.ffs.FFSService;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.models.MetaData;
-import de.th.ro.datavis.util.activity.BaseActivity;
+import de.th.ro.datavis.util.BaseActivity;
 import de.th.ro.datavis.util.constants.FileRequests;
 import de.th.ro.datavis.util.constants.IntentConst;
-import de.th.ro.datavis.util.filehandling.FileHandler;
+import de.th.ro.datavis.filehandling.FileHandler;
 import de.th.ro.datavis.imp.worker.WorkerRequestUtil;
 
 public class ImportActivity extends BaseActivity{

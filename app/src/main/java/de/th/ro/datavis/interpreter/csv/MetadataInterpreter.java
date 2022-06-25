@@ -1,9 +1,7 @@
 package de.th.ro.datavis.interpreter.csv;
 
 import android.content.ContentResolver;
-import android.database.Cursor;
 import android.net.Uri;
-import android.provider.DocumentsContract;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -11,15 +9,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 
 import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.util.constants.MetadataType;
-import de.th.ro.datavis.util.filehandling.FileHandler;
+import de.th.ro.datavis.filehandling.FileHandler;
 
 public class MetadataInterpreter {
 

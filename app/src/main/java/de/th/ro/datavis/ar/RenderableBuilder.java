@@ -1,4 +1,4 @@
-package de.th.ro.datavis.util.renderable;
+package de.th.ro.datavis.ar;
 
 import android.content.Context;
 import android.net.Uri;

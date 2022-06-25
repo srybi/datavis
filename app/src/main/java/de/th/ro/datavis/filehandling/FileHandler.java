@@ -1,4 +1,4 @@
-package de.th.ro.datavis.util.filehandling;
+package de.th.ro.datavis.filehandling;
 
 import android.content.ContentResolver;
 import android.database.Cursor;

@@ -1,4 +1,4 @@
-package de.th.ro.datavis;
+package de.th.ro.datavis.main;
 
 import static android.os.Build.VERSION.SDK_INT;
 
@@ -16,13 +16,13 @@ import androidx.appcompat.widget.Toolbar;
 
 import java.util.concurrent.Executors;
 
+import de.th.ro.datavis.R;
 import de.th.ro.datavis.about.AboutActivity;
 import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.instructions.AppInstructionsActivity;
-import de.th.ro.datavis.main.MainFragment;
 import de.th.ro.datavis.models.AntennaField;
 import de.th.ro.datavis.settings.SettingsActivity;
-import de.th.ro.datavis.util.activity.BaseActivity;
+import de.th.ro.datavis.util.BaseActivity;
 import de.th.ro.datavis.filehandling.FileHandler;
 
 public class MainActivity extends BaseActivity{

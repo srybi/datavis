@@ -1,7 +1,7 @@
 package de.th.ro.datavis.about;
 
 import de.th.ro.datavis.R;
-import de.th.ro.datavis.util.fragment.BaseFragment;
+import de.th.ro.datavis.util.BaseFragment;
 
 public class AboutFragment extends BaseFragment {
     @Override

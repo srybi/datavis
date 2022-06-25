@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 
 import de.th.ro.datavis.R;
-import de.th.ro.datavis.util.activity.BaseActivity;
+import de.th.ro.datavis.util.BaseActivity;
 
 public class AppInstructionsActivity extends BaseActivity {
 

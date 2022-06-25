@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import de.th.ro.datavis.ARActivity;
+import de.th.ro.datavis.ar.ARActivity;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.imp.ImportActivity;

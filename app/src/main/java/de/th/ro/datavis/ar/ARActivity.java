@@ -1,4 +1,4 @@
-package de.th.ro.datavis;
+package de.th.ro.datavis.ar;
 
 
 import android.os.Bundle;
@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import de.th.ro.datavis.R;
 import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.util.constants.FFSIntensityColor;
@@ -48,10 +49,9 @@ import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheet;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
-import de.th.ro.datavis.util.activity.BaseActivity;
+import de.th.ro.datavis.util.BaseActivity;
 import de.th.ro.datavis.util.constants.IntentConst;
 import de.th.ro.datavis.util.constants.InterpretationMode;
-import de.th.ro.datavis.util.renderable.RenderableBuilder;
 
 import androidx.appcompat.widget.Toolbar;
 

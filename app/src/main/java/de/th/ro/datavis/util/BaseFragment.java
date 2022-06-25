@@ -1,4 +1,4 @@
-package de.th.ro.datavis.util.fragment;
+package de.th.ro.datavis.util;
 
 import android.content.Intent;
 import android.os.Bundle;
