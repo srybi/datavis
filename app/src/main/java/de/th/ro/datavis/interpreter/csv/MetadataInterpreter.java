@@ -120,24 +120,6 @@ public class MetadataInterpreter {
         }
         return matrix;
     }
-
-    /*
-     * Obsolete
-     */
-    public List<String> interpretMetaData(InputStream in) throws IOException {
-        InputStreamReader reader = new InputStreamReader(in);
-        List<String> lines = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                lines.add(line);
-            }
-        } catch (IOException e){
-            Log.d(LOG_TAG,"failed to interpret input stream: " +e.getMessage());
-        }
-
-        return lines;
-    }
     /**
      * Utility to check MIME type
      */
