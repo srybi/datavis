@@ -3,6 +3,8 @@ package de.th.ro.datavis.imp;
 import static android.os.Build.VERSION.SDK_INT;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -24,8 +26,6 @@ import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -82,7 +82,6 @@ public class ImportActivity extends BaseActivity{
 
         setContentView(R.layout.activity_import);
         setFragmentContainerView(R.id.importFragment);
-
         Toolbar toolbar = findViewById(R.id.import_toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -94,7 +93,6 @@ public class ImportActivity extends BaseActivity{
         ffsService = new FFSService(new FFSInterpreter(), this);
         metaInt = new MetadataInterpreter();
         workManager = WorkManager.getInstance(this);
-
         try {
             givenAntennaId = getIntent().getExtras().getInt(IntentConst.INTENT_EXTRA_ANTENNA_ID);
             editMode = true;
@@ -106,6 +104,7 @@ public class ImportActivity extends BaseActivity{
         }else{
             executeRunnable(initImport());
         }
+
         initImportView();
     }
 
@@ -134,15 +133,17 @@ public class ImportActivity extends BaseActivity{
         importView = new ImportView(this, currentAntenna, currentAntennaFields, currentMetaDataType) {
 
             public TextWatcher descriptionChanged(){
+                String description = currentAntenna.description;
                 return new TextWatcher() {
-
                     @Override
                     public void afterTextChanged(Editable editable) {
                         executeRunnable(new Runnable() {
                             @Override
                             public void run() {
-                                currentAntenna.setDescription(editable.toString());
-                                hasChanged = true;
+                                if(!description.equals(editable.toString())){
+                                    currentAntenna.setDescription(editable.toString());
+                                    hasChanged = true;
+                                }
                             }
                         });
                     }
@@ -196,6 +197,32 @@ public class ImportActivity extends BaseActivity{
 
         };
     }
+
+    @Override
+    public void onBackPressed() {
+        if(!hasChanged){
+            super.onBackPressed();
+            return;
+        }
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        ImportActivity.super.onBackPressed();
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //Do your No progress
+                        break;
+                }
+            }
+        };
+        AlertDialog.Builder ab = new AlertDialog.Builder(ImportActivity.this);
+        ab.setMessage(R.string.unsavedChangesWarning).setPositiveButton(R.string.yes, dialogClickListener)
+                .setNegativeButton(R.string.no, dialogClickListener).show();
+    }
+
 
     public Runnable initImport(){
         Log.d(TAG, "addNewAntennaConfig: executing background thread");
@@ -354,7 +381,6 @@ public class ImportActivity extends BaseActivity{
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         Log.d(TAG, "Activity result initiated. Data was selected: "+(data!=null));
         if(resultCode == Activity.RESULT_OK && data!=null){
             hasChanged = true;
