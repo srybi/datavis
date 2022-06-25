@@ -29,47 +29,25 @@ public class FFSLine {
         return Math.toRadians(phi);
     }
 
-    public void setPhi(double phi) {
-        this.phi = phi;
-    }
-
     public double getThetaRadians() {
         return Math.toRadians(theta);
-    }
-
-    public void setTheta(double theta) {
-        this.theta = theta;
     }
 
     public double getRePhi() {
         return rePhi;
     }
 
-    public void setRePhi(double rePhi) {
-        this.rePhi = rePhi;
-    }
-
     public double getImPhi() {
         return imPhi;
-    }
-
-    public void setImPhi(double imPhi) {
-        this.imPhi = imPhi;
     }
 
     public double getReTheta() {
         return reTheta;
     }
 
-    public void setReTheta(double reTheta) {
-        this.reTheta = reTheta;
-    }
-
     public double getImTheta() {
         return imTheta;
     }
 
-    public void setImTheta(double imTheta) {
-        this.imTheta = imTheta;
-    }
+
 }

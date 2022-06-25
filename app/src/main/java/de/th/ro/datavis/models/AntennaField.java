@@ -11,12 +11,11 @@ import androidx.room.PrimaryKey;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-
 @Entity(tableName = "antenna_field", foreignKeys ={ @ForeignKey(entity = Antenna.class,
         parentColumns = "id",
         childColumns = "antennaId",
         onDelete = CASCADE)})
+
 public class AntennaField {
     @PrimaryKey(autoGenerate = true)
     public int id;

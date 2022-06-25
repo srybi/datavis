@@ -35,11 +35,6 @@ public class Antenna {
         this.description = description;
     }
 
-    public void setAntennaFile(String uri, String filename){
-        this.uri = uri;
-        this.filename = filename;
-    }
-
     public void setDescription(String description){
         this.description = description;
     }

@@ -43,22 +43,10 @@ public class MetaData {
         return "Metadata "+this.type+ " Freq: "+this.freq+" Tilt: "+this.tilt+" = "+this.value;
     }
 
-
-    public int getAntennaID() {
-        return antennaID;
-    }
-
     public void setAntennaID(int antennaID) {
         this.antennaID = antennaID;
     }
 
-    public double getFreq() {
-        return freq;
-    }
-
-    public void setFreq(double freq) {
-        this.freq = freq;
-    }
 
     public double getTilt() {
         return tilt;

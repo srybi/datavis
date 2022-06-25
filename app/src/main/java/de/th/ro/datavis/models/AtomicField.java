@@ -17,6 +17,30 @@ import de.th.ro.datavis.util.enums.InterpretationMode;
                 childColumns = "antennaId",
                 onDelete = CASCADE)})
 public class AtomicField {
+
+    public double tilt;
+    public double frequency;
+    @NonNull
+    public InterpretationMode interpretationMode;
+    public List<Sphere> spheres;
+    public int antennaId;
+    public int antennaFieldId;
+    public double maxIntensity;
+
+    public AtomicField(int tilt, double frequency, InterpretationMode interpretationMode, List<Sphere> spheres, double maxIntensity, int antennaId, int antennaFieldId) {
+        this.tilt = tilt;
+        this.frequency = frequency;
+        this.interpretationMode = interpretationMode;
+        this.spheres = spheres;
+        this.maxIntensity = maxIntensity;
+        this.antennaId = antennaId;
+        this.antennaFieldId = antennaFieldId;
+    }
+
+    public AtomicField(){
+
+    }
+
     public double getTilt() {
         return tilt;
     }
@@ -42,47 +66,16 @@ public class AtomicField {
         this.interpretationMode = interpretationMode;
     }
 
-    public List<Sphere> getSpheres() {
-        return spheres;
-    }
 
     public void setSpheres(List<Sphere> spheres) {
         this.spheres = spheres;
     }
 
-    public double tilt;
-    public double frequency;
-    @NonNull
-    public InterpretationMode interpretationMode;
-    public List<Sphere> spheres;
-
-
-
-    public double maxIntensity;
 
     public void setAntennaId(int antennaId) {
         this.antennaId = antennaId;
     }
 
-    public void setAntennaFieldId(int antennaFieldId) {
-        this.antennaFieldId = antennaFieldId;
-    }
-
-    public int antennaId;
-    public int antennaFieldId;
-
-    public AtomicField(int tilt, double frequency, InterpretationMode interpretationMode, List<Sphere> spheres, double maxIntensity, int antennaId, int antennaFieldId) {
-        this.tilt = tilt;
-        this.frequency = frequency;
-        this.interpretationMode = interpretationMode;
-        this.spheres = spheres;
-        this.maxIntensity = maxIntensity;
-        this.antennaId = antennaId;
-        this.antennaFieldId = antennaFieldId;
-    }
-    public AtomicField(){
-
-    }
 
 
 }
