@@ -72,6 +72,7 @@ public class ImportActivity extends BaseActivity{
 
     int givenAntennaId;
     boolean editMode= false;
+    boolean hasChanged=false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -141,6 +142,7 @@ public class ImportActivity extends BaseActivity{
                             @Override
                             public void run() {
                                 currentAntenna.setDescription(editable.toString());
+                                hasChanged = true;
                             }
                         });
                     }
@@ -160,6 +162,7 @@ public class ImportActivity extends BaseActivity{
             }
 
             public void addDefaultAntenna(){
+                hasChanged = true;
                 currentAntenna.filename = "datavis_default";
                 currentAntenna.uri = "models/datavis_antenna_asm.glb";
                 initImportView();
@@ -362,6 +365,7 @@ public class ImportActivity extends BaseActivity{
 
         Log.d(TAG, "Activity result initiated. Data was selected: "+(data!=null));
         if(resultCode == Activity.RESULT_OK && data!=null){
+            hasChanged = true;
             Uri uri = data.getData();
             importView.showProgressBar();
             switch(requestCode){
