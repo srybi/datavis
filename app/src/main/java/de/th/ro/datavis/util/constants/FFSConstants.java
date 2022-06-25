@@ -1,4 +1,4 @@
-package de.th.ro.datavis.interpreter.ffs;
+package de.th.ro.datavis.util.constants;
 
 public class FFSConstants{
     public static final String VALUES_HEADER = "// >> Phi, Theta, Re(E_Theta), Im(E_Theta), Re(E_Phi), Im(E_Phi): ";

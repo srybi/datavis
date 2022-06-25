@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
-import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.Result;
 import de.th.ro.datavis.util.enums.InterpretationMode;

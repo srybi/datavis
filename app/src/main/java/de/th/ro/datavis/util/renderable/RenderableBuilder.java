@@ -3,9 +3,6 @@ package de.th.ro.datavis.util.renderable;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
-
-import androidx.navigation.fragment.DialogFragmentNavigatorDestinationBuilder;
 
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.MaterialFactory;
@@ -16,7 +13,7 @@ import com.google.ar.sceneform.rendering.ShapeFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
+import de.th.ro.datavis.util.constants.FFSIntensityColor;
 import de.th.ro.datavis.util.FileProviderDatavis;
 
 public class RenderableBuilder {

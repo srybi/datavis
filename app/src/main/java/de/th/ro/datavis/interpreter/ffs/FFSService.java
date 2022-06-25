@@ -19,6 +19,7 @@ import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.Result;
+import de.th.ro.datavis.util.constants.FFSIntensityColor;
 import de.th.ro.datavis.util.enums.InterpretationMode;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 

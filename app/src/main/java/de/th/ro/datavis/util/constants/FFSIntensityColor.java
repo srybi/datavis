@@ -1,4 +1,4 @@
-package de.th.ro.datavis.interpreter.ffs;
+package de.th.ro.datavis.util.constants;
 
 import com.google.ar.sceneform.rendering.Color;
 
