@@ -1,4 +1,4 @@
-package de.th.ro.datavis.util.worker;
+package de.th.ro.datavis.imp.worker;
 
 import androidx.work.Data;
 import androidx.work.ListenableWorker;

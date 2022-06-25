@@ -51,7 +51,7 @@ import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.FileRequests;
 import de.th.ro.datavis.util.constants.IntentConst;
 import de.th.ro.datavis.util.filehandling.FileHandler;
-import de.th.ro.datavis.util.worker.WorkerRequestUtil;
+import de.th.ro.datavis.imp.worker.WorkerRequestUtil;
 
 public class ImportActivity extends BaseActivity{
 
