@@ -38,6 +38,8 @@ import java.util.concurrent.Future;
 import de.th.ro.datavis.MainActivity;
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.database.AppDatabase;
+import de.th.ro.datavis.imp.worker.InterpretFFSWorker;
+import de.th.ro.datavis.imp.worker.InterpretMetaDataWorker;
 import de.th.ro.datavis.instructions.ImportInstructionsActivity;
 import de.th.ro.datavis.interpreter.csv.MetadataInterpreter;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;

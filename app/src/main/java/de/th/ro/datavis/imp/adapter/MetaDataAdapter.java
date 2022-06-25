@@ -1,7 +1,6 @@
 package de.th.ro.datavis.imp.adapter;
 
 import android.content.Context;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +10,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import de.th.ro.datavis.R;
-import de.th.ro.datavis.models.AntennaField;
-import de.th.ro.datavis.models.MetaData;
 
 public class MetaDataAdapter extends ArrayAdapter<String> {
 

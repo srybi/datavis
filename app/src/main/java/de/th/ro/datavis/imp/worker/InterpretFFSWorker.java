@@ -1,4 +1,4 @@
-package de.th.ro.datavis.imp;
+package de.th.ro.datavis.imp.worker;
 
 import android.content.Context;
 import android.content.SharedPreferences;
