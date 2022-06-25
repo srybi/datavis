@@ -16,7 +16,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -84,6 +83,7 @@ public class ImportActivity extends BaseActivity{
 
         setContentView(R.layout.activity_import);
         setFragmentContainerView(R.id.importFragment);
+
         Toolbar toolbar = findViewById(R.id.import_toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -128,12 +128,15 @@ public class ImportActivity extends BaseActivity{
         return true;
     }
 
-
+    /**
+     *  Initializes the Import View with the current data given
+     */
     private void initImportView(){
         Log.d(TAG, "initImportView: Initializing ... " + currentAntenna +", "+ currentAntennaFields +", "+ currentMetaDataType);
 
         importView = new ImportView(this, currentAntenna, currentAntennaFields, currentMetaDataType) {
 
+            //handles Antenna description
             public TextWatcher descriptionChanged(){
                 String description = currentAntenna.description;
                 return new TextWatcher() {
@@ -181,7 +184,7 @@ public class ImportActivity extends BaseActivity{
                 if(editMode){
                     executeRunnable(deleteCurrentAntenna());
                 }
-                executeRunnable(saveAntenna());
+                executeRunnable(saveCurrentAntenna());
 
                 int currentAntennaID = currentAntenna.id;
 
@@ -206,31 +209,41 @@ public class ImportActivity extends BaseActivity{
         };
     }
 
-
+    /**
+     * Handles the back arrow press
+     * @return
+     */
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
     }
+
+    /**
+     * Override the default onBackPressed() function to create extra functionality
+     */
     @Override
     public void onBackPressed() {
+        //Confirm button got pressed. Leaving this page is not allowed
         if(freeze){
             return;
         }
+        //Nothing has changed. You can leave safely
         if(!hasChanged){
             super.onBackPressed();
             return;
         }
+        //Something changed but it didn't save: Show confirm dialog
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
+                        //leave import page and dismiss changes
                         ImportActivity.super.onBackPressed();
                         break;
-
                     case DialogInterface.BUTTON_NEGATIVE:
-                        //Do your No progress
+                        //Do nothing
                         break;
                 }
             }
@@ -240,7 +253,10 @@ public class ImportActivity extends BaseActivity{
                 .setNegativeButton(R.string.no, dialogClickListener).show();
     }
 
-
+    /**
+     * Initialize data when using the import button
+     * @return Runnable to execute
+     */
     public Runnable initImport(){
         Log.d(TAG, "addNewAntennaConfig: executing background thread");
         return new Runnable() {
@@ -253,8 +269,26 @@ public class ImportActivity extends BaseActivity{
         };
     }
 
+    /**
+     * Initialize data when using the edit button
+     * @return Runnable to execute
+     */
+    private Runnable initEditMode(){
+        return new Runnable() {
+            @Override
+            public void run() {
+                //load Antenna
+                currentAntenna = appDb.antennaDao().find_Background(givenAntennaId).get(0);
+                Log.d(TAG, "initEditMode: " + currentAntenna.toString());
+                currentAntennaFields = appDb.antennaFieldDao().findByAntennaId_BackGround(givenAntennaId);
+                currentMetaDataType = appDb.metadataDao().findDistinctTypesByAntennaId_Background(givenAntennaId);
+                currentMetaData = appDb.metadataDao().findAllByAntennaId_Background(givenAntennaId);
+            }
+        };
+    }
 
-    private Runnable saveAntenna(){
+
+    private Runnable saveCurrentAntenna(){
         return new Runnable() {
             @Override
             public void run() {
@@ -276,43 +310,6 @@ public class ImportActivity extends BaseActivity{
         };
     }
 
-    private Runnable initEditMode(){
-        return new Runnable() {
-            @Override
-            public void run() {
-                //load Antenna
-                currentAntenna = appDb.antennaDao().find_Background(givenAntennaId).get(0);
-                Log.d(TAG, "initEditMode: " + currentAntenna.toString());
-                currentAntennaFields = appDb.antennaFieldDao().findByAntennaId_BackGround(givenAntennaId);
-                currentMetaDataType = appDb.metadataDao().findDistinctTypesByAntennaId_Background(givenAntennaId);
-                currentMetaData = appDb.metadataDao().findAllByAntennaId_Background(givenAntennaId);
-            }
-        };
-    }
-
-
-    public void executeRunnable(Runnable runnable){
-        ExecutorService executorService  = Executors.newSingleThreadExecutor();
-        Future future = executorService.submit(runnable);
-        try{
-            future.get();
-        }catch (Exception e){
-            Log.d(TAG, "executeRunnable: " + e.getMessage());
-        }
-    }
-
-    public void setMetaDataTypes(String[] metaDataUris) {
-        Log.d(TAG, "setMetaDataUris: storing uris in var"  );
-        currentMetaDataType = new LinkedList<>();
-
-        for(String metaData : metaDataUris){
-            Uri u = Uri.parse(metaData);
-            currentMetaDataType.add(FileHandler.queryName(getContentResolver(), u));
-            Log.d(TAG, "setMetaDataUris: storing metadatatypes in var");
-        }
-        Log.d(TAG, "setMetaDataUris: finished"  );
-    }
-
     private Runnable persistAntennaFields(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         int antennaId = preferences.getInt("ID", 1);
@@ -327,6 +324,41 @@ public class ImportActivity extends BaseActivity{
         };
     }
 
+    /**
+     * Used to execute a Runnable
+     * @param runnable - One of them above
+     */
+    public void executeRunnable(Runnable runnable){
+        ExecutorService executorService  = Executors.newSingleThreadExecutor();
+        Future future = executorService.submit(runnable);
+        try{
+            future.get();
+        }catch (Exception e){
+            Log.d(TAG, "executeRunnable: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Set currentMetaDataTypes to display them to the user;
+     * @param metaDataUris - String Array of all URIs found after folder import
+     */
+    public void setMetaDataTypes(String[] metaDataUris) {
+        Log.d(TAG, "setMetaDataUris: storing uris in var"  );
+        currentMetaDataType = new LinkedList<>();
+
+        for(String metaData : metaDataUris){
+            Uri u = Uri.parse(metaData);
+            currentMetaDataType.add(FileHandler.queryName(getContentResolver(), u));
+            Log.d(TAG, "setMetaDataUris: storing metadatatypes in var");
+        }
+        this.metaDataUris = metaDataUris;
+        Log.d(TAG, "setMetaDataUris: finished"  );
+    }
+
+    /**
+     * Creates and sets current antenna fields to display them to the user
+     * @param antennaFieldsUri - String Array of all URIs found after folder import
+     */
     public void setAntennaFields(String[] antennaFieldsUri){
         currentAntennaFields = new LinkedList<>();
         for(String antennaField : antennaFieldsUri){
@@ -357,6 +389,7 @@ public class ImportActivity extends BaseActivity{
      * |    used for file handling       |
      *  ==================================
      */
+
     public void openFileDialog(int requestCode){
         String action;
         if (SDK_INT >= Build.VERSION_CODES.Q) {
@@ -426,10 +459,6 @@ public class ImportActivity extends BaseActivity{
     private void handleFolderImport(Uri uri){
         Map<Integer, String[]> pairURI = FileHandler.traverseDirectoryEntries(uri, getContentResolver());
         setMetaDataTypes(pairURI.get(0));
-
-        // Cache Metadata URIs for Worker
-        metaDataUris = pairURI.get(0);
-
         setAntennaFields(pairURI.get(1));
     }
 
