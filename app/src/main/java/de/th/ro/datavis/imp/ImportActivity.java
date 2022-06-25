@@ -197,7 +197,11 @@ public class ImportActivity extends BaseActivity{
 
         };
     }
-
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
     @Override
     public void onBackPressed() {
         if(!hasChanged){
