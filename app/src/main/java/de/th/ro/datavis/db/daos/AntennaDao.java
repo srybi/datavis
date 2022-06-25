@@ -13,7 +13,7 @@ import de.th.ro.datavis.models.Antenna;
 
 @Dao
 public interface AntennaDao {
-    @Query("SELECT * FROM antenna")
+    @Query("SELECT * FROM antenna ORDER BY id")
     LiveData<List<Antenna>> getAll();
 
     @Query("SELECT * FROM antenna")

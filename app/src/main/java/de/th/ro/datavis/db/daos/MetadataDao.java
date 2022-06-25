@@ -15,7 +15,7 @@ import de.th.ro.datavis.models.MetaData;
 
 @Dao
 public interface MetadataDao {
-    @Query("SELECT * FROM MetaData")
+    @Query("SELECT * FROM MetaData ORDER BY antennaID")
     LiveData<List<MetaData>> getAll();
 
     @Query("SELECT * FROM MetaData")

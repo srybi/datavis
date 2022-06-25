@@ -29,7 +29,7 @@ public interface AtomicFieldDao {
     @Query("DELETE FROM atomic_field")
     void deleteAll();
 
-    @Query("SELECT * from atomic_field ORDER BY tilt ASC")
+    @Query("SELECT * from atomic_field ORDER BY antennaId ASC")
     LiveData<List<AtomicField>> getAllAtomicFields();
 
     @Query("SELECT * from atomic_field WHERE interpretationMode = :interpretationMode AND antennaId = :antennaId AND tilt = :tilt AND frequency = :frequency")
