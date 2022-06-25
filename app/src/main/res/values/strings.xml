@@ -79,6 +79,7 @@
     <string name="toastRedundantMetadata">Metadata already read!</string>
     <string name="toastFolderImport">Folder import running!</string>
     <string name="toastFolderImportDone">Folder import all done!</string>
+    <string name="unsavedChangesWarning">You have unsaved changes. Do you want to exit?</string>
 
 
     <!-- Instructions -->
