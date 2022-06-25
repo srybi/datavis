@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.th.ro.datavis.db.database.AppDatabase;
+import de.th.ro.datavis.imp.ImportActivity;
 import de.th.ro.datavis.interfaces.IObserver;
 import de.th.ro.datavis.interpreter.ffs.FFSIntensityColor;
 import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
@@ -175,8 +176,10 @@ public class ARActivity extends BaseActivity implements
         itemSettings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                //open bottom sheet
-                bottomSheetHandler.showBottomSheet();
+                //open bottom sheet wenn .ffs Available sind
+                if(ffsAvailable) {
+                    bottomSheetHandler.showBottomSheet();
+                }
                 return false;
             }
         });
