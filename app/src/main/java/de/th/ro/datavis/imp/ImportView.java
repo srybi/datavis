@@ -17,7 +17,6 @@ import de.th.ro.datavis.imp.adapter.MetaDataAdapter;
 import de.th.ro.datavis.interfaces.IImportOptions;
 import de.th.ro.datavis.models.Antenna;
 import de.th.ro.datavis.models.AntennaField;
-import de.th.ro.datavis.models.MetaData;
 import de.th.ro.datavis.ui.progressBar.ProgressbarHolder;
 
 public abstract class ImportView implements IImportOptions {
@@ -29,14 +28,13 @@ public abstract class ImportView implements IImportOptions {
 
     private Button btnAddImportAntenna;
     private Button btnAddDefaultAntenna;
-    private Button btnAddMetaDataFolder;
+    private Button btnImportFolder;
     private Button btnConfirm;
 
     private EditText configName;
 
 
     TextView tvHeadLine;
-    TextView tvMetaIndicator;
 
     FragmentActivity fragmentActivity;
 
@@ -85,13 +83,13 @@ public abstract class ImportView implements IImportOptions {
         configName = fa.findViewById(R.id.configName);
         btnAddImportAntenna = fa.findViewById(R.id.btn_import_antenna);
         btnAddDefaultAntenna = fa.findViewById(R.id.btn_add_default);
-        btnAddMetaDataFolder = fa.findViewById(R.id.btn_import_Folder);
+        btnImportFolder = fa.findViewById(R.id.btn_import_Folder);
         btnConfirm = fa.findViewById(R.id.btn_confirm);
 
         configName.addTextChangedListener(descriptionChanged());
         btnAddImportAntenna.setOnClickListener(v -> { addImportAntenna(); });
         btnAddDefaultAntenna.setOnClickListener(v -> {addDefaultAntenna();});
-        btnAddMetaDataFolder.setOnClickListener( v -> { addFolder(); });
+        btnImportFolder.setOnClickListener(v -> { addFolder(); });
         btnConfirm.setOnClickListener(v -> {confirmImport(); });
     }
 
@@ -118,20 +116,18 @@ public abstract class ImportView implements IImportOptions {
         progressBar = new ProgressbarHolder(fa.findViewById(R.id.simpleProgressBar));
     }
 
-    public void hideProgressBar(){
-        progressBar.hideProgressBar();
-    }
 
     public void showProgressBar(){
         progressBar.showProgressBar();
     }
 
-
-    public void updateData(FragmentActivity fa, Antenna antenna, List<AntennaField> antennaFieldList, MetaData metaData){
-        initAntennaHeadLine(fa, antenna);
-        initFFSScrollable(fa, antennaFieldList);
+    public void disableAllButtons(){
+        btnAddImportAntenna.setEnabled(false);
+        btnAddDefaultAntenna.setEnabled(false);
+        btnImportFolder.setEnabled(false);
+        btnConfirm.setEnabled(false);
+        configName.setEnabled(false);
     }
-
 
     public FragmentActivity getFragmentActivity() {
         return fragmentActivity;

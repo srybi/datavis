@@ -36,6 +36,9 @@
         <entry key="..\:/projects/datavis/app/src/main/res/layout/list_item_antenna_settings.xml" value="0.21034630183839248" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/modal_bottom_sheet.xml" value="0.22" />
         <entry key="..\:/projects/datavis/app/src/main/res/layout/view_model_title.xml" value="0.31666666666666665" />
+        <entry key="..\:/projects/datavis/app/src/main/res/menu/menu_ar.xml" value="0.25908507909362977" />
+        <entry key="..\:/projects/datavis/app/src/main/res/menu/menu_import.xml" value="0.24112868747327917" />
+        <entry key="..\:/projects/datavis/app/src/main/res/menu/menu_main.xml" value="0.25908507909362977" />
         <entry key="..\:/projects/datavis/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.123" />
         <entry key="app/src/main/res/drawable/ic_about.xml" value="0.4235" />
         <entry key="app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.346" />

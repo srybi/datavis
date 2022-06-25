@@ -16,6 +16,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -73,6 +74,7 @@ public class ImportActivity extends BaseActivity{
     int givenAntennaId;
     boolean editMode= false;
     boolean hasChanged=false;
+    boolean freeze=false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -187,6 +189,7 @@ public class ImportActivity extends BaseActivity{
                 handleMetaDataImportWork(currentAntennaID);
 
                 executeRunnable(persistAntennaFields());
+                freezeImportActivity();
                 handleFFSImportWork("URIFFS", ffsUris);
             }
 
@@ -195,8 +198,15 @@ public class ImportActivity extends BaseActivity{
                 preferences.edit().putInt("ID", currentAntennaID).apply();
             }
 
+            private void freezeImportActivity() {
+                freeze = true;
+                importView.disableAllButtons();
+            }
+
         };
     }
+
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
@@ -204,6 +214,9 @@ public class ImportActivity extends BaseActivity{
     }
     @Override
     public void onBackPressed() {
+        if(freeze){
+            return;
+        }
         if(!hasChanged){
             super.onBackPressed();
             return;
