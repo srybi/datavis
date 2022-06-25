@@ -1,4 +1,4 @@
-package de.th.ro.datavis.ui.settings.ffs;
+package de.th.ro.datavis.settings.antenna;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,31 +21,26 @@ import java.util.concurrent.Future;
 
 import de.th.ro.datavis.R;
 import de.th.ro.datavis.database.AppDatabase;
-import de.th.ro.datavis.models.AtomicField;
+import de.th.ro.datavis.models.Antenna;
 
-public class AtomicFieldSettingsAdapter extends ArrayAdapter<AtomicField> {
-    public AtomicFieldSettingsAdapter(@NonNull Context context, @NonNull List<AtomicField> objects) {
+public class AntennaSettingsAdapter extends ArrayAdapter<Antenna> {
+    public AntennaSettingsAdapter(@NonNull Context context, @NonNull List<Antenna> objects) {
         super(context, 0, objects);
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        AtomicField field = getItem(position);
+        Antenna antenna = getItem(position);
         if(convertView == null){
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_atomicfield_settings, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_antenna_settings, parent, false);
         }
+        TextView tvId = (TextView) convertView.findViewById(R.id.text_view_antenna_id);
+        tvId.setText(String.valueOf("ID: "+antenna.id));
+        TextView tvName = (TextView) convertView.findViewById(R.id.text_view_antenna_name);
+        tvName.setText(antenna.description);
 
-        TextView tvAntId = (TextView) convertView.findViewById(R.id.text_view_field_antenna_id);
-        tvAntId.setText("Antenna Id: "+field.antennaId);
-        TextView tvFreq = (TextView) convertView.findViewById(R.id.text_view_field_freq);
-        tvFreq.setText("Freq: " +field.frequency);
-        TextView tvTilt = (TextView) convertView.findViewById(R.id.text_view_field_tilt);
-        tvTilt.setText("Tilt: "+field.tilt);
-        TextView tvIntMode = (TextView) convertView.findViewById(R.id.text_view_field_int_mode);
-        tvIntMode.setText(String.valueOf(field.interpretationMode));
-
-        ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.button_field_delete);
+        ImageButton deleteButton = (ImageButton) convertView.findViewById(R.id.button_antenna_delete);
         View finalConvertView = convertView;
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,8 +51,7 @@ public class AtomicFieldSettingsAdapter extends ArrayAdapter<AtomicField> {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
                                 //Do your Yes progress
-                                deleteField(field);
-                                break;
+                                deleteAntenna(antenna);                                break;
 
                             case DialogInterface.BUTTON_NEGATIVE:
                                 //Do your No progress
@@ -66,8 +60,7 @@ public class AtomicFieldSettingsAdapter extends ArrayAdapter<AtomicField> {
                     }
                 };
                 AlertDialog.Builder ab = new AlertDialog.Builder(finalConvertView.getContext());
-                String fieldDescription = "Antenna ID: " +field.antennaId + "; Freq: " + field.frequency + "; Tilt: " + field.tilt + "; Interpretationmode: " + field.interpretationMode;
-                ab.setMessage(getContext().getString(R.string.clear_one_confirm) + " " + fieldDescription + " ?").setPositiveButton(R.string.yes, dialogClickListener)
+                ab.setMessage(getContext().getString(R.string.clear_one_confirm) + " " + antenna.description + " ?").setPositiveButton(R.string.yes, dialogClickListener)
                         .setNegativeButton(R.string.no, dialogClickListener).show();
 
             }
@@ -76,12 +69,12 @@ public class AtomicFieldSettingsAdapter extends ArrayAdapter<AtomicField> {
         return convertView;
     }
 
-    private void deleteField(AtomicField field){
+    private void deleteAntenna(Antenna antenna){
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future future = executor.submit(new Runnable() {
             @Override
             public void run() {
-                AppDatabase.getInstance(getContext()).atomicFieldDao().delete(field);
+                AppDatabase.getInstance(getContext()).antennaDao().delete(antenna);
             }
         });
         try {
@@ -91,4 +84,5 @@ public class AtomicFieldSettingsAdapter extends ArrayAdapter<AtomicField> {
         }
         notifyDataSetChanged();
     }
+
 }

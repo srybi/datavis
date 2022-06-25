@@ -1,4 +1,4 @@
-package de.th.ro.datavis.ui.settings;
+package de.th.ro.datavis.settings;
 
 import android.content.DialogInterface;
 import android.os.Bundle;

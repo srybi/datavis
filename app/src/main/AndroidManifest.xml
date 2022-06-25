@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Datavis">
         <activity
-            android:name=".ui.settings.SettingsActivity"
+            android:name=".settings.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings"
             android:theme="@style/Theme.Datavis.NoActionBar"

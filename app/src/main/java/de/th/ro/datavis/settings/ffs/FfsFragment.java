@@ -1,4 +1,4 @@
-package de.th.ro.datavis.ui.settings.ffs;
+package de.th.ro.datavis.settings.ffs;
 
 import android.os.Bundle;
 

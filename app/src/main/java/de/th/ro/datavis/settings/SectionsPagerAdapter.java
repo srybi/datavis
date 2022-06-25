@@ -1,4 +1,4 @@
-package de.th.ro.datavis.ui.settings;
+package de.th.ro.datavis.settings;
 
 import android.content.Context;
 
@@ -8,10 +8,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
-import de.th.ro.datavis.ui.settings.antenna.AntennaFragment;
+import de.th.ro.datavis.settings.antenna.AntennaFragment;
 import de.th.ro.datavis.R;
-import de.th.ro.datavis.ui.settings.ffs.FfsFragment;
-import de.th.ro.datavis.ui.settings.metadata.MetadataFragment;
+import de.th.ro.datavis.settings.ffs.FfsFragment;
+import de.th.ro.datavis.settings.metadata.MetadataFragment;
 
 /**
  * A [FragmentPagerAdapter] that returns a fragment corresponding to

@@ -21,7 +21,7 @@ import de.th.ro.datavis.database.AppDatabase;
 import de.th.ro.datavis.instructions.AppInstructionsActivity;
 import de.th.ro.datavis.main.MainFragment;
 import de.th.ro.datavis.models.AntennaField;
-import de.th.ro.datavis.ui.settings.SettingsActivity;
+import de.th.ro.datavis.settings.SettingsActivity;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.filehandling.FileHandler;
 

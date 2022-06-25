@@ -1,4 +1,4 @@
-package de.th.ro.datavis.ui.settings.antenna;
+package de.th.ro.datavis.settings.antenna;
 
 import android.os.Bundle;
 

@@ -1,4 +1,4 @@
-package de.th.ro.datavis.ui.settings.metadata;
+package de.th.ro.datavis.settings.metadata;
 
 import android.os.Bundle;
 
