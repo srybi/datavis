@@ -62,19 +62,6 @@ public class InterpretMetaDataWorker extends Worker {
       currentAntennaID = getInputData().getInt(IntentConst.INTENT_EXTRA_ANTENNA_ID,0);
    }
 
-   private String[] prepareOutput(List<MetaData> result){
-      String[] dataArray = new String[result.size()];
-      int i = 0;
-      for(MetaData md : result){
-         try {
-            dataArray[i] = objectMapper.writeValueAsString(md);
-            i++;
-         } catch (IOException e) {
-            Log.d(TAG, "prepareOutput: Something went wrong...Skipping meta data object");
-         }
-      }
-      return dataArray;
-   }
 
    public List<MetaData> interpretMetaData(Uri uri){
       return metaInt.getCSVMetadata(uri, getApplicationContext().getContentResolver());
