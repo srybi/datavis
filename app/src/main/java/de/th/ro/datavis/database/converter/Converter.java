@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.th.ro.datavis.models.Sphere;
-import de.th.ro.datavis.util.enums.InterpretationMode;
+import de.th.ro.datavis.util.constants.InterpretationMode;
 
 public class Converter {
 

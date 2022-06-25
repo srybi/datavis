@@ -3,7 +3,7 @@ package de.th.ro.datavis.interpreter.calc;
 import java.util.Arrays;
 
 import de.th.ro.datavis.models.FFSLine;
-import de.th.ro.datavis.util.enums.InterpretationMode;
+import de.th.ro.datavis.util.constants.InterpretationMode;
 
 public class Calc {
 

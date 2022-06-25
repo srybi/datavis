@@ -2,7 +2,7 @@ package de.th.ro.datavis.interfaces;
 
 import java.math.BigDecimal;
 
-import de.th.ro.datavis.util.enums.InterpretationMode;
+import de.th.ro.datavis.util.constants.InterpretationMode;
 
 public interface ICalc {
 

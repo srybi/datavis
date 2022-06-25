@@ -5,12 +5,10 @@ import static androidx.room.ForeignKey.CASCADE;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import androidx.room.PrimaryKey;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import de.th.ro.datavis.util.enums.InterpretationMode;
+import de.th.ro.datavis.util.constants.InterpretationMode;
 
 @Entity(tableName = "atomic_field", primaryKeys = {"antennaId","" + "tilt", "frequency", "interpretationMode"}, foreignKeys ={ @ForeignKey(entity = Antenna.class,
                 parentColumns = "id",

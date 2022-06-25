@@ -6,22 +6,11 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import static de.th.ro.datavis.util.enums.InterpretationMode.Linear;
-import static de.th.ro.datavis.util.enums.InterpretationMode.Logarithmic;
+import static de.th.ro.datavis.util.constants.InterpretationMode.Linear;
+import static de.th.ro.datavis.util.constants.InterpretationMode.Logarithmic;
 
-import android.util.Log;
-
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-
-import de.th.ro.datavis.interfaces.IInterpreter;
 import de.th.ro.datavis.interpreter.calc.Calc;
-import de.th.ro.datavis.interpreter.ffs.FFSInterpreter;
 import de.th.ro.datavis.models.FFSLine;
-import de.th.ro.datavis.models.Sphere;
-import de.th.ro.datavis.util.enums.InterpretationMode;
-import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 /**
  * Testing the functionality of Calc and FFSInterpreter

@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import de.th.ro.datavis.models.AtomicField;
 import de.th.ro.datavis.models.Result;
-import de.th.ro.datavis.util.enums.InterpretationMode;
+import de.th.ro.datavis.util.constants.InterpretationMode;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 public interface IInterpreter {

@@ -50,7 +50,7 @@ import de.th.ro.datavis.ui.bottomSheet.BottomSheet;
 import de.th.ro.datavis.ui.bottomSheet.BottomSheetHandler;
 import de.th.ro.datavis.util.activity.BaseActivity;
 import de.th.ro.datavis.util.constants.IntentConst;
-import de.th.ro.datavis.util.enums.InterpretationMode;
+import de.th.ro.datavis.util.constants.InterpretationMode;
 import de.th.ro.datavis.util.renderable.RenderableBuilder;
 
 import androidx.appcompat.widget.Toolbar;

@@ -25,7 +25,7 @@ import de.th.ro.datavis.models.Result;
 import de.th.ro.datavis.models.Sphere;
 import de.th.ro.datavis.util.Helper;
 import de.th.ro.datavis.util.constants.FFSConstants;
-import de.th.ro.datavis.util.enums.InterpretationMode;
+import de.th.ro.datavis.util.constants.InterpretationMode;
 import de.th.ro.datavis.util.exceptions.FFSInterpretException;
 
 public class FFSInterpreter implements IInterpreter {
