@@ -3,6 +3,7 @@ package de.th.ro.datavis.instructions;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 
 import de.th.ro.datavis.R;
@@ -22,7 +23,10 @@ public class AppInstructionsActivity extends BaseActivity {
 
         Toolbar toolbar = findViewById(R.id.app_instructions_toolbar);
         setSupportActionBar(toolbar);
-
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         appInstructionsFragment = new AppInstructionsFragment();
         navigateTo(appInstructionsFragment);
