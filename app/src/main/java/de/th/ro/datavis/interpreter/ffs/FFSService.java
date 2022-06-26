@@ -50,14 +50,20 @@ public class FFSService {
          if (filename.charAt(start+1)=='.') {
             end = filename.indexOf("0e") + 5;
         }
-        try {
-            Double.parseDouble(filename.substring(start, end));
-        } catch (NumberFormatException e)
-        {
-            fields = Result.error(e.getMessage());
-        }
+         if (start == 1)
+            fields = interpreter.interpretData(stream, scalingFactor, 0, antennaId);
+        else {
+            try {
+                 Double.parseDouble(filename.substring(start, end));
+             } catch (NumberFormatException e)
+             {
+                 fields = Result.error(e.getMessage());
+             }
+         }
         if (fields == null)
             fields = interpreter.interpretData(stream, scalingFactor, Double.parseDouble(filename.substring(start, end)), antennaId);
+        // Kein Tilt im Dateinamen
+
         if(fields.isSuccess()){
             Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> pair = fields.getData();
             saveSpheresIfNotExist(pair.first, pair.second);
