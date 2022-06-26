@@ -33,7 +33,6 @@ public class FFSService {
     private AtomicField atomicField;
     private List<Double> frequencies;
     private List<Double> tilts;
-    private double tilt;
 
     private Context context;
 
@@ -45,33 +44,20 @@ public class FFSService {
     }
 
     public void interpretData(InputStream stream, double scalingFactor, int antennaId, String filename) throws FFSInterpretException{
-        double floatingPoint = 1;
         int start = filename.indexOf("_T") + 2;
         int end = start + 2;
-
-        if (filename.charAt(start+1)=='.') {
-            end = filename.indexOf("0e") + 1;
-            String subString = filename.substring(end+1, end+4);
-            floatingPoint = Math.pow(10, Double.parseDouble(subString));
+        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = null;
+         if (filename.charAt(start+1)=='.') {
+            end = filename.indexOf("0e") + 5;
         }
-        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(stream, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPoint, antennaId);
-        if(fields.isSuccess()){
-            Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> pair = fields.getData();
-            saveSpheresIfNotExist(pair.first, pair.second);
-        }else{
-            throw new FFSInterpretException(fields.getMessage());
+        try {
+            Double.parseDouble(filename.substring(start, end));
+        } catch (NumberFormatException e)
+        {
+            fields = Result.error(e.getMessage());
         }
-    }
-
-    public void interpretData(File file, double scalingFactor, int antennaId) throws FFSInterpretException{
-        double floatingPiont = 1;
-        String filename = file.getName();
-        int start = filename.indexOf("_T") + 2, end = start + 2;
-        if (filename.charAt(start+1)=='.') {
-            end = filename.indexOf("e+");
-            floatingPiont = Math.pow(10, Double.parseDouble(filename.substring(end+2, end+4)));
-        }
-        Result<Pair<ArrayList<AtomicField>, ArrayList<AtomicField>>> fields = interpreter.interpretData(file, scalingFactor, Double.parseDouble(filename.substring(start, end))*floatingPiont, antennaId);
+        if (fields == null)
+            fields = interpreter.interpretData(stream, scalingFactor, Double.parseDouble(filename.substring(start, end)), antennaId);
         if(fields.isSuccess()){
             Pair<ArrayList<AtomicField>, ArrayList<AtomicField>> pair = fields.getData();
             saveSpheresIfNotExist(pair.first, pair.second);
@@ -160,23 +146,6 @@ public class FFSService {
             e.printStackTrace();
         }
         return new ArrayList<>();
-    }
-
-    public double TiltForAntenna(int antennaID) {
-        Future future = executor.submit(new Runnable(){
-            @Override
-            public void run() {
-                tilt = db.atomicFieldDao().getAtomicFieldsByAntennaFieldIdSync(antennaID).get(0).tilt;
-            }
-        });
-
-        try {
-            future.get();
-            return tilt;
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return tilt;
     }
 
     public FFSIntensityColor mapToColor(double intensity, double maxItensity) {
