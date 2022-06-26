@@ -62,7 +62,7 @@
     <string name="action_import">Import</string>
 
     <!-- Import -->
-    <string name="btn_add_default">Use Default</string>
+    <string name="btn_add_default">Use Default Antenna</string>
     <string name="btn_add_new_antenna">Import Antenna</string>
     <string name="btn_add_metaData">Add Metadata</string>
     <string name="btn_add_metaFolder">Import Folder</string>
@@ -83,13 +83,21 @@
 
 
     <!-- Instructions -->
-    <string name="app_instructions_text_1">1) Click on one of the items\n \  \  to start the visualization\n \  \  If there are none, click Import.</string>
-    <string name="app_instructions_text_2">2) Press the Settings Icon or swipe up\n \  \  to show the Bottom Sheet</string>
-    <string name="app_instructions_text_3">3) Use the Bottom Sheet to get\n \  \  more information about the\n \  \  field strength of the antenna\n \  \  and to change frequency and tilt</string>
-    <string name="import_instructions_text_1">1) *OPTIONAL*\n \  \  Change the name by clicking on it</string>
-    <string name="import_instructions_text_2">2) If you want to use a custom antenna,\n \  \  add one by clicking on\n \  \  \'IMPORT ANTENNA\', otherwise\n \  \  click on \'USE DEFAULT\'</string>
-    <string name="import_instructions_text_3">3) Click on \'IMPORT FOLDER\'\n \  \  to add Metadata and .ffs files</string>
-    <string name="import_instructions_text_4">4) Click on \'CONFIRM\' to confirm</string>
+    <string name="app_instructions_text_1">Press the Import Button to Import new Antennas and FarFieldSource Data to visualize in AR.</string>
+
+    <string name="app_instructions_text">All Imported Antennas will be shown with 3 buttons.</string>
+    <string name="app_instructions_text_eye">Press the Eye to visualize the Antenna in AR.</string>
+    <string name="app_instructions_text_pen">Press the Pencil to edit the Antenna Data.</string>
+    <string name="app_instructions_text_cross">Press the red X, to delete the Antenna.</string>
+
+    <string name="import_instructions_text_default_antenna">Click to assign the default Antenna Model</string>
+    <string name="import_instructions_text_import_antenna">Click to Import a Antenna Model.
+        \nThe Antenna Model needs to be a .glb or .gltf File</string>
+    <string name="import_instructions_text_import_folder">Click to Import a Folder with all relevant Data.
+        \nAntennafields need to be a .ffs File.
+        \nMetadata needs to be a .csv File.</string>
+    <string name="import_instructions_text_confirm">Click to Confirm the Import of the selected Import folder.
+        \nDepending on the Data Size, this may take a while. </string>
 
 
     <!-- about -->
