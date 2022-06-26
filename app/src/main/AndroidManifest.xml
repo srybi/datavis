@@ -22,9 +22,13 @@
         <activity
             android:name=".settings.SettingsActivity"
             android:exported="false"
-            android:label="@string/title_activity_settings"
+            android:label="@string/app_name"
             android:theme="@style/Theme.Datavis.NoActionBar"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="de.th.ro.datavis.main.MainActivity" />
+        </activity>
 
         <meta-data
             android:name="com.google.ar.core"
