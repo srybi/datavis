@@ -74,6 +74,7 @@ public class ImportActivity extends BaseActivity{
 
     int givenAntennaId;
     boolean editMode= false;
+    boolean newFolderImported = false;
     boolean hasChanged=false;
     boolean freeze=false;
 
@@ -183,9 +184,14 @@ public class ImportActivity extends BaseActivity{
 
             @Override
             public void confirmImport(){
-                if(editMode){
+                if(editMode && newFolderImported){
+                    //make use of on delete cascade
                     executeRunnable(deleteCurrentAntenna());
+                }else if(editMode) {
+                    //just update and keep current data
+                    executeRunnable(updateCurrentAntenna());
                 }
+
                 executeRunnable(saveCurrentAntenna());
 
                 int currentAntennaID = currentAntenna.id;
@@ -299,6 +305,15 @@ public class ImportActivity extends BaseActivity{
                 if(!editMode){
                     handleNewlyInsertedAntenna(appDb);
                 }
+            }
+        };
+    }
+
+    private Runnable updateCurrentAntenna(){
+        return new Runnable() {
+            @Override
+            public void run() {
+                appDb.antennaDao().update(currentAntenna);
             }
         };
     }
@@ -440,6 +455,7 @@ public class ImportActivity extends BaseActivity{
             importView.showProgressBar();
             switch(requestCode){
                 case FileRequests.REQUEST_CODE_FOLDER:
+                    newFolderImported = true;
                     handleFolderImport(uri);
                     //showToast(getString(R.string.toastFolderImport));
                     initImportView();
